@@ -561,7 +561,7 @@ function applyState(d){
 // Admin panel: ` toggles it (ignored while typing in a field)
 const A = $('admin'), give = n => { S.coins += n; save(); refresh(); };
 // ponytail: passcode is checked in the browser (static site), so it stops casual use, not a determined hacker
-const ADMIN_HASH = 'bbcde6588c8268220df3279dc6dfe957c5cff95138111ebbe23389ffabbdb65f';
+const ADMIN_HASH = '371ca238d183a07b416fb16bace016f76d1d964efc554f3124291c61c690689b';
 let adminOk = false;
 async function toggleAdmin(){
   if (A.open) return A.close();
