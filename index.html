@@ -174,6 +174,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <h2>Upgrades</h2>
   <div id="buyRow"><button data-n="1">×1</button><button data-n="10">×10</button><button data-n="25">×25</button><button data-n="50">×50</button></div>
   <h2>Click Power</h2><div id="clickUps"></div>
+  <h2>Auto Clickers</h2><div id="kUps"></div>
   <h2>Passive Jun Income</h2><div id="autoUps"></div>
   <h2>Minigame</h2>
   <button class="up" id="fplay"><div class="ic">🐦</div><div><div class="nm">Flappy Jun</div><div class="ds">Every pipe cleared pays your click value.</div><div class="ct">Best: <span id="fbest">0</span></div></div></button>
@@ -238,6 +239,13 @@ const UPS = [
   {id:'fore',   t:'c', v:1500,   cost:6e5,   ic:'🪩', nm:'Forehead Reflector Array',   ds:'Visible from low Earth orbit.'},
   {id:'nasa',   t:'c', v:12000,  cost:1e7,   ic:'✂️', nm:'NASA-Grade Clippers',        ds:'Trims at 0.0001mm. Also trims the space-time continuum.'},
   {id:'hand',   t:'c', v:100000, cost:2e8,   ic:'🫵', nm:'The Hand of Jun',            ds:'One poke. Entire economies collapse.'},
+  // type k = auto clicks per second: real clicks on Jun, each worth your full click value
+  {id:'twitch', t:'k', v:.5,     cost:200,   ic:'🫨', nm:'Nervous Finger Twitch',      ds:'Clicks on its own. Doctors are concerned.'},
+  {id:'cat',    t:'k', v:1,      cost:2500,  ic:'🐈', nm:'Cat On The Mouse',           ds:'Refuses to move. Paws keep clicking.'},
+  {id:'drum',   t:'k', v:3,      cost:30000, ic:'🥁', nm:"Jun's Drummer Cousin",       ds:'Practices his blast beats on Jun\'s forehead.'},
+  {id:'pecker', t:'k', v:8,      cost:4e5,   ic:'🐦', nm:'Trained Woodpecker',         ds:'Mistook the buzzcut for tree bark. Committed anyway.'},
+  {id:'piston', t:'k', v:25,     cost:6e6,   ic:'🦾', nm:'Hydraulic Click Piston',     ds:'Industrial strength. OSHA has questions.'},
+  {id:'qclick', t:'k', v:100,    cost:1.5e8, ic:'⚛️', nm:'Quantum Clicker',            ds:'Clicks Jun in every timeline at once.'},
   {id:'blind',  t:'a', v:1,      cost:50,    ic:'🪟', nm:'Guy Behind the Blinds',      ds:'He watches. He clicks. Slowly.'},
   {id:'gym',    t:'a', v:4,      cost:300,   ic:'🏋️', nm:'Gym Bro Spotter',            ds:'"All you bro." Every rep: one coin.'},
   {id:'mom',    t:'a', v:8,      cost:700,   ic:'📞', nm:"Jun's Mom On Speed Dial",   ds:'"Are you eating?" Every call: coins.'},
@@ -265,6 +273,7 @@ const umult = u => 2 ** MILES.filter(m => own(u) >= m).length;
 const prestige = () => 1 + .1 * S.bp;
 const cost = (u, n = S.buy) => Math.ceil(u.cost * 1.15 ** own(u) * (1.15 ** n - 1) / .15);
 const perClick = () => (1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0)) * prestige();
+const autoCps = () => UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0);
 const perSec = () => UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige();
 const fmt = n => n < 1e3 ? Math.floor(n).toString()
   : (()=>{const u=['K','M','B','T','Qa','Qi']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
@@ -274,13 +283,13 @@ function earn(n){ n *= MULT; S.coins += n; S.total += n; S.lifetime += n; }
 
 // shop
 function renderShop(){
-  for (const [box,t] of [[$('clickUps'),'c'],[$('autoUps'),'a']]) {
+  for (const [box,t] of [[$('clickUps'),'c'],[$('kUps'),'k'],[$('autoUps'),'a']]) {
     box.innerHTML = '';
     for (const u of UPS.filter(u => u.t===t)) {
       const b = document.createElement('button');
       b.className = 'up'; b.dataset.id = u.id;
       b.innerHTML = `<div class="ic">${u.ic}</div><div style="flex:1;min-width:0"><div class="nm">${u.nm}</div><div class="ds">${u.ds}</div>
-        <div class="ct">🪙 <span class="p"></span> · +<span class="v"></span>${t==='c'?'/click':'/sec'} each</div><div class="ms"></div></div><div class="own"></div><div class="bar"></div>`;
+        <div class="ct">🪙 <span class="p"></span> · +<span class="v"></span>${{c:'/click', k:' clicks/sec', a:'/sec'}[t]} each</div><div class="ms"></div></div><div class="own"></div><div class="bar"></div>`;
       b.onclick = () => {
         const p = cost(u); if (S.coins < p) return;
         const before = umult(u); S.coins -= p; S.own[u.id] = own(u) + S.buy;
@@ -294,12 +303,12 @@ function renderShop(){
 }
 function refresh(){
   const fz = frenzy() > 1 ? ` · 💎 FRENZY ${Math.ceil((frenzyUntil - performance.now())/1000)}s` : '';
-  $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${fz}`;
+  $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}`;
   document.title = `${fmt(S.coins)} coins · Click Jun`;
   for (const b of document.querySelectorAll('.up[data-id]')) {
     const u = UPS.find(x => x.id===b.dataset.id), p = cost(u), can = S.coins >= p, next = MILES.find(m => own(u) < m);
     b.querySelector('.p').textContent = fmt(p) + (S.buy > 1 ? ` for ${S.buy}` : '');
-    b.querySelector('.v').textContent = fmt(u.v * umult(u) * prestige());
+    b.querySelector('.v').textContent = u.t === 'k' ? cps(u.v * umult(u)) : fmt(u.v * umult(u) * prestige());
     b.querySelector('.own').textContent = own(u) || '';
     b.querySelector('.ms').textContent = next ? `×2 output at ${next} owned` : 'All milestones reached';
     b.querySelector('.bar').style.width = Math.min(100, S.coins / p * 100) + '%';
@@ -455,6 +464,21 @@ function applyFx(){ $('fxBtn').textContent = S.fx ? '✨ Upgrade effects: on' : 
 $('fxBtn').onclick = () => { S.fx = !S.fx; save(); applyFx(); };
 applyFx();
 
+// auto clickers: income is continuous; on-screen click pops are capped at 8/sec so huge click rates don't lag
+const cps = n => n < 10 ? (Math.round(n*10)/10).toString() : fmt(n);
+let autoPopAcc = 0;
+function autoClick(dt){
+  const c = autoCps(); if (!c) return;
+  earn(perClick() * frenzy() * c * dt);
+  if ((autoPopAcc += Math.min(c, 8) * dt) < 1) return;
+  autoPopAcc -= 1;
+  const r = $('jun').getBoundingClientRect(); if (!r.width) return;
+  const ks = UPS.filter(u => u.t === 'k' && own(u)), u = ks[Math.random()*ks.length|0];
+  const e = {clientX:r.left + r.width*(.2 + Math.random()*.6), clientY:r.top + r.height*(.2 + Math.random()*.6)};
+  pop(`${u.ic} +${fmt(perClick() * frenzy() * Math.max(1, c/8))}`, e);
+  if (S.fx) sparks(e);
+}
+
 // main loop
 let last = performance.now(), acc = 0, shown = S.coins;
 function tick(now){
@@ -481,6 +505,7 @@ function tick(now){
   if (T.on) tStep(dt);
   if (M.on) mStep(dt);
   earn(perSec()*dt);
+  autoClick(dt);
   if ((acc += dt) > .1) { acc = 0; refresh(); }
   requestAnimationFrame(tick);
 }
