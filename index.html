@@ -82,7 +82,7 @@ body.xmas #lights{display:flex;justify-content:space-around;position:absolute;to
 #lights i:nth-child(4n+2){background:#ffd166;color:#ffd166;animation-delay:.6s}#lights i:nth-child(4n+3){background:#57cc99;color:#57cc99;animation-delay:.9s}
 @keyframes blink{from{opacity:.35}to{opacity:1;box-shadow:0 0 12px currentColor}}
 #xmasBtn{background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;margin-top:10px}
-#reset,#adminBtn{margin-top:20px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;width:100%}
+#saveCopy,#saveLoad,#reset,#adminBtn{margin-top:20px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;width:100%}
 #dpad{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px}
 #dpad button{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);font-size:22px;touch-action:none}
 #dpad button:active{background:rgba(255,255,255,.22)}
@@ -134,6 +134,10 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <button class="up" id="pplay"><div class="ic">👻</div><div><div class="nm">Pac-Jun</div><div class="ds">Eat dots, dodge the Evil Juns. Clear the maze for 100× your click value.</div><div class="ct">Mazes cleared: <span id="pwins">0</span></div></div></button>
   <h2>Click Power</h2><div id="clickUps"></div>
   <h2>Passive Jun Income</h2><div id="autoUps"></div>
+  <h2>Save Code</h2>
+  <div style="color:var(--dim);font-size:13px;margin-bottom:-10px">Copy your code on one device, load it on another.</div>
+  <button id="saveCopy">📋 Copy save code</button>
+  <button id="saveLoad">📥 Load save code</button>
   <button id="reset">Reset progress</button>
   <button id="adminBtn">⚙ Admin panel <span style="opacity:.5">(`)</span></button>
 </aside>
@@ -335,6 +339,29 @@ addEventListener('keydown', e => {
   if (e.code === 'Escape') fClose();
 });
 $('fbest').textContent = S.best;
+// Save codes: "JUN1:" + base64(JSON of S). Loading validates everything — the code is user-pasted input.
+$('saveCopy').onclick = async () => {
+  save();
+  const code = 'JUN1:' + btoa(JSON.stringify(S));
+  try { await navigator.clipboard.writeText(code); toast('Save code copied!'); }
+  catch { prompt('Copy your save code:', code); }
+};
+$('saveLoad').onclick = () => {
+  const code = (prompt('Paste your save code:') || '').trim();
+  if (!code) return;
+  try {
+    if (!code.startsWith('JUN1:')) throw 0;
+    const d = JSON.parse(atob(code.slice(5)));
+    const num = v => Number.isFinite(v) && v >= 0 ? v : 0, int = v => Math.floor(num(v));
+    const own = {};
+    for (const u of UPS) if (d.own && d.own[u.id]) own[u.id] = int(d.own[u.id]);
+    S = {coins:num(d.coins), total:num(d.total), own, best:int(d.best), hwins:int(d.hwins), twins:int(d.twins), pwins:int(d.pwins), xmas:d.xmas !== false};
+    save(); applyXmas(); refresh();
+    ['fbest', 'hwins', 'twins', 'pwins'].forEach(id => $(id).textContent = S[id === 'fbest' ? 'best' : id]);
+    toast('Save loaded!');
+  } catch { alert("That save code doesn't look right. Make sure you copied the whole thing."); }
+};
+
 // Admin panel: ` toggles it (ignored while typing in a field)
 const A = $('admin'), give = n => { S.coins += n; save(); refresh(); };
 const toggleAdmin = () => A.open ? A.close() : A.showModal();
