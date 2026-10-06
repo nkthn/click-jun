@@ -251,7 +251,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <div id="achGrid"></div>
   <h2>Upgrades</h2>
   <div id="upgWrap">
-  <div id="buyRow"><button data-n="1">×1</button><button data-n="10">×10</button><button data-n="25">×25</button><button data-n="50">×50</button></div>
+  <div id="buyRow"><button data-n="1">×1</button><button data-n="10">×10</button><button data-n="25">×25</button><button data-n="50">×50</button><button data-n="max" id="buyMax" hidden>MAX</button></div>
   <div id="resWrap" hidden><h2>🔬 Research</h2><div id="resRow"></div></div>
   <div id="favWrap" hidden><h2>⭐ Starred</h2><div id="favUps"></div></div>
   <h2>Click Power</h2><div id="clickUps"></div>
@@ -441,6 +441,7 @@ const PERKS = [
   {id:'shine',     ic:'🌟', nm:'Extra Shiny',      cost:4, g:1.6,  max:6,  fx:L => `Achievements give +${2 + .5*L}% each`},
   {id:'auto',      ic:'🦾', nm:'Robot Hands',      cost:5, g:1.6,  max:10, fx:L => `Auto clicks worth ${10 + 2*L}% of a click`},
   {id:'cheap',     ic:'✂️', nm:'Coupon Clipper',   cost:6, g:1.7,  max:10, fx:L => `Upgrades cost ${3*L}% less`},
+  {id:'maxbuy',    ic:'🛍️', nm:'Bulk Buyer',       cost:5, g:1,    max:1,  fx:L => 'Unlocks a MAX button that buys as many of an upgrade as you can afford'},
   {id:'party',     ic:'🎉', nm:'Party Planner',    cost:4, g:1.6,  max:5,  fx:L => `Random frenzies ${20*L}% more often and ${10*L}% longer`},
   {id:'vc',        ic:'💼', nm:'Angel Network',    cost:4, g:1.6,  max:5,  fx:L => `VC offers ${20*L}% bigger and more frequent`},
 ];
@@ -532,7 +533,15 @@ const achCount = () => ACH.filter(a => S.ach[a.id]).length;
 const prestige = () => evtMult() * (1 + .1 * S.bp) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon'));
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.t === 'k' ? 1.3 : 1.15;
-const cost = (u, n = S.buy) => { const g = growth(u); return Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap'))); };
+// MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
+const buyN = u => S.buy === 'max' ? Math.max(1, maxN(u)) : S.buy;
+function maxN(u){
+  const g = growth(u), first = cost(u, 1);
+  let n = Math.floor(Math.log(S.coins * (g - 1) / first + 1) / Math.log(g));   // closed form for a geometric series
+  while (n > 0 && cost(u, n) > S.coins) n--;
+  return Math.max(0, n);
+}
+const cost = (u, n = buyN(u)) => { const g = growth(u); return Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap'))); };
 const perClick = () => (1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0)) * prestige() * (1 + .1*lv('click')) * (1 + .05*petLv('cat')) + perSec()*RM.c2;
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
 const autoCps = () => UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * (1 + .05*petLv('ham'));
@@ -560,8 +569,8 @@ function renderShop(){
         save(); renderShop(); refresh();
       };
       b.onclick = () => {
-        const p = cost(u); if (S.coins < p) return;
-        const before = umult(u); S.coins -= p; S.own[u.id] = own(u) + S.buy;
+        const n = buyN(u), p = cost(u, n); if (S.coins < p) return;   // fix n before paying (MAX depends on coins)
+        const before = umult(u); S.coins -= p; S.own[u.id] = own(u) + n;
         if (umult(u) > before) toast(`${u.ic} ${u.nm} milestone! Output ×2`);
         b.animate([{background:'rgba(255,201,77,.25)'}, {background:'var(--panel)'}], {duration:350});
         save(); refresh();
@@ -581,7 +590,7 @@ function refresh(){
   const pc = perClick();
   for (const b of shopBtns) {
     const u = b._u, r = b._r, p = cost(u), can = S.coins >= p, next = MILES.find(m => own(u) < m);
-    setText(r.p, fmt(p) + (S.buy > 1 ? ` for ${S.buy}` : ''));
+    const n = buyN(u); setText(r.p, fmt(p) + (n > 1 ? ` for ${n}` : ''));
     setText(r.v, fmt(u.t === 'k' ? u.v * umult(u) * AUTO * pc : u.v * umult(u) * prestige()));
     setText(r.own, String(own(u) || ''));
     setText(r.ms, next ? `×2 output at ${next} owned` : 'All milestones reached');
@@ -591,9 +600,9 @@ function refresh(){
   }
   const g = rbGain(), n = rbCan(S.rbN) ? S.rbN : 1, gn = rbGainN(n);
   $('rbBp').textContent = S.bp; $('rbBoost').textContent = `+${S.bp*10}%`;
-  for (const b of rbRowBtns) { const k = +b.dataset.n; b.disabled = !rbCan(k); b.classList.toggle('on', k === n); b.title = rbCan(k) ? `+${rbGainN(k)} points, ${tokenGain(rbGainN(k), k)} tokens` : `need ${fmt(rbCost(k))} coins this run`; }
+  for (const b of rbRowBtns) { const k = +b.dataset.n; b.disabled = !rbCan(k); b.classList.toggle('on', k === n); b.title = rbCan(k) ? `${k} rebirths: +${rbGainN(k)} points, ${tokenGain(rbGainN(k))} tokens` : `need ${fmt(rbCost(k))} coins this run`; }
   $('rbBtn').disabled = g < 1;
-  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} for +${gn} Buzz Point${gn > 1 ? 's' : ''} · ${tokenGain(gn, n)} 💈`;
+  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} for +${gn} Buzz Point${gn > 1 ? 's' : ''} · ${tokenGain(gn)} 💈`;
   setText($('hcBal'), String(S.hc));
   $('rbNext').textContent = `${fmt(((g+1)/rbMult())**3*rbBase() - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far (×${rbMult().toFixed(2)} points)`;
 }
@@ -691,28 +700,33 @@ const rbMult = (r = S.rebirths) => 1 + .1 * Math.sqrt(r);   // diminishing: 1 re
 const rbBase = (r = S.rebirths) => 1e6 * 1.15 ** r;
 const rbReq = r => rbBase(r);                           // coins this run needed to rebirth at all, only ever goes up
 const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbBase()) * rbMult());
-// multi-rebirth ×n: costs the coins of n back-to-back rebirths (each requirement 15% higher than the last),
-// pays the same Buzz Points as ×1, n× the tokens, and adds n to your rebirth count
+// multi-rebirth ×n: n real rebirths in one go. Needs the coins of n back-to-back rebirths (each requirement 15% higher),
+// the run's coins are shared across them in proportion to their requirements, and each pays its own points + tokens.
+// ×1 is the same formula with n = 1.
 const rbCost = n => { let c = 0; for (let i = 0; i < n; i++) c += rbReq(S.rebirths + i); return c; };
-const rbGainN = () => rbGain();
-const rbCan = n => rbGain() >= 1 && S.total >= rbCost(n);
-// tokens scale with how many rebirths you do at once: ×10 multi-rebirth pays 10× tokens
-const tokenGain = (g, n = 1) => Math.floor(g * (1 + .1*lv('tokens'))) * n;
+const rbGainN = n => {
+  if (S.total < rbCost(n)) return 0;
+  const k = Math.cbrt(S.total / rbCost(n)); let g = 0;
+  for (let i = 0; i < n; i++) g += Math.floor(k * rbMult(S.rebirths + i));
+  return g;
+};
+const rbCan = n => rbGainN(n) >= 1;
+const tokenGain = g => Math.floor(g * (1 + .1*lv('tokens')));   // every Buzz Point earned also pays a token
 const rbRowBtns = [...$('rbRow').children];
 rbRowBtns.forEach(b => b.onclick = () => { S.rbN = +b.dataset.n; save(); refresh(); });
 $('rbBtn').onclick = () => {
   const n = rbCan(S.rbN) ? S.rbN : 1; if (!rbCan(n)) return;
   const g = rbGainN(n);
-  if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but gain ${g} Buzz Point${g > 1 ? 's' : ''} (+${g*10}% to everything, forever) and ${tokenGain(g, n)} 💈 tokens for the Rebirth Shop.`)) return;
+  if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but gain ${g} Buzz Point${g > 1 ? 's' : ''} (+${g*10}% to everything, forever) and ${tokenGain(g)} 💈 tokens for the Rebirth Shop.`)) return;
   const L = lv('headstart');
-  Object.assign(S, {coins:S.coins * .02*lv('keep'), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, bp:S.bp + g, hc:S.hc + tokenGain(g, n), rebirths:S.rebirths + n, research:{}}); shown = S.coins; recalcResearch();
+  Object.assign(S, {coins:S.coins * .02*lv('keep'), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, bp:S.bp + g, hc:S.hc + tokenGain(g), rebirths:S.rebirths + n, research:{}}); shown = S.coins; recalcResearch();
   save(); refresh(); toast(`🔁 Reborn! +${g} Buzz Points`);
 };
 
 // bulk buy
 const buyBtns = [...$('buyRow').children];
-const applyBuy = () => buyBtns.forEach(b => b.classList.toggle('on', +b.dataset.n === S.buy));
-buyBtns.forEach(b => b.onclick = () => { S.buy = +b.dataset.n; applyBuy(); refresh(); save(); });
+const applyBuy = () => buyBtns.forEach(b => b.classList.toggle('on', b.dataset.n === String(S.buy)));
+buyBtns.forEach(b => b.onclick = () => { S.buy = b.dataset.n === 'max' ? 'max' : +b.dataset.n; applyBuy(); refresh(); save(); });
 applyBuy();
 
 // upgrade effects drawn around Jun. Visible icons grow with log2(owned), capped at 6 per upgrade,
@@ -896,7 +910,7 @@ function applyState(d){
   for (const u of UPS) if (d.own && d.own[u.id]) own[u.id] = int(d.own[u.id]);
   S = {...DEF(), coins:num(d.coins), total:num(d.total), lifetime:Math.max(num(d.lifetime), num(d.total)), own,
     best:int(d.best), hwins:int(d.hwins), twins:int(d.twins), pwins:int(d.pwins), xmas:d.xmas !== false, fx:d.fx !== false,
-    buy:[1, 10, 25, 50].includes(d.buy) ? d.buy : 1, rbN:[1, 2, 5, 10].includes(d.rbN) ? d.rbN : 1, rebirths:int(d.rebirths), bp:int(d.bp), diamonds:int(d.diamonds),
+    buy:[1, 10, 25, 50, 'max'].includes(d.buy) ? d.buy : 1, rbN:[1, 2, 5, 10].includes(d.rbN) ? d.rbN : 1, rebirths:int(d.rebirths), bp:int(d.bp), diamonds:int(d.diamonds),
     cheater:d.cheater === true || S.cheater,   // once a cheater, always a cheater
     theme:['none', 'xmas', 'spooky'].includes(d.theme) ? d.theme : d.xmas === false ? 'none' : 'xmas',
     hc:d.hc === undefined ? int(d.bp) : int(d.hc), golds:int(d.golds), clicks:int(d.clicks), maxCombo:num(d.maxCombo) || 1, candy:int(d.candy), vcDeals:int(d.vcDeals),
@@ -1337,7 +1351,11 @@ function checkAch(){
 }
 
 // rebirth shop
-function applyPerks(){ AUTO = .1 + .02*lv('auto'); }
+function applyPerks(){
+  AUTO = .1 + .02*lv('auto');
+  $('buyMax').hidden = !lv('maxbuy');
+  if (S.buy === 'max' && !lv('maxbuy')) { S.buy = 1; applyBuy(); }
+}
 function renderPerks(){
   $('hcBal2').textContent = S.hc;
   $('perkList').innerHTML = '';
@@ -1426,7 +1444,8 @@ const UPDATES = [
     '⚡ Random frenzy events: 2× everything for 60s, or a rare 4× for 30s',
     'Buy instant 2× and 4× frenzies with 💈 tokens in the Rebirth Shop',
     'New perk: 🎉 Party Planner makes random frenzies more frequent and longer',
-    'Rebirths get 15% harder each time, and multi-rebirth ×n costs n rebirths\' worth of coins (but pays n× tokens)']},
+    'Rebirths get 15% harder each time',
+    'Multi-rebirth: save enough for 2, 5 or 10 rebirths and do them all at once, with full rewards for each']},
   {v:'2.8', date:'Oct 5, 2026', title:'Lab & Pets', notes:[
     '🔬 Research: one-time upgrades that unlock as you play (90+ of them). They reset when you rebirth',
     'Special research like Jun Discovers Moisturizer: clicks earn a share of your per-second income',
