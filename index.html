@@ -193,9 +193,18 @@ body.rainbow .flake{font-size:14px!important}
 .res .rp{font-size:11px;color:var(--gold);font-weight:600}
 .res.can{border-color:rgba(255,201,77,.55);box-shadow:0 0 14px rgba(255,201,77,.12)}
 .res:not(.can){opacity:.55}
-#eggBtn{width:100%;background:linear-gradient(90deg,#57cc99,#2ec4b6);border:0;color:#08110c;border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
-#eggBtn:disabled{opacity:.4;cursor:not-allowed}
-#petGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+#eggRow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+#eggRow button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:8px 2px;font:inherit;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+#eggRow button b{font-size:24px}
+#eggRow button.can{border-color:rgba(87,204,153,.6);box-shadow:0 0 12px rgba(87,204,153,.15)}
+#petDetail{margin-top:10px;padding:12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);display:flex;gap:12px;align-items:center}
+#petDetail[hidden]{display:none}
+#petDetail .big{font-size:44px}
+#petDetail .rar{font-size:11px;font-weight:800;letter-spacing:1px}
+#petDetail .bar2{height:6px;border-radius:3px;background:var(--line);margin:6px 0;overflow:hidden}
+#petDetail .bar2 i{display:block;height:100%;background:var(--gold)}
+#petGrid button.sel{outline:2px solid var(--gold)}
+#petGrid{display:grid;grid-template-columns:repeat(5,1fr);max-height:260px;overflow-y:auto;gap:8px;margin-top:10px}
 #petGrid button{border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;padding:8px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 #petGrid button .pi{font-size:26px}
 #petGrid button .pl{font-size:11px;color:var(--dim)}
@@ -277,6 +286,19 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .frCard{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;color:var(--text);font:inherit;cursor:pointer}
 .frCard span{flex:1;font-size:12px;color:var(--dim)}
 .frCard i{font-style:normal;color:var(--dim);font-size:20px}
+.fxLayer{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);cursor:pointer}
+.fxLayer.fxPass{background:none;pointer-events:none}
+.fxEgg{font-size:110px}
+.fxGlow{position:absolute;width:420px;height:420px;border-radius:50%;opacity:.8}
+.fxPet{position:relative;text-align:center;color:#fff}
+.fxConf{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}
+.fxConf i{position:absolute;top:0;border-radius:2px}
+.fxFlash{position:absolute;inset:0;background:#fff}
+.fxRing{position:absolute;width:80px;height:80px;border-radius:50%;border:6px solid var(--gold)}
+.fxCoin{position:absolute;font-size:26px}
+.fxText{position:absolute;left:50%;top:40%;font-size:clamp(36px,9vw,72px);font-weight:900;color:#fff;text-shadow:0 4px 30px var(--accent),0 0 12px #000;white-space:nowrap}
+#stage.frz::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 0 70px 12px rgba(255,201,77,.55);animation:frz .9s ease-in-out infinite alternate}
+@keyframes frz{from{opacity:.35}to{opacity:1}}
 #reset,#adminBtn{margin-top:20px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;width:100%}
 #dpad{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px}
 #dpad button{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);font-size:22px;touch-action:none}
@@ -355,8 +377,9 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   </div>
   <h2>🐾 Pets</h2>
   <div class="card">
-    <button id="eggBtn"></button>
+    <div id="eggRow"></div>
     <div id="petGrid"></div>
+    <div id="petDetail" hidden></div>
     <div id="petInfo"></div>
   </div>
   <h2>Achievements · <span id="achCount"></span></h2>
@@ -740,7 +763,7 @@ const PERKS = [
 const lv = id => S.perks[id] || 0;
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true, rainbow:false, muted:[], guild:'',
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -748,6 +771,7 @@ let saved = null;
 try { saved = JSON.parse(localStorage.getItem('clickjun')); } catch {}
 if (saved) {
   S = {...S, ...saved};
+  if (!('eggs' in saved)) S.eggs = {basic:S.hatches || 0};          // old saves: every egg so far was a basic egg
   if (!('ap' in saved)) S.ap = S.asc || 0;                            // ✨ points for players who ascended before the shop existed
   if (!('hc' in saved)) S.hc = S.bp;                                    // tokens for players who rebirthed before the shop existed
   if (S.perks && S.perks.maxbuy) { S.hc += 5; delete S.perks.maxbuy; }  // MAX buy is free now: refund Bulk Buyer
@@ -799,7 +823,7 @@ function evtSchedule(){
   setTimeout(() => {
     if (!document.hidden) { const big = Math.random() < .25; startEvt(big ? 4 : 2, (big ? 30 : 60) * (1 + .1*lv('party'))); }
     evtSchedule();
-  }, (240000 + Math.random()*240000) / (1 + .2*lv('party')));
+  }, (240000 + Math.random()*240000) / (1 + .2*lv('party')) / (1 + .1*petLv('wolf')));
 }
 let RM;   // research multipliers, rebuilt whenever research changes (umult runs too often to scan RES each time)
 function recalcResearch(){
@@ -824,8 +848,26 @@ const PETS = [
   {id:'baby',   ic:'👶', nm:'Baby Jun',      r:'Legendary', w:2,  fx:L => `Diamond Juns ${20*L}% more often, frenzy +${2*L}s`},
   {id:'whale',  ic:'🐋', nm:'Big Wally',     r:'Epic',      w:6,  fx:L => `+${10*L}% rebirth tokens`},
   {id:'unicorn',ic:'🦄', nm:'Sparkle the Unicorn', r:'Mythic', w:1, fx:L => `+${15*L}% to everything`},
+  {id:'turtle', ic:'🐢', nm:'Shelly',        r:'Common',    w:20, fx:L => `Offline earnings last ${2*L}h longer`},
+  {id:'bunny',  ic:'🐰', nm:'Bun Bun',       r:'Common',    w:20, fx:L => `Combo builds ${5*L}% faster`},
+  {id:'hedge',  ic:'🦔', nm:'Spike',         r:'Common',    w:20, fx:L => `Upgrades cost ${L}% less`},
+  {id:'panda',  ic:'🐼', nm:'Bao',           r:'Rare',      w:10, fx:L => `+${5*L}% rebirth tokens`},
+  {id:'octo',   ic:'🐙', nm:'Inky',          r:'Rare',      w:10, fx:L => `+${8*L}% auto clicks`},
+  {id:'fly',    ic:'🦋', nm:'Flutter',       r:'Rare',      w:10, fx:L => `Golden Juns pay +${10*L}%`},
+  {id:'wolf',   ic:'🐺', nm:'Luna',          r:'Epic',      w:8,  fx:L => `Frenzy events ${10*L}% more often`},
+  {id:'eagle',  ic:'🦅', nm:'Talon',         r:'Epic',      w:8,  fx:L => `+${8*L}% click power and +${4*L}% passive income`},
+  {id:'ember',  ic:'🐲', nm:'Ember',         r:'Legendary', w:2,  fx:L => `Diamond Juns pay +${15*L}%`},
+  {id:'prism',  ic:'🦚', nm:'Prism',         r:'Mythic',    w:1,  fx:L => `+${8*L}% to everything`},
 ];
-const PET_MAX = 10;
+const PET_MAX = 25, PET_SLOTS = 4;
+// egg tiers: what each rarity's share of the roll is, and what the egg costs
+const EGGS = [
+  {id:'basic',  ic:'🥚', nm:'Basic Egg',  odds:{Common:60, Rare:28, Epic:9, Legendary:2.5, Mythic:.5}},
+  {id:'golden', ic:'🌟', nm:'Golden Egg', odds:{Common:0, Rare:50, Epic:32, Legendary:14, Mythic:4}},
+  {id:'cosmic', ic:'🌌', nm:'Cosmic Egg', odds:{Common:0, Rare:0, Epic:55, Legendary:35, Mythic:10}},
+  {id:'royal',  ic:'👑', nm:'Royal Egg',  odds:{Common:0, Rare:0, Epic:0, Legendary:75, Mythic:25}},
+];
+const RARC = {Common:'#9aa3b5', Rare:'#4cc9f0', Epic:'#c77dff', Legendary:'#ffc94d', Mythic:'#ff5c7a'};
 
 // Ascension Shop: cheap, one-time, permanent upgrades bought with ✨ (1 per Ascension)
 const AUP = [
@@ -899,7 +941,7 @@ const rbBoost = (r = S.rebirths) => 1 + .2 * r ** .85;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 1) * RM[u.t];
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
+const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.g;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
@@ -910,11 +952,11 @@ function maxN(u){
   while (n > 0 && cost(u, n) > S.coins) n--;
   return Math.max(0, n);
 }
-const cost = (u, n = buyN(u)) => { const g = growth(u); return fin(Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap')))); };
-const perClick = () => fin((1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0)) * prestige() * (1 + .1*lv('click')) * (1 + .05*petLv('cat')) + perSec()*RM.c2);
+const cost = (u, n = buyN(u)) => { const g = growth(u); return fin(Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap')) * (1 - .01*petLv('hedge')))); };
+const perClick = () => fin((1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0)) * prestige() * (1 + .1*lv('click')) * (1 + .05*petLv('cat')) * (1 + .08*petLv('eagle')) + perSec()*RM.c2);
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
-const autoCps = () => fin(UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * (1 + .05*petLv('ham')));
-const perSec = () => fin(UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .05*petLv('pug')));
+const autoCps = () => fin(UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * (1 + .05*petLv('ham')) * (1 + .08*petLv('octo')));
+const perSec = () => fin(UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .05*petLv('pug')) * (1 + .04*petLv('eagle')));
 const fmt = n => n >= 1e300 ? '∞' : n < 1e3 ? String(Math.round(n*10)/10) : S.sci ? n.toExponential(2).replace('+', '')   // one decimal under 1K, rounded (13.26 → 13.3); K/M/B above
   : n >= 1e36 ? n.toExponential(2).replace('+', '')   // beyond decillions: 1.23e40
   : (()=>{const u=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
@@ -944,10 +986,28 @@ const SFX = {
   buy:() => { tone(660, .07, 'square', .35); setTimeout(() => tone(990, .09, 'square', .35), 60); },
   gold:() => [784, 988, 1175, 1568].forEach((f, i) => setTimeout(() => tone(f, .16, 'triangle', .7), i*70)),
   ach:() => [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, .2, 'sine', .7), i*90)),
-  rebirth:() => { tone(180, .7, 'sawtooth', .4, 5); setTimeout(() => tone(880, .4, 'sine', .5), 500); },
+  // rebirth: a springy "boing" into a quick bouncy arpeggio and a sparkle on top
+  rebirth:() => { tone(160, .35, 'sawtooth', .35, 4); [523, 659, 784, 1047, 1319].forEach((f, i) => setTimeout(() => tone(f, .12, 'square', .28), 260 + i*65));
+    setTimeout(() => { tone(1568, .35, 'triangle', .45, 1.5); tone(2093, .25, 'sine', .3); }, 620); },
+  // angel: a slow-swelling choir chord (detuned pairs) with a harp glissando drifting up over it
+  angel:() => { [261.6, 329.6, 392, 493.9, 523.3, 659.3].forEach(f => { pad(f, 3.4, .5); pad(f*1.006, 3.4, .35); });
+    [1047, 1175, 1319, 1568, 1760, 2093, 2349, 2637].forEach((f, i) => setTimeout(() => tone(f, .7, 'triangle', .3), 500 + i*120)); },
+  fanfare:() => [[392, 0], [523, 140], [659, 280], [784, 420], [1047, 620]].forEach(([f, t]) => setTimeout(() => { tone(f, .38, 'square', .28); tone(f/2, .38, 'triangle', .3); }, t)),
+  crack:() => { tone(320, .09, 'square', .4, .5); setTimeout(() => tone(240, .08, 'square', .3, .5), 70); },
   coin:() => tone(1250, .1, 'triangle', .5, 1.3),
   error:() => tone(190, .18, 'square', .35, .7),
 };
+// soft swelling note for the choir (slow attack, long fade)
+function pad(f, d, v = 1){
+  if (!S.sound || !S.vol) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume();
+    const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
+    o.type = 'sine'; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.12*S.vol*v, t + .6); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d);
+  } catch {}
+}
 const sfx = k => SFX[k] && SFX[k]();
 // live meter: steady income only (clicks, auto clicks, passive), averaged over a few seconds. Lump sums
 // like offline earnings, golden Juns, VC deals and minigame prizes are left out so they don't spike it.
@@ -973,7 +1033,7 @@ function renderShop(){
       b.onclick = () => {
         const n = buyN(u), p = cost(u, n); if (S.coins < p) return;   // fix n before paying (MAX depends on coins)
         const before = umult(u); S.coins -= p; S.own[u.id] = own(u) + n; sfx('buy');
-        if (umult(u) > before) toast(`${u.ic} ${u.nm} milestone! Output ×2`);
+        if (umult(u) > before) { toast(`${u.ic} ${u.nm} milestone! Output ×2`); confetti(30); }
         b.animate([{background:'rgba(255,201,77,.25)'}, {background:'var(--panel)'}], {duration:350});
         save(); refresh();
       };
@@ -1066,7 +1126,7 @@ function sparks(e){
 }
 $('jun').addEventListener('pointerdown', e => {
   const now = performance.now();
-  combo = now - lastClick < 450 ? Math.min(3 + .5*lv('combo') + .2*petLv('fox'), combo + .04*RM.combo) : Math.max(1, combo - .2); lastClick = now;
+  combo = now - lastClick < 450 ? Math.min(3 + .5*lv('combo') + .2*petLv('fox'), combo + .04*RM.combo*(1 + .05*petLv('bunny'))) : Math.max(1, combo - .2); lastClick = now;
   S.clicks++; S.maxCombo = Math.max(S.maxCombo, combo);
   const n = perClick() * combo * frenzy(); earnLive(n); pop('+'+fmt(n), e); sparks(e); sfx('click'); if (n > S.bigClick) S.bigClick = n;
   // nudge him away from the cursor so he feels alive
@@ -1082,7 +1142,7 @@ function spawnGold(){
   $('golden').style.display = 'block'; goldUntil = performance.now() + 7000 * (1 + .15*lv('linger'));
 }
 $('golden').addEventListener('pointerdown', e => {
-  const n = Math.max(perSec()*60, perClick()*100) * (1 + .2*lv('gold')) * RM.gold; earn(n); S.golds++; sfx('gold'); pop('+'+fmt(n)+' ✨', e);
+  const n = Math.max(perSec()*60, perClick()*100) * (1 + .2*lv('gold')) * RM.gold * (1 + .1*petLv('fly')); earn(n); S.golds++; sfx('gold'); pop('+'+fmt(n)+' ✨', e);
   toast(`GOLDEN JUN! +${fmt(n)} coins`); $('golden').style.display = 'none'; goldUntil = 0;
   setTimeout(spawnGold, goldDelay()); refresh();
 });
@@ -1097,7 +1157,7 @@ function spawnDiamond(){
   $('diamond').style.display = 'block'; diaUntil = performance.now() + 4000 * (1 + .15*lv('linger'));
 }
 $('diamond').addEventListener('pointerdown', e => {
-  const n = Math.max(perSec()*600, perClick()*1000); earn(n); S.diamonds++; sfx('gold'); frenzyUntil = performance.now() + (20 + 3*lv('frenzy') + 2*petLv('baby'))*1000;
+  const n = Math.max(perSec()*600, perClick()*1000) * (1 + .15*petLv('ember')); earn(n); S.diamonds++; sfx('gold'); frenzyUntil = performance.now() + (20 + 3*lv('frenzy') + 2*petLv('baby'))*1000;
   pop('+'+fmt(n)+' 💎', e); toast(`💎 DIAMOND JUN! +${fmt(n)} and 7× clicks for 20s`);
   $('diamond').style.display = 'none'; diaUntil = 0; setTimeout(spawnDiamond, diaDelay()); save(); refresh();
 });
@@ -1126,7 +1186,7 @@ const rbCan = n => S.rebirths + n <= MAXR && rbGainN(n) >= 1;
 function rbMaxN(){ let n = 0, c = 0; while (S.rebirths + n < MAXR && c + rbReq(S.rebirths + n) <= S.total) c += rbReq(S.rebirths + n++); return n; }
 const rbPick = v => v === 'max' ? rbMaxN() : v;          // resolve a selector value (1/2/5/10/'max') to a count
 const TOKEN_CAP = 1e15;
-const tokenGain = g => Math.min(TOKEN_CAP, Math.floor(fin(g * (1 + .1*lv('tokens')) * (1 + .1*petLv('whale')) * (1 + .5*S.asc) * (asu('tokens') ? 2 : 1))));
+const tokenGain = g => Math.min(TOKEN_CAP, Math.floor(fin(g * (1 + .1*lv('tokens')) * (1 + .1*petLv('whale')) * (1 + .5*S.asc) * (asu('tokens') ? 2 : 1) * (1 + .05*petLv('panda')))));
 const rbRowBtns = [...$('rbRow').children];
 rbRowBtns.forEach(b => b.onclick = () => { S.rbN = b.dataset.n === 'max' ? 'max' : +b.dataset.n; save(); refresh(); });
 $('rbBtn').onclick = () => {
@@ -1136,7 +1196,7 @@ $('rbBtn').onclick = () => {
   if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but your rebirth boost goes from +${pct(S.rebirths)}% to +${pct(S.rebirths + n)}% and you get ${tokenGain(g)} 💈 tokens for the Rebirth Shop.`)) return;
   const L = lv('headstart');
   Object.assign(S, {coins:Math.max(S.coins * .02*lv('keep'), asu('rich') ? 1e6 : 0), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, hc:Math.min(TOKEN_CAP, S.hc + tokenGain(g)), rebirths:S.rebirths + n, rebTotal:S.rebTotal + n, research:asu('lab') ? S.research : {}}); shown = S.coins; recalcResearch();
-  sfx('rebirth'); save(); refresh(); toast(`🔁 Reborn! Rebirth boost is now +${fmt(Math.round((rbBoost() - 1)*100))}%`);
+  sfx('rebirth'); rebirthFx(n); save(); refresh(); toast(`🔁 Reborn! Rebirth boost is now +${fmt(Math.round((rbBoost() - 1)*100))}%`);
   if (S.rebirths >= MAXR && !S.beaten) { S.beaten = true; save(); playEnding(); }
 };
 // Ascension: reset everything (coins, upgrades, research, rebirths, tokens, perks) but keep lifetime coins, pets,
@@ -1147,7 +1207,7 @@ function ascend(){
   const carried = asu('carry') ? Object.fromEntries(Object.entries(S.perks).map(([k, v]) => [k, Math.floor(v/4)]).filter(([, v]) => v > 0)) : {};
   Object.assign(S, {coins:asu('rich') ? 1e6 : 0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); window.pushNow?.();
-  sfx('rebirth'); playAscendScene();
+  playAscendScene();
   if (S.asc === 1) setTimeout(() => toast('🕊️ Angel Wings unlocked! Wear them in your 👕 Wardrobe'), 9000);
 }
 $('ascBtn').onclick = ascend;
@@ -1174,7 +1234,7 @@ function playTrueEnding(){
     }
   }, 2200);
   setTimeout(() => {
-    el('div', 'inset:0;background:#fff').animate([{opacity:1}, {opacity:0}], {duration:900, fill:'forwards'});
+    el('div', 'inset:0;background:#fff').animate([{opacity:1}, {opacity:0}], {duration:900, fill:'forwards'}); sfx('angel');
     const rays = el('div', 'left:50%;top:42%;width:900px;height:900px;margin:-450px 0 0 -450px;border-radius:50%;background:repeating-conic-gradient(rgba(255,209,102,.35) 0 8deg,transparent 8deg 20deg)');
     rays.animate([{transform:'rotate(0) scale(.2)'}, {transform:'rotate(360deg) scale(1)'}], {duration:12000, iterations:Infinity});
     const g = el('img', 'width:min(240px,50vw);left:50%;top:42%;filter:sepia(1) saturate(5) brightness(1.2) drop-shadow(0 0 40px #ffd166)');
@@ -1187,13 +1247,13 @@ function playTrueEnding(){
        <div style="margin:8px 0 4px;color:#e8e2ff">You clicked Jun all the way to infinity.</div>
        <div style="color:#9a93b8;font-size:13px;margin-bottom:16px">Starring Jun · Made by nkthn · Thanks for playing Click Jun</div>
        <button class="end-btn" id="trueStay">Keep clicking ∞</button>`);
-    go(box, [{opacity:0, transform:'translateY(20px)'}, {opacity:1, transform:'translateY(0)'}], {duration:900});
+    go(box, [{opacity:0, transform:'translateY(20px)'}, {opacity:1, transform:'translateY(0)'}], {duration:900}); sfx('fanfare');
     $('trueStay').onclick = () => { E.hidden = true; E.style.background = ''; };
   }, 6400);
 }
 // Jun ascends into heaven: sky, drifting clouds, a beam of light, Jun with halo and flapping wings rising out of view
 function playAscendScene(){
-  const E = $('ending'); E.innerHTML = ''; E.hidden = false;
+  const E = $('ending'); E.innerHTML = ''; E.hidden = false; sfx('angel'); setTimeout(() => sfx('angel'), 3200);
   E.style.background = 'linear-gradient(#9fd3ff 0%,#d9efff 55%,#fff6dd 100%)';
   const el = (tag, css, html = '') => { const d = document.createElement(tag); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
   const go = (node, frames, o) => node.animate(frames, {fill:'forwards', easing:'ease-in-out', ...o});
@@ -1237,7 +1297,7 @@ function playEnding(){
   setTimeout(() => el('div', 'left:58%;top:30%;font-size:40px', '💦').animate([{opacity:0}, {opacity:1, transform:'translateY(20px)'}, {opacity:0, transform:'translateY(50px)'}], {duration:1200, fill:'forwards'}), 900);
   go(finger, [{top:'110%'}, {top:'64%'}], {duration:900, delay:1900, easing:'cubic-bezier(.2,1.4,.4,1)'});
   setTimeout(() => {
-    el('div', 'inset:0;background:#fff').animate([{opacity:.9}, {opacity:0}], {duration:450, fill:'forwards'});
+    el('div', 'inset:0;background:#fff').animate([{opacity:.9}, {opacity:0}], {duration:450, fill:'forwards'}); sfx('rebirth');
     go(finger, [{transform:'translateX(-50%) translateY(0)'}, {transform:'translateX(-50%) translateY(-40px)'}, {transform:'translateX(-50%) translateY(0)'}], {duration:300});
     go(head, [{transform:'translate(-50%,-50%) rotate(0) scale(1)', opacity:1}, {transform:'translate(-50%,-260%) rotate(1080deg) scale(.05)', opacity:0}], {duration:1600, easing:'cubic-bezier(.5,0,.8,.4)'});
     for (let i = 0; i < 40; i++) {
@@ -1251,7 +1311,7 @@ function playEnding(){
       `<div style="font-size:clamp(30px,7vw,54px);font-weight:800;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent">👑 YOU BEAT CLICK JUN 👑</div>
        <div style="margin:10px 0 22px;color:#c9cce0">Jun has been clicked into another dimension.<br>Ascend to bring him back, stronger. Your ${MAXR} rebirths stay on the leaderboard.</div>
        <button class="end-btn" id="endAsc">✨ Ascend now</button><button class="end-btn alt" id="endStay">Keep playing</button>`);
-    go(box, [{opacity:0, transform:'translateY(20px)'}, {opacity:1, transform:'translateY(0)'}], {duration:700});
+    go(box, [{opacity:0, transform:'translateY(20px)'}, {opacity:1, transform:'translateY(0)'}], {duration:700}); sfx('fanfare'); confetti(80);
     $('endStay').onclick = () => { E.hidden = true; };
     $('endAsc').onclick = () => { E.hidden = true; ascend(); };
   }, 4700);
@@ -1358,6 +1418,7 @@ function tick(now){
     if (now > diaUntil) { $('diamond').style.display = 'none'; diaUntil = 0; setTimeout(spawnDiamond, diaDelay()); }
   }
   if (now - lastClick > 900) combo = Math.max(1, combo - dt*.8);
+  const frz = evtMult() > 1 || frenzy() > 1; if (stage.classList.contains('frz') !== frz) stage.classList.toggle('frz', frz);
   setText($('evtBar'), evtMult() > 1 ? `⚡ ${evtX}× FRENZY · ${Math.ceil((evtUntil - now)/1000)}s` : '');
   setText($('combo'), combo > 1.05 ? `🔥 ${combo.toFixed(1)}× combo` : '');
   shown += (S.coins - shown) * Math.min(1, dt*12);
@@ -1460,7 +1521,7 @@ function applyState(d){
     stars:Object.fromEntries(UPS.filter(u => d.stars && d.stars[u.id] === true).map(u => [u.id, true])),
     research:Object.fromEntries(RES.filter(r => d.research && d.research[r.id] === true).map(r => [r.id, true])),
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
-    equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, 3) : [],
+    equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
     sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
@@ -1468,6 +1529,7 @@ function applyState(d){
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
     friends:Array.isArray(d.friends) ? [...new Set(d.friends.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)))].slice(0, 30) : [], ap:d.ap === undefined ? int(d.asc) : int(d.ap), aup:Object.fromEntries(AUP.filter(a => d.aup && d.aup[a.id] === true).map(a => [a.id, true])), autoBuy:d.autoBuy !== false,
     muted:Array.isArray(d.muted) ? d.muted.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)).slice(-100) : [],
+    eggs:Object.fromEntries(EGGS.map(e => [e.id, int(d.eggs?.[e.id] ?? (e.id === 'basic' ? d.hatches : 0))])),
     guild:typeof d.guild === 'string' && /^[A-Z0-9]{6}$/.test(d.guild) ? d.guild : '',
     rebTotal:int(d.rebTotal) || int(d.asc)*300 + int(d.rebirths)};
   shown = S.coins; recalcResearch(); save(); applyXmas(); applyFx(); applyBuy(); applyPerks(); renderAch(); renderPets(); renderShop(); refresh();
@@ -1907,8 +1969,12 @@ function renderAch(){
 }
 function checkAch(){
   let changed = false;
-  for (const a of ACH) if (!S.ach[a.id] && a.ok()) { S.ach[a.id] = true; changed = true; toast(`🏆 Achievement: ${a.ic} ${a.nm}`); sfx('ach'); }
-  if (changed) { renderAch(); save(); refresh(); }
+  const got = [];
+  for (const a of ACH) if (!S.ach[a.id] && a.ok()) { S.ach[a.id] = true; changed = true; got.push(a); }
+  if (changed) {
+    toast(got.length === 1 ? `🏆 Achievement: ${got[0].ic} ${got[0].nm}` : `🏆 ${got.length} achievements: ${got.map(a => a.ic).join(' ')}`);
+    sfx('ach'); confetti(45); renderAch(); save(); refresh();
+  }
 }
 
 // rebirth shop
@@ -1983,7 +2049,7 @@ news();
 // offline earnings: passive + auto clicks at 50% (100% with Night Shift), capped at 24h (48h)
 const dur = s => s >= 3600 ? `${Math.floor(s/3600)}h ${Math.floor(s%3600/60)}m` : `${Math.floor(s/60)}m`;
 function offline(ms){
-  const sec = Math.min(ms/1000, (asu('night') ? 72 : 24 + 6*lv('offline')) * 3600);
+  const sec = Math.min(ms/1000, ((asu('night') ? 72 : 24 + 6*lv('offline')) + 2*petLv('turtle')) * 3600);
   if (sec < 60) return;
   const n = (perSec() + autoCps()*AUTO*perClick()) * sec * (asu('night') ? 1 : .5 + .1*lv('offline') + .1*petLv('owl'));
   if (n < 1) return;
@@ -2000,6 +2066,13 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'4.4', date:'Oct 5, 2026', title:'Pets & Polish', notes:[
+    '🥚 Four egg tiers: Basic, Golden (no Commons), Cosmic (tokens, Epic+) and Royal (✨, Legendary or Mythic)',
+    '10 new pets with real effects: cheaper upgrades, faster combos, longer offline, bigger Golden and Diamond payouts and more',
+    'Pet level cap raised to 25 and a 4th equip slot',
+    'Tap a pet to see its rarity, level, effect and next level',
+    'New animations: egg hatching, rebirth burst, confetti for achievements and milestones, frenzy screen glow',
+    '😇 Ascending plays a heaven cutscene and unlocks wings in the Wardrobe']},
   {v:'4.3', date:'Oct 5, 2026', title:'Chat & Guilds', notes:[
     '💬 Live chat: Global, friend DMs and guild chat',
     'Chat is moderated: bad words and links are filtered, 1 message every 3 seconds, mute anyone, mods can delete and ban',
@@ -2198,43 +2271,118 @@ function renderResearch(){
 }
 
 // pets
-const eggCost = () => Math.ceil(25000 * 2.2 ** S.hatches);
+// egg prices: Basic and Golden cost coins and get pricier the more you hatch (Golden is always ≥25× Basic); Cosmic costs tokens, Royal costs ✨
+const eggCost = (t = 'basic') => t === 'basic' ? Math.ceil(25000 * 1.8 ** (S.eggs.basic || 0))
+  : t === 'golden' ? Math.ceil(eggCost('basic') * 25 * 1.3 ** (S.eggs.golden || 0)) : t === 'cosmic' ? 25 : 1;   // golden always ≥25× a basic egg
+const eggCur = t => t === 'cosmic' ? '💈' : t === 'royal' ? '✨' : '🪙';
+const eggAfford = t => t === 'cosmic' ? S.hc >= 25 : t === 'royal' ? S.ap >= 1 : S.coins >= eggCost(t);
+let petSel = '';
 function renderPets(){
-  $('eggBtn').textContent = `🥚 Hatch Mystery Egg · 🪙 ${fmt(eggCost())}`;
+  $('eggRow').innerHTML = '';
+  for (const e of EGGS) {
+    const b = document.createElement('button'); b.className = eggAfford(e.id) ? 'can' : '';
+    b.innerHTML = `<b>${e.ic}</b><span>${e.nm}</span><span class="dimtxt">${eggCur(e.id)} ${fmt(eggCost(e.id))}</span>`;
+    b.title = Object.entries(e.odds).filter(([, v]) => v).map(([k, v]) => `${k} ${v}%`).join(' · ');
+    b.onclick = () => hatchEgg(false, e.id);
+    $('eggRow').appendChild(b);
+  }
   $('petGrid').innerHTML = '';
   for (const q of PETS) {
     const L = S.pets[q.id] || 0, b = document.createElement('button');
     b.innerHTML = `<span class="pi">${L ? q.ic : '❓'}</span><span class="pl">${L ? 'Lv ' + L : q.r}</span>`;
-    if (!L) b.className = 'none'; else if (S.equip.includes(q.id)) b.className = 'eq';
-    b.onclick = () => {
-      if (!L) return toast(`❓ A ${q.r.toLowerCase()} pet. Keep hatching!`);
-      if (S.equip.includes(q.id)) S.equip = S.equip.filter(x => x !== q.id);
-      else if (S.equip.length >= 3) return toast('You can equip 3 pets. Tap one to unequip it first.');
-      else S.equip.push(q.id);
-      toast(`${q.ic} ${q.nm} (${q.r}, Lv ${L}): ${q.fx(L)}${S.equip.includes(q.id) ? ' · equipped' : ' · unequipped'}`);
-      save(); renderPets(); refresh();
-    };
+    b.className = (!L ? 'none' : S.equip.includes(q.id) ? 'eq' : '') + (petSel === q.id ? ' sel' : '');
+    if (L) b.style.borderColor = RARC[q.r];
+    b.onclick = () => { petSel = petSel === q.id ? '' : q.id; renderPets(); };
     $('petGrid').appendChild(b);
   }
-  $('petInfo').textContent = `Equipped ${S.equip.length}/3 · tap a pet to equip or unequip · duplicates level pets up (max ${PET_MAX})`;
-}
-$('eggBtn').onclick = () => hatchEgg();
-function hatchEgg(free){
-  const c = eggCost(); if (!free && S.coins < c) return toast(`You need 🪙 ${fmt(c)} for an egg`);
-  if (!free) S.coins -= c;
-  S.hatches++; sfx('coin');
-  const pw = q => q.w * (asu('luck') && q.r !== 'Common' ? 2 : 1);
-  let pick = Math.random() * PETS.reduce((s, q) => s + pw(q), 0), q = PETS[0];
-  for (const x of PETS) if ((pick -= pw(x)) <= 0) { q = x; break; }
-  const L = S.pets[q.id] || 0;
-  if (L >= PET_MAX) { S.hc++; toast(`🥚 ${q.ic} ${q.nm} again, but they're maxed. +1 💈 token instead`); }
-  else {
-    S.pets[q.id] = L + 1;
-    if (!L && S.equip.length < 3) S.equip.push(q.id);
-    toast(L ? `🥚 ${q.ic} ${q.nm} leveled up to Lv ${L + 1}!` : `🥚 You hatched ${q.ic} ${q.nm} (${q.r})!`);
+  // detail panel for the tapped pet
+  const q = PETS.find(x => x.id === petSel), D = $('petDetail');
+  D.hidden = !q;
+  if (q) {
+    const L = S.pets[q.id] || 0, on = S.equip.includes(q.id);
+    D.innerHTML = `<div class="big">${L ? q.ic : '❓'}</div><div style="flex:1;min-width:0">
+      <div class="rar" style="color:${RARC[q.r]}">${q.r.toUpperCase()}</div><div style="font-weight:700">${L ? q.nm : 'Not found yet'}</div>
+      <div class="dimtxt">${L ? `Lv ${L}/${PET_MAX} · ${q.fx(L)}` : `Hatch eggs to find this ${q.r.toLowerCase()} pet`}</div>
+      ${L ? `<div class="bar2"><i style="width:${L/PET_MAX*100}%"></i></div><div class="dimtxt">${L < PET_MAX ? `Next level: ${q.fx(L + 1)} (hatch a duplicate)` : 'Max level!'}</div>` : ''}
+      ${L ? `<button class="ab" id="petEq" style="margin-top:8px">${on ? 'Unequip' : 'Equip'}</button>` : ''}</div>`;
+    if (L) $('petEq').onclick = () => {
+      if (on) S.equip = S.equip.filter(x => x !== q.id);
+      else if (S.equip.length >= PET_SLOTS) return toast(`You can equip ${PET_SLOTS} pets. Unequip one first.`);
+      else S.equip.push(q.id);
+      save(); renderPets(); refresh();
+    };
   }
-  save(); renderPets(); refresh();
-};
+  $('petInfo').textContent = `Equipped ${S.equip.length}/${PET_SLOTS} · ${Object.keys(S.pets).length}/${PETS.length} found · tap a pet for details · hover an egg for its odds`;
+}
+function hatchEgg(free, tier = 'basic'){
+  const egg = EGGS.find(e => e.id === tier) || EGGS[0];
+  if (!free) {
+    if (!eggAfford(egg.id)) return sfx('error'), toast(`You need ${eggCur(egg.id)} ${fmt(eggCost(egg.id))} for a ${egg.nm}`);
+    if (egg.id === 'cosmic') S.hc -= 25; else if (egg.id === 'royal') S.ap -= 1; else S.coins -= eggCost(egg.id);
+  }
+  S.eggs[egg.id] = (S.eggs[egg.id] || 0) + 1; S.hatches++;
+  // pick a rarity by the egg's odds (Lucky Eggs doubles the non-Common odds), then a pet of that rarity
+  const odds = Object.fromEntries(Object.entries(egg.odds).map(([k, v]) => [k, v * (asu('luck') && k !== 'Common' ? 2 : 1)]));
+  let pick = Math.random() * Object.values(odds).reduce((a, b) => a + b, 0), rar = 'Common';
+  for (const [k, v] of Object.entries(odds)) if ((pick -= v) <= 0) { rar = k; break; }
+  const pool = PETS.filter(x => x.r === rar), q = pool[Math.random()*pool.length|0];
+  const L = S.pets[q.id] || 0;
+  let note;
+  if (L >= PET_MAX) { S.hc += 3; note = 'Already max level: +3 💈'; }
+  else { S.pets[q.id] = L + 1; if (!L && S.equip.length < PET_SLOTS) S.equip.push(q.id); note = L ? `Level ${L + 1}!` : 'New pet!'; }
+  petSel = q.id; save(); renderPets(); refresh();
+  hatchFx(egg.ic, q, note);
+}
+// hatch animation: the egg wobbles, cracks with a flash, and the pet pops out with its rarity colour
+function hatchFx(eggIc, q, note){
+  const F = document.createElement('div'); F.className = 'fxLayer'; document.body.appendChild(F);
+  const egg = Object.assign(document.createElement('div'), {className:'fxEgg', textContent:eggIc}); F.appendChild(egg);
+  egg.animate([{transform:'rotate(0)'}, {transform:'rotate(-14deg)'}, {transform:'rotate(14deg)'}, {transform:'rotate(-10deg)'}, {transform:'rotate(10deg)'}, {transform:'rotate(0) scale(1.15)'}], {duration:900});
+  setTimeout(() => {
+    egg.remove(); sfx('crack'); setTimeout(() => sfx(q.r === 'Mythic' || q.r === 'Legendary' ? 'fanfare' : q.r === 'Common' ? 'coin' : 'gold'), 120);
+    const glow = Object.assign(document.createElement('div'), {className:'fxGlow'}); glow.style.background = `radial-gradient(circle, ${RARC[q.r]} 0%, transparent 65%)`; F.appendChild(glow);
+    const pet = document.createElement('div'); pet.className = 'fxPet';
+    pet.innerHTML = `<div style="font-size:90px">${q.ic}</div><div style="color:${RARC[q.r]};font-weight:800;letter-spacing:2px;font-size:12px">${q.r.toUpperCase()}</div><div style="font-size:22px;font-weight:800">${q.nm}</div><div class="dimtxt">${note}</div>`;
+    F.appendChild(pet);
+    pet.animate([{transform:'scale(0)'}, {transform:'scale(1.2)'}, {transform:'scale(1)'}], {duration:500, easing:'ease-out'});
+    glow.animate([{transform:'scale(.3)', opacity:0}, {transform:'scale(1)', opacity:1}], {duration:500, fill:'forwards'});
+    if (q.r !== 'Common') confetti(q.r === 'Mythic' || q.r === 'Legendary' ? 90 : 40);
+  }, 950);
+  const close = () => { F.animate([{opacity:1}, {opacity:0}], {duration:300}).onfinish = () => F.remove(); };
+  F.onclick = close; setTimeout(close, 3200);
+}
+// confetti burst from the top of the screen
+function confetti(n = 60){
+  const C = document.createElement('div'); C.className = 'fxConf'; document.body.appendChild(C);
+  const cols = ['#ff5c7a', '#ffc94d', '#57cc99', '#4cc9f0', '#c77dff', '#ff8a3d'];
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement('i'); d.style.cssText = `left:${Math.random()*100}%;background:${cols[i % cols.length]};width:${6 + Math.random()*6}px;height:${8 + Math.random()*8}px`;
+    C.appendChild(d);
+    d.animate([{transform:'translateY(-20px) rotate(0)', opacity:1}, {transform:`translate(${(Math.random() - .5)*200}px, 105vh) rotate(${Math.random()*900}deg)`, opacity:.9}],
+      {duration:1800 + Math.random()*1600, delay:Math.random()*400, easing:'cubic-bezier(.2,.6,.4,1)', fill:'forwards'});
+  }
+  setTimeout(() => C.remove(), 4200);
+}
+// rebirth burst: white flash, a ring expanding from Jun, big text, coins swirling
+function rebirthFx(n){
+  const F = document.createElement('div'); F.className = 'fxLayer fxPass'; document.body.appendChild(F);
+  const r = $('jun').getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+  const flash = Object.assign(document.createElement('div'), {className:'fxFlash'}); F.appendChild(flash);
+  flash.animate([{opacity:.85}, {opacity:0}], {duration:700, fill:'forwards'});
+  for (let k = 0; k < 3; k++) {
+    const ring = document.createElement('div'); ring.className = 'fxRing'; ring.style.left = cx + 'px'; ring.style.top = cy + 'px'; F.appendChild(ring);
+    ring.animate([{transform:'translate(-50%,-50%) scale(.1)', opacity:1}, {transform:'translate(-50%,-50%) scale(9)', opacity:0}], {duration:1200, delay:k*180, fill:'forwards', easing:'ease-out'});
+  }
+  for (let i = 0; i < 24; i++) {
+    const c = Object.assign(document.createElement('div'), {className:'fxCoin', textContent:'🪙'}); c.style.left = cx + 'px'; c.style.top = cy + 'px'; F.appendChild(c);
+    const a = i/24*Math.PI*2, d = 120 + Math.random()*220;
+    c.animate([{transform:'translate(-50%,-50%) scale(.4)', opacity:1}, {transform:`translate(calc(-50% + ${Math.cos(a)*d}px), calc(-50% + ${Math.sin(a)*d}px)) scale(1) rotate(360deg)`, opacity:0}], {duration:1100, easing:'ease-out', fill:'forwards'});
+  }
+  const t = Object.assign(document.createElement('div'), {className:'fxText', textContent:n > 1 ? `🔁 REBIRTH ×${n}` : '🔁 REBIRTH'}); F.appendChild(t);
+  t.animate([{transform:'translate(-50%,-50%) scale(.4)', opacity:0}, {transform:'translate(-50%,-50%) scale(1.1)', opacity:1, offset:.3}, {transform:'translate(-50%,-50%) scale(1)', opacity:1, offset:.75}, {transform:'translate(-50%,-50%) scale(1.3)', opacity:0}], {duration:1800, fill:'forwards'});
+  confetti(50);
+  setTimeout(() => F.remove(), 2000);
+}
 
 $('buyEvt2').onclick = () => { if (S.hc < 2) return toast('Not enough 💈 tokens'); S.hc -= 2; save(); renderPerks(); startEvt(2, 60); };
 $('buyEvt4').onclick = () => { if (S.hc < 5) return toast('Not enough 💈 tokens'); S.hc -= 5; save(); renderPerks(); startEvt(4, 30); };
@@ -2317,7 +2465,7 @@ $('dailyBtn').onclick = () => { renderDaily(); $('daily').showModal(); };
 $('dailyClaim').onclick = () => {
   const {can, day} = dailyState(); if (!can) return;
   S.daily = {last:dayKey(), streak:day}; DAILY[day - 1].fn(); sfx('gold');
-  toast(`📅 Day ${day} reward: ${DAILY[day - 1].txt}!`); save(); renderDaily(); renderPets(); refresh();
+  toast(`📅 Day ${day} reward: ${DAILY[day - 1].txt}!`); confetti(day === 7 ? 120 : 50); save(); renderDaily(); renderPets(); refresh();
 };
 
 // --- wardrobe ---
