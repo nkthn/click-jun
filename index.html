@@ -120,10 +120,10 @@ body.xmas #tank{background:#0b1a12}
 .hat{position:absolute;left:0;top:0;will-change:transform;pointer-events:none;display:none;transform-origin:50% 150%;z-index:2}
 body.xmas .hat.show,body.spooky .hat.show{display:block}
 #snow,#lights{display:none;pointer-events:none}
-body.xmas #snow,body.spooky #snow{display:block;position:fixed;inset:0;z-index:20}
+body.xmas #snow,body.spooky #snow,body.rainbow #snow{display:block;position:fixed;inset:0;z-index:20}
 .flake{position:absolute;top:-20px;color:#fff;animation:fall linear infinite}
 @keyframes fall{to{transform:translate(var(--dx),105vh) rotate(360deg)}}
-body.xmas #lights,body.spooky #lights{display:flex;justify-content:space-around;position:absolute;top:0;left:0;right:0;height:22px;z-index:4;border-top:2px solid #234}
+body.xmas #lights,body.spooky #lights,body.rainbow #lights{display:flex;justify-content:space-around;position:absolute;top:0;left:0;right:0;height:22px;z-index:4;border-top:2px solid #234}
 #lights i{width:10px;height:14px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;margin-top:4px;box-shadow:0 0 8px currentColor;animation:blink 1.2s infinite alternate}
 #lights i:nth-child(4n){background:#e63946;color:#e63946}#lights i:nth-child(4n+1){background:#2ec4b6;color:#2ec4b6;animation-delay:.3s}
 #lights i:nth-child(4n+2){background:#ffd166;color:#ffd166;animation-delay:.6s}#lights i:nth-child(4n+3){background:#57cc99;color:#57cc99;animation-delay:.9s}
@@ -143,6 +143,15 @@ body.spooky #pac{background:#0a0710}
 body.spooky .flake{font-size:16px!important}
 body.spooky #lights i:nth-child(odd){background:#ff7a18;color:#ff7a18}
 body.spooky #lights i:nth-child(even){background:#9b5de5;color:#9b5de5}
+/* rainbow theme (secret) */
+body.rainbow{--accent:#ff4fa3;--gold:#ffe066;background:#140c24}
+body.rainbow::before{content:'';position:fixed;inset:-20%;z-index:-1;background:conic-gradient(from 0deg,#ff5c7a,#ffc94d,#57cc99,#4cc9f0,#9b5de5,#ff5c7a);opacity:.35;filter:blur(60px);animation:rbspin 30s linear infinite}
+@keyframes rbspin{to{transform:rotate(360deg)}}
+body.rainbow aside{background:rgba(20,12,36,.9)}
+body.rainbow #lights i:nth-child(6n){background:#ff5c7a;color:#ff5c7a}body.rainbow #lights i:nth-child(6n+1){background:#ff9f43;color:#ff9f43}
+body.rainbow #lights i:nth-child(6n+2){background:#ffe066;color:#ffe066}body.rainbow #lights i:nth-child(6n+3){background:#57cc99;color:#57cc99}
+body.rainbow #lights i:nth-child(6n+4){background:#4cc9f0;color:#4cc9f0}body.rainbow #lights i:nth-child(6n+5){background:#9b5de5;color:#9b5de5}
+body.rainbow .flake{font-size:14px!important}
 .pumpkin{position:absolute;bottom:-60px;font-size:44px;background:none;border:0;padding:0;cursor:pointer;z-index:4;animation:floatup 9s linear forwards}
 @keyframes floatup{to{transform:translateY(calc(-100vh - 80px)) rotate(25deg)}}
 /* news ticker */
@@ -624,6 +633,7 @@ const ACH = [
   ['beat', '👑', 'Click Jun Beaten', `Reach 300 rebirths`, () => S.rebirths >= 300 || S.asc > 0],
   ['asc1', '✨', 'Ascended', 'Ascend once', () => S.asc >= 1],
   ['asc5', '🌟', 'Ascension Addict', 'Ascend 5 times', () => S.asc >= 5],
+  ['egg', '🥚', 'Theme Hopper', 'Find a secret (hint: someone can\'t decide on a theme)', () => S.rainbow],
   ['inf', '♾️', 'To Infinity', 'Reach ∞ coins and see the true ending', () => S.trueEnd],
   ['candy', '🎃', 'Trick or Treat', 'Catch a Halloween pumpkin', () => S.candy >= 1],
   ['night', '🦉', 'Past Your Bedtime', 'Play between 2 and 4 AM', () => [2, 3].includes(new Date().getHours())],
@@ -653,7 +663,7 @@ const PERKS = [
 const lv = id => S.perks[id] || 0;
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true,
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true, rainbow:false,
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -1318,7 +1328,7 @@ function applyState(d){
     best:int(d.best), hwins:int(d.hwins), twins:int(d.twins), pwins:int(d.pwins), xmas:d.xmas !== false, fx:d.fx !== false,
     buy:[1, 10, 25, 50, 'max'].includes(d.buy) ? d.buy : 1, rbN:[1, 2, 5, 10, 'max'].includes(d.rbN) ? d.rbN : 1, rebirths:int(d.rebirths), bp:int(d.bp), diamonds:int(d.diamonds),
     cheater:d.cheater === true || S.cheater,   // once a cheater, always a cheater
-    theme:['none', 'xmas', 'spooky'].includes(d.theme) ? d.theme : d.xmas === false ? 'none' : 'xmas',
+    theme:['none', 'xmas', 'spooky'].includes(d.theme) || (d.theme === 'rainbow' && d.rainbow === true) ? d.theme : d.xmas === false ? 'none' : 'xmas', rainbow:d.rainbow === true,
     hc:(d.hc === undefined ? int(d.bp) : int(d.hc)) + (d.perks && d.perks.maxbuy ? 5 : 0), golds:int(d.golds), clicks:int(d.clicks), maxCombo:num(d.maxCombo) || 1, candy:int(d.candy), vcDeals:int(d.vcDeals),
     ach:Object.fromEntries(ACH.filter(a => d.ach && d.ach[a.id] === true).map(a => [a.id, true])),
     perks:Object.fromEntries(PERKS.filter(k => d.perks && d.perks[k.id]).map(k => [k.id, d.perks[k.id] === true ? 1 : Math.min(int(d.perks[k.id]), k.max || Infinity)])),   // old saves stored true = level 1
@@ -1722,19 +1732,29 @@ for (let i = 0; i < 40; i++) {
   f.style.setProperty('--dx', (Math.random()-.5)*120+'px'); $('snow').appendChild(f);
 }
 // themes: classic / Christmas / Halloween (S.xmas is kept in sync for older code paths)
-const THEMES = {none:'Classic', xmas:'Christmas 🎄', spooky:'Halloween 🎃'};
+const THEMES = {none:'Classic', xmas:'Christmas 🎄', spooky:'Halloween 🎃', rainbow:'Rainbow 🌈'};   // rainbow is secret until unlocked
 const SWORDS = ['pumpkin','witch hat','haunted','skeleton','cobweb','candy corn','jack o lantern','graveyard','vampire','trick or treat'];
 const SANTA = $('jhat').src, WITCH = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M28 58 Q44 30 50 6 Q54 -2 62 6 Q60 20 74 58Z' fill='%23231433'/%3E%3Crect x='33' y='44' width='37' height='8' fill='%23ff7a18'/%3E%3Cellipse cx='50' cy='60' rx='48' ry='9' fill='%232e1a44'/%3E%3C/svg%3E";
 function applyXmas(){
   S.xmas = S.theme === 'xmas';
-  document.body.classList.toggle('xmas', S.theme === 'xmas'); document.body.classList.toggle('spooky', S.theme === 'spooky');
+  for (const t of ['xmas', 'spooky', 'rainbow']) document.body.classList.toggle(t, S.theme === t);
   $('xmasBtn').textContent = '🎨 Theme: ' + THEMES[S.theme];
   const ch = cosItem('hat', S.cos.hat), hat = ch ? emojiImg(ch.ic) : S.theme === 'spooky' ? WITCH : SANTA;
   document.body.classList.toggle('hatcos', !!ch);
   if ($('jhat').src !== hat) { $('jhat').src = hat; $('ghat').src = hat; }
-  $('snow').querySelectorAll('.flake').forEach((f, i) => f.textContent = S.theme === 'spooky' ? ['🦇', '🍂', '🍁'][i % 3] : i % 2 ? '❄' : '•');
+  $('snow').querySelectorAll('.flake').forEach((f, i) => f.textContent = S.theme === 'spooky' ? ['🦇', '🍂', '🍁'][i % 3] : S.theme === 'rainbow' ? ['🌈', '⭐', '✨', '💖'][i % 4] : i % 2 ? '❄' : '•');
 }
-$('xmasBtn').onclick = () => { const ks = Object.keys(THEMES); S.theme = ks[(ks.indexOf(S.theme) + 1) % ks.length]; save(); applyXmas(); };
+// easter egg: tap the theme button 10 times within 4 seconds to unlock the secret rainbow theme
+let themeTaps = [];
+$('xmasBtn').onclick = () => {
+  const now = Date.now(); themeTaps = [...themeTaps.filter(t => now - t < 4000), now];
+  if (!S.rainbow && themeTaps.length >= 10) {
+    S.rainbow = true; S.theme = 'rainbow'; themeTaps = []; save(); applyXmas(); sfx('ach'); checkAch();
+    toast('🥚 Secret found! The 🌈 Rainbow theme is now unlocked'); return;
+  }
+  const ks = Object.keys(THEMES).filter(k => k !== 'rainbow' || S.rainbow);
+  S.theme = ks[(ks.indexOf(S.theme) + 1) % ks.length]; save(); applyXmas();
+};
 // Halloween: pumpkins float up every ~25–45s; tap for candy and 30s of income
 function spawnPumpkin(){
   setTimeout(spawnPumpkin, 25000 + Math.random()*20000);
