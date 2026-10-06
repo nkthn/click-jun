@@ -706,11 +706,11 @@ setTimeout(spawnDiamond, diaDelay());
 
 // rebirth: Buzz Points = cube root of this run's coins in millions × rbMult
 const rbMult = (r = S.rebirths) => 1 + .1 * Math.sqrt(r);   // diminishing: 1 rebirth ×1.1, 4 → ×1.2, 25 → ×1.5, 100 → ×2
-// the base requirement climbs 15% with every rebirth you've done
-const rbBase = (r = S.rebirths) => 1e6 * 1.15 ** r;
+// the base requirement climbs 10% with every rebirth you've done
+const rbBase = (r = S.rebirths) => 1e6 * 1.1 ** r;
 const rbReq = r => rbBase(r);                           // coins this run needed to rebirth at all, only ever goes up
 const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbBase()) * rbMult());
-// multi-rebirth ×n: n real rebirths in one go. Needs the coins of n back-to-back rebirths (each requirement 15% higher),
+// multi-rebirth ×n: n real rebirths in one go. Needs the coins of n back-to-back rebirths (each requirement 10% higher),
 // the run's coins are shared across them in proportion to their requirements, and each pays its own points + tokens.
 // ×1 is the same formula with n = 1.
 const rbCost = n => { let c = 0; for (let i = 0; i < n; i++) c += rbReq(S.rebirths + i); return c; };
@@ -1454,7 +1454,7 @@ const UPDATES = [
     '⚡ Random frenzy events: 2× everything for 60s, or a rare 4× for 30s',
     'Buy instant 2× and 4× frenzies with 💈 tokens in the Rebirth Shop',
     'New perk: 🎉 Party Planner makes random frenzies more frequent and longer',
-    'Rebirths get 15% harder each time',
+    'Rebirths get 10% harder each time',
     'Multi-rebirth: save enough for 2, 5 or 10 rebirths and do them all at once, with full rewards for each']},
   {v:'2.8', date:'Oct 5, 2026', title:'Lab & Pets', notes:[
     '🔬 Research: one-time upgrades that unlock as you play (90+ of them). They reset when you rebirth',
