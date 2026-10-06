@@ -16,7 +16,10 @@
 :root{--bg:#0b0d12;--panel:rgba(255,255,255,.04);--line:rgba(255,255,255,.08);--text:#e8eaf0;--dim:#8a90a2;--gold:#ffc94d;--accent:#7c5cff}
 *{box-sizing:border-box;margin:0}
 body{background:radial-gradient(1200px 600px at 30% 20%,#1a1640 0%,var(--bg) 60%);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;height:100vh;display:grid;grid-template-columns:1fr 360px;overflow:hidden;user-select:none}
-#stage{position:relative;overflow:hidden}
+/* explicit cells: browser extensions sometimes inject elements into <body>, which used to push the game into a 0px corner */
+body{grid-template-rows:100vh;grid-auto-rows:0}
+#stage{position:relative;overflow:hidden;grid-column:1;grid-row:1;min-height:0}
+aside{grid-column:2;grid-row:1;min-height:0}
 #hud{position:absolute;top:28px;left:0;right:0;text-align:center;pointer-events:none;z-index:5}
 #coins{font-size:56px;font-weight:700;letter-spacing:-1px;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 #rates{color:var(--dim);font-size:14px;margin-top:4px}
@@ -305,7 +308,7 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 #dpad button:active{background:rgba(255,255,255,.22)}
 @media(pointer:coarse){#dpad{display:grid}}
 @media(max-width:760px){#flappy,#hang,#tank,#pac{position:fixed;z-index:30}
-body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;border-top:1px solid var(--line)}#coins{font-size:40px}.jun{width:110px}}
+body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}#stage{grid-column:1;grid-row:1}aside{grid-column:1;grid-row:2;border-left:0;border-top:1px solid var(--line)}#coins{font-size:40px}.jun{width:110px}}
 </style>
 </head>
 <body>
