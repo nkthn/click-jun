@@ -21,7 +21,6 @@ body{background:radial-gradient(1200px 600px at 30% 20%,#1a1640 0%,var(--bg) 60%
 #coins{font-size:56px;font-weight:700;letter-spacing:-1px;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 #rates{color:var(--dim);font-size:14px;margin-top:4px}
 .jun{position:absolute;width:150px;cursor:pointer;clip-path:ellipse(48% 47% at 50% 48%);filter:drop-shadow(0 10px 30px rgba(124,92,255,.5));left:0;top:0;will-change:transform}
-.jun:active{scale:.92}
 #golden{width:90px;filter:sepia(1) saturate(4) hue-rotate(5deg) brightness(1.15);display:none}
 .pop{position:absolute;pointer-events:none;font-weight:700;color:var(--gold);font-size:22px;animation:up 1s ease-out forwards;z-index:6;text-shadow:0 2px 8px #000}
 @keyframes up{to{transform:translateY(-80px);opacity:0}}
@@ -337,7 +336,8 @@ let SW = stage.clientWidth, SH = stage.clientHeight;
 const movers = [];
 addEventListener('resize', () => { SW = stage.clientWidth; SH = stage.clientHeight; movers.forEach(m => m.w = 0); });
 function mover(el, speed, hat){
-  const m = {el, hat, x:100, y:150, vx:speed, vy:speed*.8, a:0, w:0, h:0};
+  const m = {el, hat, x:100, y:150, vx:speed, vy:speed*.8, a:0, w:0, h:0, pressed:0};
+  el.addEventListener('pointerdown', () => m.pressed = performance.now());
   m.step = dt => {
     if (!m.w) { m.w = el.offsetWidth; m.h = el.offsetHeight; if (hat) hat.style.width = m.w*.8 + 'px'; }
     const W = SW - m.w, H = SH - m.h;
@@ -345,7 +345,8 @@ function mover(el, speed, hat){
     if (m.x < 0 || m.x > W) { m.vx *= -1; m.x = Math.max(0, Math.min(W, m.x)); }
     if (m.y < 0 || m.y > H) { m.vy *= -1; m.y = Math.max(0, Math.min(H, m.y)); }
     const rot = `rotate(${Math.sin(m.a)*12}deg)`;
-    el.style.transform = `translate3d(${m.x}px,${m.y}px,0) ${rot}`;
+    const squish = performance.now() - m.pressed < 90 ? ' scale(.92)' : '';
+    el.style.transform = `translate3d(${m.x}px,${m.y}px,0) ${rot}${squish}`;
     if (hat) {
       hat.style.transform = `translate3d(${m.x + m.w*.1}px,${m.y - m.w*.22}px,0) ${rot}`;
       if (!hat.classList.contains('show')) hat.classList.add('show');
