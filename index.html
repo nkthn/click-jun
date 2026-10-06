@@ -20,7 +20,7 @@ body{background:radial-gradient(1200px 600px at 30% 20%,#1a1640 0%,var(--bg) 60%
 #hud{position:absolute;top:28px;left:0;right:0;text-align:center;pointer-events:none;z-index:5}
 #coins{font-size:56px;font-weight:700;letter-spacing:-1px;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 #rates{color:var(--dim);font-size:14px;margin-top:4px}
-.jun{position:absolute;width:150px;cursor:pointer;clip-path:ellipse(48% 47% at 50% 48%);filter:drop-shadow(0 10px 30px rgba(124,92,255,.5));left:0;top:0;will-change:transform}
+.jun{position:absolute;width:150px;cursor:pointer;clip-path:polygon(50% 2.5%,60% 3.5%,70% 7%,79% 12%,87% 20%,92% 28%,94% 38%,95% 48%,96% 58%,95% 66%,92% 72%,88% 77%,83% 82%,77% 87%,70% 91.5%,61% 95%,50% 96%,40% 94.5%,31% 90.5%,24% 85%,19% 79%,15% 74%,12% 70.5%,7% 68.5%,3% 64%,1.5% 57%,2.5% 51%,5% 48%,4% 40%,5% 31%,9% 22%,15% 15%,22% 9%,31% 5%,40% 3%);filter:drop-shadow(0 10px 30px rgba(124,92,255,.5));left:0;top:0;will-change:transform}
 #golden{width:90px;filter:sepia(1) saturate(4) hue-rotate(5deg) brightness(1.15);display:none}
 .pop{position:absolute;pointer-events:none;font-weight:700;color:var(--gold);font-size:22px;animation:up 1s ease-out forwards;z-index:6;text-shadow:0 2px 8px #000}
 @keyframes up{to{transform:translateY(-80px);opacity:0}}
@@ -209,7 +209,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <div id="ticker"><span>📰</span><div id="newsBox"><span id="news"></span></div></div>
   <div id="hang">
     <svg viewBox="0 0 200 260">
-      <defs><clipPath id="hclip"><ellipse cx="140" cy="84" rx="23" ry="30"/></clipPath></defs>
+      <defs><clipPath id="hclip"><polygon points="140.0,52.7 145.0,53.3 150.0,55.7 154.5,59.0 158.5,64.4 161.0,69.8 162.0,76.5 162.5,83.2 163.0,89.9 162.5,95.2 161.0,99.2 159.0,102.6 156.5,105.9 153.5,109.3 150.0,112.3 145.5,114.7 140.0,115.3 135.0,114.3 130.5,111.6 127.0,107.9 124.5,103.9 122.5,100.6 121.0,98.2 118.5,96.9 116.5,93.9 115.8,89.2 116.2,85.2 117.5,83.2 117.0,77.8 117.5,71.8 119.5,65.7 122.5,61.0 126.0,57.0 130.5,54.4 135.0,53.0"/></clipPath></defs>
       <line class="gp" x1="15" y1="250" x2="125" y2="250"/>
       <line class="gp" x1="45" y1="250" x2="45" y2="15"/>
       <line class="gp" x1="45" y1="15" x2="140" y2="15"/>
@@ -392,6 +392,9 @@ const UPS = [
   {id:'all',    t:'a', v:2.5e10, cost:4e15,  ic:'♾️', nm:'Jun Is Everything',          ds:'There is no longer any difference between Jun and the universe.'},
 ];
 const $ = id => document.getElementById(id);
+// Jun's head outline as % of the cropped photo (traced: buzzcut, left ear, cheeks, jaw). Used by CSS and the canvas minigames.
+const HEAD = [[50, 2.5], [60, 3.5], [70, 7], [79, 12], [87, 20], [92, 28], [94, 38], [95, 48], [96, 58], [95, 66], [92, 72], [88, 77], [83, 82], [77, 87], [70, 91.5], [61, 95], [50, 96], [40, 94.5], [31, 90.5], [24, 85], [19, 79], [15, 74], [12, 70.5], [7, 68.5], [3, 64], [1.5, 57], [2.5, 51], [5, 48], [4, 40], [5, 31], [9, 22], [15, 15], [22, 9], [31, 5], [40, 3]];
+function headClip(g, x, y, w, h){ g.beginPath(); HEAD.forEach(([a, b], i) => g[i ? 'lineTo' : 'moveTo'](x + a/100*w, y + b/100*h)); g.closePath(); g.clip(); }
 
 // achievements: each one adds Shine (+2% to everything, +3% with the Extra Shiny perk)
 const ACH = [
@@ -894,7 +897,7 @@ function fStep(dt){
     fx.beginPath(); fx.roundRect(p.x, -20, PW, p.top+20, 12); fx.roundRect(p.x, p.top+GAP, PW, H, 12); fx.fill();
   }
   fx.save(); fx.translate(x, F.y); fx.rotate(Math.max(-.5, Math.min(1.2, F.vy/700)));
-  fx.beginPath(); fx.ellipse(0, 0, R*1.05, R*1.3, 0, 0, 7); fx.clip();
+  headClip(fx, -R*1.1, -R*1.4, R*2.2, R*2.94);
   fx.drawImage($('jun'), -R*1.1, -R*1.4, R*2.2, R*2.94); fx.restore();
   fx.textAlign = 'center'; fx.fillStyle = '#ffc94d';
   for (const q of F.pops) { q.t -= dt; q.y -= 60*dt; fx.globalAlpha = Math.max(q.t, 0); fx.font = '700 20px Space Grotesk'; fx.fillText(q.txt, q.x, q.y - 40); }
@@ -1092,7 +1095,7 @@ function tStep(dt){
     tx.fillStyle = '#111'; tx.fillRect(-26, -24, 52, 10); tx.fillRect(-26, 14, 52, 10);
     tx.fillStyle = c; tx.beginPath(); tx.roundRect(-22, -17, 44, 34, 8); tx.fill(); tx.restore();
     tx.save(); tx.rotate(t.ta); tx.fillStyle = c; tx.fillRect(0, -5, 34, 10); tx.restore();
-    tx.beginPath(); tx.arc(0, 0, 16, 0, 7); tx.clip();
+    headClip(tx, -17, -21, 34, 45);
     if (!t.me) tx.filter = 'sepia(1) saturate(6) hue-rotate(-35deg)';
     tx.drawImage($('jun'), -17, -21, 34, 45);
     tx.restore();
@@ -1268,7 +1271,7 @@ function mStep(dt){
   const head = (e, filter, flip) => {
     const [ex, ey] = pos(e), x = ox + (ex+.5)*ts, y = oy + (ey+.5)*ts, R = ts*.48;
     px.save(); px.translate(x, y); if (flip) px.scale(-1, 1);
-    px.beginPath(); px.arc(0, 0, R, 0, 7); px.clip();
+    headClip(px, -R*1.05, -R*1.25, R*2.1, R*2.81);
     px.filter = filter; px.drawImage($('jun'), -R*1.05, -R*1.25, R*2.1, R*2.81); px.restore();
   };
   head(M.pl, 'none', M.pl.dx < 0);
