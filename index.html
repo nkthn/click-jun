@@ -478,6 +478,10 @@ const RES = [
   ...UPS.flatMap((u, i) => [
     {id:u.id + '1', ic:u.ic, nm:`${['Turbo', 'Deluxe', 'Overclocked', 'Premium', 'Industrial'][i % 5]} ${u.nm}`, ds:`${u.nm} ×2`, cost:u.cost*30, need:() => has(u.id, 10), up:u.id, x:2},
     {id:u.id + '2', ic:u.ic, nm:`${['Legendary', 'Cosmic', 'Mythic'][i % 3]} ${u.nm}`, ds:`${u.nm} ×3`, cost:u.cost*3000, need:() => has(u.id, 75), up:u.id, x:3},
+    // late tiers cost ~100× the upgrade's own price at the unlock count, so they're a real investment
+    ...[[150, 4, ['Quantum', 'Galactic', 'Ultra']], [250, 8, ['Transcendent', 'Divine', 'Infinite']], [400, 16, ['Omega', 'Final Form', 'Godlike']]]
+      .map(([n, x, names], t) => ({id:u.id + (t + 3), ic:u.ic, nm:`${names[i % 3]} ${u.nm}`, ds:`${u.nm} ×${x}`,
+        cost:u.cost * (u.t === 'k' ? 1.3 : 1.15) ** n * 100, need:() => has(u.id, n), up:u.id, x})),
   ]),
 ];
 // frenzy events: random 2× (60s) or rarer 4× (30s) multiplier on all income, or bought with tokens in the Rebirth Shop
@@ -534,7 +538,8 @@ let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
 const autoCps = () => UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * (1 + .05*petLv('ham'));
 const perSec = () => UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .05*petLv('pug'));
 const fmt = n => n < 1e3 ? String(Math.round(n*10)/10)   // one decimal under 1K, rounded (13.26 → 13.3); K/M/B above
-  : (()=>{const u=['K','M','B','T','Qa','Qi']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
+  : n >= 1e36 ? n.toExponential(2).replace('+', '')   // beyond decillions: 1.23e40
+  : (()=>{const u=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
 
 let MULT = 1, BASE = 180;
 function earn(n){ n *= MULT; S.coins += n; S.total += n; S.lifetime += n; }
@@ -1417,14 +1422,11 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
-  {v:'2.10', date:'Oct 5, 2026', title:'Harder Rebirths', notes:[
-    'Each rebirth raises the coins needed for the next one by 15%',
-    'Multi-rebirth ×n now costs the coins of n separate rebirths, and pays n× tokens',
-    'Hover the ×2/×5/×10 buttons to see what each one costs']},
   {v:'2.9', date:'Oct 5, 2026', title:'Frenzy', notes:[
     '⚡ Random frenzy events: 2× everything for 60s, or a rare 4× for 30s',
     'Buy instant 2× and 4× frenzies with 💈 tokens in the Rebirth Shop',
-    'New perk: 🎉 Party Planner makes random frenzies more frequent and longer']},
+    'New perk: 🎉 Party Planner makes random frenzies more frequent and longer',
+    'Rebirths get 15% harder each time, and multi-rebirth ×n costs n rebirths\' worth of coins (but pays n× tokens)']},
   {v:'2.8', date:'Oct 5, 2026', title:'Lab & Pets', notes:[
     '🔬 Research: one-time upgrades that unlock as you play (90+ of them). They reset when you rebirth',
     'Special research like Jun Discovers Moisturizer: clicks earn a share of your per-second income',
