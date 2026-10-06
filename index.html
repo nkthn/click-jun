@@ -20,13 +20,13 @@ body{background:radial-gradient(1200px 600px at 30% 20%,#1a1640 0%,var(--bg) 60%
 #hud{position:absolute;top:28px;left:0;right:0;text-align:center;pointer-events:none;z-index:5}
 #coins{font-size:56px;font-weight:700;letter-spacing:-1px;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 #rates{color:var(--dim);font-size:14px;margin-top:4px}
-.jun{position:absolute;width:150px;cursor:pointer;clip-path:ellipse(48% 47% at 50% 48%);filter:drop-shadow(0 10px 30px rgba(124,92,255,.5));transition:transform .08s;will-change:left,top}
-.jun:active{transform:scale(.92)}
+.jun{position:absolute;width:150px;cursor:pointer;clip-path:ellipse(48% 47% at 50% 48%);filter:drop-shadow(0 10px 30px rgba(124,92,255,.5));left:0;top:0;will-change:transform}
+.jun:active{scale:.92}
 #golden{width:90px;filter:sepia(1) saturate(4) hue-rotate(5deg) brightness(1.15);display:none}
 .pop{position:absolute;pointer-events:none;font-weight:700;color:var(--gold);font-size:22px;animation:up 1s ease-out forwards;z-index:6;text-shadow:0 2px 8px #000}
 @keyframes up{to{transform:translateY(-80px);opacity:0}}
 #toast{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:var(--gold);color:#111;padding:10px 18px;border-radius:999px;font-weight:700;opacity:0;transition:opacity .3s;z-index:7}
-aside{border-left:1px solid var(--line);background:rgba(10,12,18,.7);backdrop-filter:blur(20px);overflow-y:auto;padding:24px 18px}
+aside{border-left:1px solid var(--line);background:rgba(10,12,18,.92);overflow-y:auto;padding:24px 18px}
 h1{font-size:28px;letter-spacing:-.5px}h1 span{color:var(--accent)}
 h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin:24px 0 10px}
 .up{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;color:var(--text);font:inherit;cursor:pointer;transition:.15s}
@@ -97,21 +97,21 @@ dialog input[type=range]{width:100%;accent-color:var(--accent)}
 .ab:hover{background:rgba(124,92,255,.3)}
 /* Christmas theme */
 body.xmas{--accent:#e63946;--gold:#ffd166;background:radial-gradient(1000px 600px at 30% 15%,#3a0f14 0%,#0d1f16 55%,#07110c 100%)}
-body.xmas aside{background:rgba(8,20,14,.75)}
+body.xmas aside{background:rgba(8,20,14,.93)}
 body.xmas .up:hover:not(:disabled){background:rgba(230,57,70,.12)}
 body.xmas #flappy,body.xmas #hang{background:linear-gradient(#3a0f14,#07110c)}
 body.xmas #tank{background:#0b1a12}
-.hat{position:absolute;pointer-events:none;display:none;transform-origin:50% 160%;z-index:2}
+.hat{position:absolute;left:0;top:0;will-change:transform;pointer-events:none;display:none;transform-origin:50% 160%;z-index:2}
 body.xmas .hat.show{display:block}
 #snow,#lights{display:none;pointer-events:none}
 body.xmas #snow{display:block;position:fixed;inset:0;z-index:20}
 .flake{position:absolute;top:-20px;color:#fff;animation:fall linear infinite}
 @keyframes fall{to{transform:translate(var(--dx),105vh) rotate(360deg)}}
 body.xmas #lights{display:flex;justify-content:space-around;position:absolute;top:0;left:0;right:0;height:22px;z-index:4;border-top:2px solid #234}
-#lights i{width:10px;height:14px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;margin-top:4px;animation:blink 1.2s infinite alternate}
+#lights i{width:10px;height:14px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;margin-top:4px;box-shadow:0 0 8px currentColor;animation:blink 1.2s infinite alternate}
 #lights i:nth-child(4n){background:#e63946;color:#e63946}#lights i:nth-child(4n+1){background:#2ec4b6;color:#2ec4b6;animation-delay:.3s}
 #lights i:nth-child(4n+2){background:#ffd166;color:#ffd166;animation-delay:.6s}#lights i:nth-child(4n+3){background:#57cc99;color:#57cc99;animation-delay:.9s}
-@keyframes blink{from{opacity:.35}to{opacity:1;box-shadow:0 0 12px currentColor}}
+@keyframes blink{from{opacity:.35}to{opacity:1}}
 #xmasBtn,#fxBtn{background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;margin-top:10px}
 #acct input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;margin-bottom:8px}
 #acct .row{display:flex;gap:8px}
@@ -239,13 +239,13 @@ const UPS = [
   {id:'fore',   t:'c', v:1500,   cost:6e5,   ic:'🪩', nm:'Forehead Reflector Array',   ds:'Visible from low Earth orbit.'},
   {id:'nasa',   t:'c', v:12000,  cost:1e7,   ic:'✂️', nm:'NASA-Grade Clippers',        ds:'Trims at 0.0001mm. Also trims the space-time continuum.'},
   {id:'hand',   t:'c', v:100000, cost:2e8,   ic:'🫵', nm:'The Hand of Jun',            ds:'One poke. Entire economies collapse.'},
-  // type k = auto clicks per second: real clicks on Jun, each worth your full click value
-  {id:'twitch', t:'k', v:.5,     cost:200,   ic:'🫨', nm:'Nervous Finger Twitch',      ds:'Clicks on its own. Doctors are concerned.'},
-  {id:'cat',    t:'k', v:1,      cost:2500,  ic:'🐈', nm:'Cat On The Mouse',           ds:'Refuses to move. Paws keep clicking.'},
-  {id:'drum',   t:'k', v:3,      cost:30000, ic:'🥁', nm:"Jun's Drummer Cousin",       ds:'Practices his blast beats on Jun\'s forehead.'},
-  {id:'pecker', t:'k', v:8,      cost:4e5,   ic:'🐦', nm:'Trained Woodpecker',         ds:'Mistook the buzzcut for tree bark. Committed anyway.'},
-  {id:'piston', t:'k', v:25,     cost:6e6,   ic:'🦾', nm:'Hydraulic Click Piston',     ds:'Industrial strength. OSHA has questions.'},
-  {id:'qclick', t:'k', v:100,    cost:1.5e8, ic:'⚛️', nm:'Quantum Clicker',            ds:'Clicks Jun in every timeline at once.'},
+  // type k = auto clicks per second on Jun, each worth AUTO (10%) of your click value
+  {id:'twitch', t:'k', v:.5,     cost:800,   ic:'🫨', nm:'Nervous Finger Twitch',      ds:'Clicks on its own. Doctors are concerned.'},
+  {id:'cat',    t:'k', v:1,      cost:1e4,   ic:'🐈', nm:'Cat On The Mouse',           ds:'Refuses to move. Paws keep clicking.'},
+  {id:'drum',   t:'k', v:3,      cost:1.2e5, ic:'🥁', nm:"Jun's Drummer Cousin",       ds:'Practices his blast beats on Jun\'s forehead.'},
+  {id:'pecker', t:'k', v:8,      cost:1.6e6, ic:'🐦', nm:'Trained Woodpecker',         ds:'Mistook the buzzcut for tree bark. Committed anyway.'},
+  {id:'piston', t:'k', v:25,     cost:2.4e7, ic:'🦾', nm:'Hydraulic Click Piston',     ds:'Industrial strength. OSHA has questions.'},
+  {id:'qclick', t:'k', v:100,    cost:6e8,   ic:'⚛️', nm:'Quantum Clicker',            ds:'Clicks Jun in every timeline at once.'},
   {id:'blind',  t:'a', v:1,      cost:50,    ic:'🪟', nm:'Guy Behind the Blinds',      ds:'He watches. He clicks. Slowly.'},
   {id:'gym',    t:'a', v:4,      cost:300,   ic:'🏋️', nm:'Gym Bro Spotter',            ds:'"All you bro." Every rep: one coin.'},
   {id:'mom',    t:'a', v:8,      cost:700,   ic:'📞', nm:"Jun's Mom On Speed Dial",   ds:'"Are you eating?" Every call: coins.'},
@@ -271,8 +271,11 @@ const own = u => S.own[u.id] || 0;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length;
 const prestige = () => 1 + .1 * S.bp;
-const cost = (u, n = S.buy) => Math.ceil(u.cost * 1.15 ** own(u) * (1.15 ** n - 1) / .15);
+// auto clickers get pricier faster (×1.3 each) since their value scales with your click power
+const growth = u => u.t === 'k' ? 1.3 : 1.15;
+const cost = (u, n = S.buy) => { const g = growth(u); return Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1)); };
 const perClick = () => (1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0)) * prestige();
+const AUTO = .1;
 const autoCps = () => UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0);
 const perSec = () => UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige();
 const fmt = n => n < 1e3 ? Math.floor(n).toString()
@@ -287,9 +290,9 @@ function renderShop(){
     box.innerHTML = '';
     for (const u of UPS.filter(u => u.t===t)) {
       const b = document.createElement('button');
-      b.className = 'up'; b.dataset.id = u.id;
+      b.className = 'up'; b.dataset.id = u.id; b._u = u;
       b.innerHTML = `<div class="ic">${u.ic}</div><div style="flex:1;min-width:0"><div class="nm">${u.nm}</div><div class="ds">${u.ds}</div>
-        <div class="ct">🪙 <span class="p"></span> · +<span class="v"></span>${{c:'/click', k:' clicks/sec', a:'/sec'}[t]} each</div><div class="ms"></div></div><div class="own"></div><div class="bar"></div>`;
+        <div class="ct">🪙 <span class="p"></span> · +<span class="v"></span>${t === 'c' ? '/click' : '/sec'} each</div><div class="ms"></div></div><div class="own"></div><div class="bar"></div>`;
       b.onclick = () => {
         const p = cost(u); if (S.coins < p) return;
         const before = umult(u); S.coins -= p; S.own[u.id] = own(u) + S.buy;
@@ -297,22 +300,28 @@ function renderShop(){
         b.animate([{background:'rgba(255,201,77,.25)'}, {background:'var(--panel)'}], {duration:350});
         save(); refresh();
       };
+      b._r = Object.fromEntries(['p', 'v', 'own', 'ms', 'bar'].map(c => [c, b.querySelector('.' + c)]));
       box.appendChild(b);
     }
   }
+  shopBtns = [...document.querySelectorAll('.up[data-id]')];
 }
+let shopBtns = [];
+const setText = (el, t) => { if (el.textContent !== t) el.textContent = t; };
 function refresh(){
   const fz = frenzy() > 1 ? ` · 💎 FRENZY ${Math.ceil((frenzyUntil - performance.now())/1000)}s` : '';
   $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}`;
   document.title = `${fmt(S.coins)} coins · Click Jun`;
-  for (const b of document.querySelectorAll('.up[data-id]')) {
-    const u = UPS.find(x => x.id===b.dataset.id), p = cost(u), can = S.coins >= p, next = MILES.find(m => own(u) < m);
-    b.querySelector('.p').textContent = fmt(p) + (S.buy > 1 ? ` for ${S.buy}` : '');
-    b.querySelector('.v').textContent = u.t === 'k' ? cps(u.v * umult(u)) : fmt(u.v * umult(u) * prestige());
-    b.querySelector('.own').textContent = own(u) || '';
-    b.querySelector('.ms').textContent = next ? `×2 output at ${next} owned` : 'All milestones reached';
-    b.querySelector('.bar').style.width = Math.min(100, S.coins / p * 100) + '%';
-    b.disabled = !can; b.classList.toggle('can', can);
+  const pc = perClick();
+  for (const b of shopBtns) {
+    const u = b._u, r = b._r, p = cost(u), can = S.coins >= p, next = MILES.find(m => own(u) < m);
+    setText(r.p, fmt(p) + (S.buy > 1 ? ` for ${S.buy}` : ''));
+    setText(r.v, fmt(u.t === 'k' ? u.v * umult(u) * AUTO * pc : u.v * umult(u) * prestige()));
+    setText(r.own, String(own(u) || ''));
+    setText(r.ms, next ? `×2 output at ${next} owned` : 'All milestones reached');
+    const w = Math.min(100, S.coins / p * 100).toFixed(1) + '%';
+    if (r.bar.style.width !== w) r.bar.style.width = w;
+    if (b.disabled === can) { b.disabled = !can; b.classList.toggle('can', can); }
   }
   const g = rbGain();
   $('rbBp').textContent = S.bp; $('rbBoost').textContent = `+${S.bp*10}%`;
@@ -323,18 +332,26 @@ function refresh(){
 
 // floating heads
 const stage = $('stage');
+// sizes are cached (re-measured on resize) and movement uses transforms, so animation never forces a layout
+let SW = stage.clientWidth, SH = stage.clientHeight;
+const movers = [];
+addEventListener('resize', () => { SW = stage.clientWidth; SH = stage.clientHeight; movers.forEach(m => m.w = 0); });
 function mover(el, speed, hat){
-  const m = {el, hat, x:100, y:150, vx:speed, vy:speed*.8, a:0};
+  const m = {el, hat, x:100, y:150, vx:speed, vy:speed*.8, a:0, w:0, h:0};
   m.step = dt => {
-    const W = stage.clientWidth - el.offsetWidth, H = stage.clientHeight - el.offsetHeight;
+    if (!m.w) { m.w = el.offsetWidth; m.h = el.offsetHeight; if (hat) hat.style.width = m.w*.8 + 'px'; }
+    const W = SW - m.w, H = SH - m.h;
     m.x += m.vx*dt; m.y += m.vy*dt; m.a += dt*2;
     if (m.x < 0 || m.x > W) { m.vx *= -1; m.x = Math.max(0, Math.min(W, m.x)); }
     if (m.y < 0 || m.y > H) { m.vy *= -1; m.y = Math.max(0, Math.min(H, m.y)); }
-    el.style.left = m.x+'px'; el.style.top = m.y+'px';
-    el.style.rotate = Math.sin(m.a)*12 + 'deg';
-    if (hat) { const w = el.offsetWidth; Object.assign(hat.style, {width:w*.8+'px', left:m.x+w*.1+'px', top:m.y-w*.22+'px', rotate:el.style.rotate});
-      hat.classList.toggle('show', el.style.display !== 'none' && getComputedStyle(el).display !== 'none'); }
+    const rot = `rotate(${Math.sin(m.a)*12}deg)`;
+    el.style.transform = `translate3d(${m.x}px,${m.y}px,0) ${rot}`;
+    if (hat) {
+      hat.style.transform = `translate3d(${m.x + m.w*.1}px,${m.y - m.w*.22}px,0) ${rot}`;
+      if (!hat.classList.contains('show')) hat.classList.add('show');
+    }
   };
+  movers.push(m);
   return m;
 }
 const jun = mover($('jun'), 180, $('jhat')), gold = mover($('golden'), 380, $('ghat'));
@@ -352,7 +369,7 @@ let combo = 1, lastClick = 0, frenzyUntil = 0;
 const frenzy = () => performance.now() < frenzyUntil ? 7 : 1;
 function sparks(e){
   const r = stage.getBoundingClientRect();
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     const d = document.createElement('div'), a = Math.random()*Math.PI*2, v = 30 + Math.random()*50;
     d.className = 'spark'; d.style.left = e.clientX - r.left + 'px'; d.style.top = e.clientY - r.top + 'px';
     d.style.setProperty('--dx', Math.cos(a)*v + 'px'); d.style.setProperty('--dy', Math.sin(a)*v + 'px');
@@ -417,22 +434,31 @@ const fxc = $('fxc'), fxx = fxc.getContext('2d'), flyers = [], fxTexts = [];
 let flyT = 0;
 const vis = n => n > 0 ? Math.min(6, Math.ceil(Math.log2(n + 1))) : 0;
 const ease = t => t*t*(3 - 2*t);
+const sprites = new Map();
+function drawIc(ic, size, x, y){
+  let c = sprites.get(ic + size);
+  if (!c) {
+    c = document.createElement('canvas'); c.width = c.height = Math.ceil(size*1.4);
+    const g = c.getContext('2d'); g.font = `${size}px serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(ic, c.width/2, c.height/2); sprites.set(ic + size, c);
+  }
+  fxx.drawImage(c, x - c.width/2, y - c.height/2);
+}
 function fxStep(dt, now){
-  const W = stage.clientWidth, H = stage.clientHeight;
+  const W = SW, H = SH;
   if (fxc.width !== W || fxc.height !== H) { fxc.width = W; fxc.height = H; }
   fxx.clearRect(0, 0, W, H);
   if (!S.fx) return;
-  const el = $('jun'), cx = jun.x + el.offsetWidth/2, cy = jun.y + el.offsetHeight/2, R0 = el.offsetWidth*.62, t = now/1000;
+  const cx = jun.x + jun.w/2, cy = jun.y + jun.h/2, R0 = jun.w*.62, t = now/1000;
   fxx.textAlign = 'center'; fxx.textBaseline = 'middle';
   // click upgrades orbit Jun in rings and every few seconds dive in to "click" him
   UPS.filter(u => u.t === 'c').forEach((u, ring) => {
     const k = vis(own(u)); if (!k) return;
-    fxx.font = `${18 - ring}px serif`;
     for (let i = 0; i < k; i++) {
       const ph = i/k*Math.PI*2, a = ph + t*(.6 + ring*.1)*(ring % 2 ? -1 : 1);
       const dive = Math.max(0, Math.sin(t*2.2 + ph*3 + ring)) ** 12;
       const r = (R0 + ring*13) * (1 - .5*dive);
-      fxx.globalAlpha = .9; fxx.fillText(u.ic, cx + Math.cos(a)*r, cy + Math.sin(a)*r);
+      fxx.globalAlpha = .9; drawIc(u.ic, 18 - ring, cx + Math.cos(a)*r, cy + Math.sin(a)*r);
     }
   });
   // passive upgrades fly in from the edges with a trail and pop on arrival
@@ -447,10 +473,10 @@ function fxStep(dt, now){
   }
   for (const f of flyers) {
     f.t += dt/1.1;
-    for (let j = 4; j >= 0; j--) {
-      const e = ease(Math.max(0, Math.min(1, f.t - j*.05)));
-      fxx.globalAlpha = (1 - j/5) * .9; fxx.font = `${20 - j*2}px serif`;
-      fxx.fillText(f.u.ic, f.sx + (cx - f.sx)*e, f.sy + (cy - f.sy)*e);
+    for (let j = 2; j >= 0; j--) {
+      const e = ease(Math.max(0, Math.min(1, f.t - j*.07)));
+      fxx.globalAlpha = (1 - j/3) * .9;
+      drawIc(f.u.ic, 20 - j*3, f.sx + (cx - f.sx)*e, f.sy + (cy - f.sy)*e);
     }
     if (f.t >= 1) fxTexts.push({x:cx + (Math.random()-.5)*40, y:cy - 30, life:1, txt:'+' + fmt(f.u.v * umult(f.u) * prestige())});
   }
@@ -464,19 +490,18 @@ function applyFx(){ $('fxBtn').textContent = S.fx ? '✨ Upgrade effects: on' : 
 $('fxBtn').onclick = () => { S.fx = !S.fx; save(); applyFx(); };
 applyFx();
 
-// auto clickers: income is continuous; on-screen click pops are capped at 8/sec so huge click rates don't lag
+// auto clickers: income is continuous; on-screen click pops are capped at 4/sec so huge click rates don't lag
 const cps = n => n < 10 ? (Math.round(n*10)/10).toString() : fmt(n);
 let autoPopAcc = 0;
 function autoClick(dt){
   const c = autoCps(); if (!c) return;
-  earn(perClick() * frenzy() * c * dt);
-  if ((autoPopAcc += Math.min(c, 8) * dt) < 1) return;
+  earn(perClick() * AUTO * frenzy() * c * dt);
+  if ((autoPopAcc += Math.min(c, 4) * dt) < 1) return;
   autoPopAcc -= 1;
   const r = $('jun').getBoundingClientRect(); if (!r.width) return;
   const ks = UPS.filter(u => u.t === 'k' && own(u)), u = ks[Math.random()*ks.length|0];
   const e = {clientX:r.left + r.width*(.2 + Math.random()*.6), clientY:r.top + r.height*(.2 + Math.random()*.6)};
-  pop(`${u.ic} +${fmt(perClick() * frenzy() * Math.max(1, c/8))}`, e);
-  if (S.fx) sparks(e);
+  pop(`${u.ic} +${fmt(perClick() * AUTO * frenzy() * Math.max(1, c/4))}`, e);
 }
 
 // main loop
@@ -494,10 +519,10 @@ function tick(now){
     if (now > diaUntil) { $('diamond').style.display = 'none'; diaUntil = 0; setTimeout(spawnDiamond, diaDelay()); }
   }
   if (now - lastClick > 900) combo = Math.max(1, combo - dt*.8);
-  $('combo').textContent = combo > 1.05 ? `🔥 ${combo.toFixed(2)}× combo` : '';
+  setText($('combo'), combo > 1.05 ? `🔥 ${combo.toFixed(1)}× combo` : '');
   shown += (S.coins - shown) * Math.min(1, dt*12);
   if (Math.abs(S.coins - shown) < 1) shown = S.coins;
-  $('coins').textContent = fmt(shown);
+  setText($('coins'), fmt(shown));
   fxStep(dt, now);
   // ease speed back down after click nudges
   jun.vx += (Math.sign(jun.vx)*BASE - jun.vx) * dt * .5;
@@ -506,7 +531,7 @@ function tick(now){
   if (M.on) mStep(dt);
   earn(perSec()*dt);
   autoClick(dt);
-  if ((acc += dt) > .1) { acc = 0; refresh(); }
+  if ((acc += dt) > .2) { acc = 0; refresh(); }
   requestAnimationFrame(tick);
 }
 setInterval(save, 5000);
@@ -961,7 +986,7 @@ const CANE = (() => { const c = document.createElement('canvas'); c.width = c.he
   x.fillStyle = '#fff'; x.fillRect(0, 0, 40, 40); x.strokeStyle = '#e63946'; x.lineWidth = 10;
   for (let i = -40; i <= 80; i += 20) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i - 40, 40); x.stroke(); }
   return fx.createPattern(c, 'repeat'); })();
-for (let i = 0; i < 70; i++) {
+for (let i = 0; i < 40; i++) {
   const f = document.createElement('div'); f.className = 'flake'; f.textContent = Math.random() < .5 ? '❄' : '•';
   Object.assign(f.style, {left:Math.random()*100+'vw', fontSize:6 + Math.random()*12+'px', opacity:.3 + Math.random()*.6,
     animationDuration:6 + Math.random()*10+'s', animationDelay:-Math.random()*16+'s'});
