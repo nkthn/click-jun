@@ -175,7 +175,7 @@ body.spooky #lights i:nth-child(even){background:#9b5de5;color:#9b5de5}
 .res:not(.can){opacity:.55}
 #eggBtn{width:100%;background:linear-gradient(90deg,#57cc99,#2ec4b6);border:0;color:#08110c;border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
 #eggBtn:disabled{opacity:.4;cursor:not-allowed}
-#petGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+#petGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
 #petGrid button{border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;padding:8px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 #petGrid button .pi{font-size:26px}
 #petGrid button .pl{font-size:11px;color:var(--dim)}
@@ -362,6 +362,10 @@ const UPS = [
   {id:'mirror', t:'c', v:5e7,    cost:8e11,  ic:'🪞', nm:'Infinite Mirror Selfie',     ds:'Jun clicking Jun clicking Jun clicking Jun.'},
   {id:'bang',   t:'c', v:4e8,    cost:1.2e13,ic:'💥', nm:'Big Bang Boop',              ds:'Turns out the universe began with a poke on the forehead.'},
   {id:'omni',   t:'c', v:3e9,    cost:2e14,  ic:'🌠', nm:'Omnipoke',                   ds:'You are now poking every forehead in existence. Mostly Jun\'s.'},
+  {id:'nova',   t:'c', v:6e11,   cost:2e17,  ic:'💫', nm:'Supernova Smack',            ds:'A star exploded. Jun barely flinched.'},
+  {id:'quasar', t:'c', v:1.2e14, cost:2e20,  ic:'🔆', nm:'Quasar Knuckles',            ds:'Brightest object in the universe, after the forehead.'},
+  {id:'flick',  t:'c', v:2.4e16, cost:2e23,  ic:'🧿', nm:'Fifth-Dimensional Flick',    ds:'You click Jun from directions that don\'t exist yet.'},
+  {id:'create', t:'c', v:4.8e18, cost:2e26,  ic:'✴️', nm:'Finger of Creation',         ds:'Every click creates a new universe. Each one has a Jun.'},
   // type k = auto clicks per second on Jun, each worth AUTO (10%) of your click value
   {id:'twitch', t:'k', v:.5,     cost:800,   ic:'🫨', nm:'Nervous Finger Twitch',      ds:'Clicks on its own. Doctors are concerned.'},
   {id:'cat',    t:'k', v:1,      cost:1e4,   ic:'🐈', nm:'Cat On The Mouse',           ds:'Refuses to move. Paws keep clicking.'},
@@ -374,6 +378,9 @@ const UPS = [
   {id:'army',   t:'k', v:6000,   cost:5e12,  ic:'👯', nm:'Clone Army',                 ds:'A thousand Juns clicking the original Jun.'},
   {id:'sing',   t:'k', v:25000,  cost:1.5e14,ic:'🕳️', nm:'Click Singularity',          ds:'Clicks so dense not even light escapes.'},
   {id:'loop',   t:'k', v:1e5,    cost:5e15,  ic:'⏳', nm:'Time Loop Clicker',          ds:'It\'s the same click. Forever. Very profitable.'},
+  {id:'nano',   t:'k', v:4e5,    cost:2e17,  ic:'🦠', nm:'Nanobot Clickers',           ds:'Trillions of tiny robots, all aiming for the forehead.'},
+  {id:'dyson',  t:'k', v:1.6e6,  cost:8e19,  ic:'🛰️', nm:'Dyson Click Sphere',         ds:'Harnesses an entire star to power one finger.'},
+  {id:'divine', t:'k', v:6.4e6,  cost:3e22,  ic:'🔱', nm:'Divine Autoclicker',         ds:'The gods themselves have joined the grind.'},
   {id:'blind',  t:'a', v:1,      cost:50,    ic:'🪟', nm:'Guy Behind the Blinds',      ds:'He watches. He clicks. Slowly.'},
   {id:'gym',    t:'a', v:4,      cost:300,   ic:'🏋️', nm:'Gym Bro Spotter',            ds:'"All you bro." Every rep: one coin.'},
   {id:'mom',    t:'a', v:8,      cost:700,   ic:'📞', nm:"Jun's Mom On Speed Dial",   ds:'"Are you eating?" Every call: coins.'},
@@ -391,6 +398,10 @@ const UPS = [
   {id:'sim',    t:'a', v:4e8,    cost:1.5e13,ic:'💾', nm:'The Jun Simulation',         ds:'Turns out we all live inside Jun\'s screensaver.'},
   {id:'church', t:'a', v:3e9,    cost:2.5e14,ic:'🛐', nm:'Church of the Buzzcut',      ds:'Sunday service is just staring at the forehead.'},
   {id:'all',    t:'a', v:2.5e10, cost:4e15,  ic:'♾️', nm:'Jun Is Everything',          ds:'There is no longer any difference between Jun and the universe.'},
+  {id:'cluster',t:'a', v:5e12,   cost:4e18,  ic:'🎆', nm:'Galaxy Cluster Franchise',   ds:'A Jun barbershop in every galaxy. Same haircut everywhere.'},
+  {id:'dark',   t:'a', v:1e15,   cost:4e21,  ic:'🌑', nm:'Dark Matter Barbershops',    ds:'Invisible. Profitable. Nobody knows who\'s getting haircuts.'},
+  {id:'dna',    t:'a', v:2e17,   cost:4e24,  ic:'🧬', nm:'Jun DNA In Everything',      ds:'Every living thing now has a tiny buzzcut gene.'},
+  {id:'heat',   t:'a', v:4e19,   cost:4e27,  ic:'🌋', nm:'Heat Death Hustle',          ds:'The universe ended. Jun is still earning.'},
 ];
 const $ = id => document.getElementById(id);
 // Jun's head outline as % of the cropped photo (traced: buzzcut, left ear, cheeks, jaw). Used by CSS and the canvas minigames.
@@ -433,6 +444,11 @@ const ACH = [
   ['pet1', '🐾', 'New Best Friend', 'Hatch a pet', () => S.hatches >= 1],
   ['petleg', '👶', 'Legendary!', 'Hatch Baby Jun', () => !!S.pets.baby],
   ['petmax', '💯', 'Max Level Bestie', 'Get a pet to level 10', () => Object.values(S.pets).some(l => l >= PET_MAX)],
+  ['unicorn', '🦄', 'Mythical', 'Hatch Sparkle the Unicorn', () => !!S.pets.unicorn],
+  ['reb50', '🔄', 'Rebirth Veteran', 'Rebirth 50 times', () => S.rebirths >= 50],
+  ['reb200', '🌀', 'Eternal Recurrence', 'Rebirth 200 times', () => S.rebirths >= 200],
+  ['earn1sx', '🌌', 'Sextillionaire', 'Earn 1Sx coins all-time', () => S.lifetime >= 1e21],
+  ['earn1oc', '🕳️', 'Octillion Odyssey', 'Earn 1Oc coins all-time', () => S.lifetime >= 1e27],
   ['candy', '🎃', 'Trick or Treat', 'Catch a Halloween pumpkin', () => S.candy >= 1],
   ['night', '🦉', 'Past Your Bedtime', 'Play between 2 and 4 AM', () => [2, 3].includes(new Date().getHours())],
   ['hacker', '🕶️', 'Hacker Man', 'Unlock the admin panel', () => S.cheater],
@@ -490,6 +506,11 @@ const RES = [
   {id:'interest',  ic:'📈', nm:'Compound Interest',       ds:'All passive income ×1.5',                         cost:5e7,  need:() => perSec() >= 1e5, a:1.5},
   {id:'cream',     ic:'🌙', nm:'Night Cream Routine',     ds:'Clicks earn another 2% of your per-second income', cost:5e8,  need:() => S.lifetime >= 1e8, c2:.02},
   {id:'serum',     ic:'✨', nm:'Forehead Serum',          ds:'Clicks earn another 3% of your per-second income', cost:5e11, need:() => S.lifetime >= 1e11, c2:.03},
+  {id:'goldrush',  ic:'🏅', nm:'Gold Rush',               ds:'Golden Juns pay ×3',                               cost:1e16, need:() => S.golds >= 50, gold:3},
+  {id:'galaxy',    ic:'🪐', nm:'Galaxy Brain Strategy',   ds:'Every upgrade ×2',                                 cost:1e18, need:() => S.lifetime >= 1e17, c:2, k:2, a:2},
+  {id:'overdrive', ic:'🚀', nm:'Overdrive Clicking',      ds:'All auto clickers ×3',                             cost:1e19, need:() => autoCps() >= 1e4, k:3},
+  {id:'synergy',   ic:'🤝', nm:'Click-Passive Synergy',   ds:'Clicks earn another 5% of your per-second income', cost:1e20, need:() => S.lifetime >= 1e19, c2:.05},
+  {id:'final',     ic:'🗿', nm:'The Final Research',      ds:'Every upgrade ×5',                                 cost:1e30, need:() => S.lifetime >= 1e29, c:5, k:5, a:5},
   ...UPS.flatMap((u, i) => [
     {id:u.id + '1', ic:u.ic, nm:`${['Turbo', 'Deluxe', 'Overclocked', 'Premium', 'Industrial'][i % 5]} ${u.nm}`, ds:`${u.nm} ×2`, cost:u.cost*30, need:() => has(u.id, 10), up:u.id, x:2},
     {id:u.id + '2', ic:u.ic, nm:`${['Legendary', 'Cosmic', 'Mythic'][i % 3]} ${u.nm}`, ds:`${u.nm} ×3`, cost:u.cost*3000, need:() => has(u.id, 75), up:u.id, x:3},
@@ -535,6 +556,8 @@ const PETS = [
   {id:'owl',    ic:'🦉', nm:'Hoot',          r:'Rare',      w:10, fx:L => `Offline earnings +${10*L}%`},
   {id:'dragon', ic:'🐉', nm:'Lil Dragon',    r:'Epic',      w:8,  fx:L => `+${10*L}% to everything`},
   {id:'baby',   ic:'👶', nm:'Baby Jun',      r:'Legendary', w:2,  fx:L => `Diamond Juns ${20*L}% more often, frenzy +${2*L}s`},
+  {id:'whale',  ic:'🐋', nm:'Big Wally',     r:'Epic',      w:6,  fx:L => `+${10*L}% rebirth tokens`},
+  {id:'unicorn',ic:'🦄', nm:'Sparkle the Unicorn', r:'Mythic', w:1, fx:L => `+${15*L}% to everything`},
 ];
 const PET_MAX = 10;
 const petLv = id => S.equip.includes(id) ? (S.pets[id] || 0) : 0;
@@ -546,7 +569,7 @@ const rbBoost = (r = S.rebirths) => 1 + .2 * r ** .85;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 1) * RM[u.t];
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => evtMult() * rbBoost() * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon'));
+const prestige = () => evtMult() * rbBoost() * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.t === 'k' ? 1.3 : 1.15;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
@@ -567,7 +590,8 @@ const fmt = n => n < 1e3 ? String(Math.round(n*10)/10)   // one decimal under 1K
   : (()=>{const u=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
 
 let MULT = 1, BASE = 180;
-function earn(n){ n *= MULT; S.coins += n; S.total += n; S.lifetime += n; }
+const CAP = 1e300;   // keep numbers finite: past ~1.8e308 JS turns them into Infinity and the game breaks
+function earn(n){ n *= MULT; if (!(n > 0)) return; S.coins = Math.min(CAP, S.coins + n); S.total = Math.min(CAP, S.total + n); S.lifetime = Math.min(CAP, S.lifetime + n); }
 
 // shop
 function renderShop(){
@@ -621,7 +645,7 @@ function refresh(){
   $('rbBtn').disabled = g < 1;
   $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
   setText($('hcBal'), String(S.hc));
-  $('rbNext').textContent = g < 1 ? 'Each rebirth needs 10% more coins than the last' : `${fmt(((g+1)/rbMult())**3*rbBase() - S.total)} more coins this run for +1 💈 token`;
+  $('rbNext').textContent = g < 1 ? 'Each rebirth needs 20% more coins than the last' : `${fmt(rbBase() * 10 ** ((g + 1)/rbMult() - 1) - S.total)} more coins this run for +1 💈 token`;
 }
 
 // floating heads
@@ -711,10 +735,10 @@ $('diamond').addEventListener('pointerdown', e => {
 });
 setTimeout(spawnDiamond, diaDelay());
 
-// rebirth tokens = cube root of this run's coins over the requirement × rbMult (bigger runs pay more tokens)
+// rebirth tokens per rebirth = (1 + log10 of how far past the requirement this run got) × rbMult, so huge runs pay more but don't explode
 const rbMult = (r = S.rebirths) => 1 + .1 * Math.sqrt(r);   // diminishing: 1 rebirth ×1.1, 4 → ×1.2, 25 → ×1.5, 100 → ×2
-// the base requirement climbs 10% with every rebirth you've done
-const rbBase = (r = S.rebirths) => 1e6 * 1.1 ** r;
+// the base requirement climbs 20% with every rebirth you've done: 100 rebirths → 8e13, 200 → 7e21, 300 → 6e29
+const rbBase = (r = S.rebirths) => 1e6 * 1.2 ** r;
 const rbReq = r => rbBase(r);                           // coins this run needed to rebirth at all, only ever goes up
 const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbBase()) * rbMult());
 // multi-rebirth ×n: n real rebirths in one go. Needs the coins of n back-to-back rebirths (each requirement 10% higher),
@@ -723,7 +747,7 @@ const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbB
 const rbCost = n => { let c = 0; for (let i = 0; i < n; i++) c += rbReq(S.rebirths + i); return c; };
 const rbGainN = n => {
   if (S.total < rbCost(n)) return 0;
-  const k = Math.cbrt(S.total / rbCost(n)); let g = 0;
+  const k = 1 + Math.log10(S.total / rbCost(n)); let g = 0;
   for (let i = 0; i < n; i++) g += Math.floor(k * rbMult(S.rebirths + i));
   return g;
 };
@@ -731,7 +755,7 @@ const rbCan = n => rbGainN(n) >= 1;
 // MAX: as many rebirths as this run's coins cover, each requirement 10% higher than the last
 function rbMaxN(){ let n = 0, c = 0; while (n < 1000 && c + rbReq(S.rebirths + n) <= S.total) c += rbReq(S.rebirths + n++); return n; }
 const rbPick = v => v === 'max' ? rbMaxN() : v;          // resolve a selector value (1/2/5/10/'max') to a count
-const tokenGain = g => Math.floor(g * (1 + .1*lv('tokens')));
+const tokenGain = g => Math.floor(g * (1 + .1*lv('tokens')) * (1 + .1*petLv('whale')));
 const rbRowBtns = [...$('rbRow').children];
 rbRowBtns.forEach(b => b.onclick = () => { S.rbN = b.dataset.n === 'max' ? 'max' : +b.dataset.n; save(); refresh(); });
 $('rbBtn').onclick = () => {
@@ -1459,6 +1483,14 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'3.1', date:'Oct 5, 2026', title:'Endgame', notes:[
+    '11 new late-game upgrades, all the way up to Heat Death Hustle 🌋 (4Oc)',
+    '5 new special research cards, including The Final Research 🗿 (everything ×5)',
+    '2 new pets: Big Wally 🐋 (more tokens) and the Mythic Sparkle the Unicorn 🦄',
+    '5 new achievements for veterans',
+    'Rebirths now get 20% harder each time, so the late game has a real climb',
+    'Huge runs pay more tokens on a gentler curve',
+    'Each upgrade card shows how many you\'re about to buy']},
   {v:'3.0', date:'Oct 5, 2026', title:'Rebirth Rework', notes:[
     'Buzz Points are gone: your boost now comes straight from how many times you\'ve rebirthed',
     'The rebirth boost has diminishing returns, so the late game no longer runs away (100 rebirths = about +1,000%)',
@@ -1470,7 +1502,7 @@ const UPDATES = [
     '⚡ Random frenzy events: 2× everything for 60s, or a rare 4× for 30s',
     'Buy instant 2× and 4× frenzies with 💈 tokens in the Rebirth Shop',
     'New perk: 🎉 Party Planner makes random frenzies more frequent and longer',
-    'Rebirths get 10% harder each time',
+    'Rebirths get harder each time',
     'Multi-rebirth: save enough for 2, 5 or 10 rebirths and do them all at once, with full rewards for each']},
   {v:'2.8', date:'Oct 5, 2026', title:'Lab & Pets', notes:[
     '🔬 Research: one-time upgrades that unlock as you play (90+ of them). They reset when you rebirth',
