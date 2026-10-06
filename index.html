@@ -160,6 +160,11 @@ body.spooky #lights i:nth-child(even){background:#9b5de5;color:#9b5de5}
 .up.dis{opacity:.55;cursor:not-allowed}
 .up .star{position:absolute;top:4px;right:8px;font-size:15px;color:var(--dim);cursor:pointer;padding:2px}
 .up .star.on{color:var(--gold)}
+#clickUps,#kUps,#autoUps{max-height:310px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y proximity;padding-right:4px;
+  -webkit-mask-image:linear-gradient(#000 88%,transparent);mask-image:linear-gradient(#000 88%,transparent)}
+#clickUps .up,#kUps .up,#autoUps .up{scroll-snap-align:start}
+#clickUps::-webkit-scrollbar,#kUps::-webkit-scrollbar,#autoUps::-webkit-scrollbar{width:4px}
+#clickUps::-webkit-scrollbar-thumb,#kUps::-webkit-scrollbar-thumb,#autoUps::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
 #reset,#adminBtn{margin-top:20px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;width:100%}
 #dpad{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px}
 #dpad button{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);font-size:22px;touch-action:none}
@@ -314,6 +319,11 @@ const UPS = [
   {id:'fore',   t:'c', v:1500,   cost:6e5,   ic:'🪩', nm:'Forehead Reflector Array',   ds:'Visible from low Earth orbit.'},
   {id:'nasa',   t:'c', v:12000,  cost:1e7,   ic:'✂️', nm:'NASA-Grade Clippers',        ds:'Trims at 0.0001mm. Also trims the space-time continuum.'},
   {id:'hand',   t:'c', v:100000, cost:2e8,   ic:'🫵', nm:'The Hand of Jun',            ds:'One poke. Entire economies collapse.'},
+  {id:'halo',   t:'c', v:8e5,    cost:3e9,   ic:'😇', nm:'Buzzcut Halo',               ds:'Angels requested the forehead for the choir.'},
+  {id:'meteor', t:'c', v:6e6,    cost:5e10,  ic:'☄️', nm:'Meteor Finger',              ds:'Every tap is a minor extinction event.'},
+  {id:'mirror', t:'c', v:5e7,    cost:8e11,  ic:'🪞', nm:'Infinite Mirror Selfie',     ds:'Jun clicking Jun clicking Jun clicking Jun.'},
+  {id:'bang',   t:'c', v:4e8,    cost:1.2e13,ic:'💥', nm:'Big Bang Boop',              ds:'Turns out the universe began with a poke on the forehead.'},
+  {id:'omni',   t:'c', v:3e9,    cost:2e14,  ic:'🌠', nm:'Omnipoke',                   ds:'You are now poking every forehead in existence. Mostly Jun\'s.'},
   // type k = auto clicks per second on Jun, each worth AUTO (10%) of your click value
   {id:'twitch', t:'k', v:.5,     cost:800,   ic:'🫨', nm:'Nervous Finger Twitch',      ds:'Clicks on its own. Doctors are concerned.'},
   {id:'cat',    t:'k', v:1,      cost:1e4,   ic:'🐈', nm:'Cat On The Mouse',           ds:'Refuses to move. Paws keep clicking.'},
@@ -321,6 +331,11 @@ const UPS = [
   {id:'pecker', t:'k', v:8,      cost:1.6e6, ic:'🐦', nm:'Trained Woodpecker',         ds:'Mistook the buzzcut for tree bark. Committed anyway.'},
   {id:'piston', t:'k', v:25,     cost:2.4e7, ic:'🦾', nm:'Hydraulic Click Piston',     ds:'Industrial strength. OSHA has questions.'},
   {id:'qclick', t:'k', v:100,    cost:6e8,   ic:'⚛️', nm:'Quantum Clicker',            ds:'Clicks Jun in every timeline at once.'},
+  {id:'drone',  t:'k', v:400,    cost:1e10,  ic:'🛸', nm:'Click Drone Swarm',          ds:'Air traffic control has stopped asking questions.'},
+  {id:'jungpt', t:'k', v:1500,   cost:2e11,  ic:'🧠', nm:'Jun-GPT',                    ds:'Trained only on clicking Jun. Became sentient. Still clicking.'},
+  {id:'army',   t:'k', v:6000,   cost:5e12,  ic:'👯', nm:'Clone Army',                 ds:'A thousand Juns clicking the original Jun.'},
+  {id:'sing',   t:'k', v:25000,  cost:1.5e14,ic:'🕳️', nm:'Click Singularity',          ds:'Clicks so dense not even light escapes.'},
+  {id:'loop',   t:'k', v:1e5,    cost:5e15,  ic:'⏳', nm:'Time Loop Clicker',          ds:'It\'s the same click. Forever. Very profitable.'},
   {id:'blind',  t:'a', v:1,      cost:50,    ic:'🪟', nm:'Guy Behind the Blinds',      ds:'He watches. He clicks. Slowly.'},
   {id:'gym',    t:'a', v:4,      cost:300,   ic:'🏋️', nm:'Gym Bro Spotter',            ds:'"All you bro." Every rep: one coin.'},
   {id:'mom',    t:'a', v:8,      cost:700,   ic:'📞', nm:"Jun's Mom On Speed Dial",   ds:'"Are you eating?" Every call: coins.'},
@@ -333,6 +348,11 @@ const UPS = [
   {id:'verse',  t:'a', v:25000,  cost:3e7,   ic:'🌌', nm:'The Jun-iverse',             ds:'Every planet is just his head now.'},
   {id:'multi',  t:'a', v:150000, cost:4e8,   ic:'🌀', nm:'Jun Multiverse',             ds:'Infinite Juns. All of them smiling. All of them clicking.'},
   {id:'sun',    t:'a', v:1e6,    cost:5e9,   ic:'☀️', nm:'Jun Becomes The Sun',        ds:'Bald. Radiant. Warming the planet one buzzcut at a time.'},
+  {id:'planet', t:'a', v:7e6,    cost:7e10,  ic:'🪐', nm:'Planet Jun',                 ds:'Population: Jun. Main export: selfies.'},
+  {id:'hole',   t:'a', v:5e7,    cost:1e12,  ic:'⚫', nm:'Black Hole Barbershop',      ds:'Haircuts so short they bend space.'},
+  {id:'sim',    t:'a', v:4e8,    cost:1.5e13,ic:'💾', nm:'The Jun Simulation',         ds:'Turns out we all live inside Jun\'s screensaver.'},
+  {id:'church', t:'a', v:3e9,    cost:2.5e14,ic:'🛐', nm:'Church of the Buzzcut',      ds:'Sunday service is just staring at the forehead.'},
+  {id:'all',    t:'a', v:2.5e10, cost:4e15,  ic:'♾️', nm:'Jun Is Everything',          ds:'There is no longer any difference between Jun and the universe.'},
 ];
 const $ = id => document.getElementById(id);
 
@@ -621,8 +641,8 @@ function fxStep(dt, now){
     for (let i = 0; i < k; i++) {
       const ph = i/k*Math.PI*2, a = ph + t*(.6 + ring*.1)*(ring % 2 ? -1 : 1);
       const dive = Math.max(0, Math.sin(t*2.2 + ph*3 + ring)) ** 12;
-      const r = (R0 + ring*13) * (1 - .5*dive);
-      fxx.globalAlpha = .9; drawIc(u.ic, 18 - ring, cx + Math.cos(a)*r, cy + Math.sin(a)*r);
+      const r = (R0 + (ring % 8)*13) * (1 - .5*dive);
+      fxx.globalAlpha = .9; drawIc(u.ic, Math.max(10, 18 - ring), cx + Math.cos(a)*r, cy + Math.sin(a)*r);
     }
   });
   // passive upgrades fly in from the edges with a trail and pop on arrival
@@ -1290,6 +1310,9 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'2.7', date:'Oct 5, 2026', title:'Late Game', notes:[
+    '15 new upgrades: 5 click, 5 auto clicker, 5 passive, up to Jun Is Everything ♾️',
+    'Upgrade lists now scroll, showing a few at a time']},
   {v:'2.6', date:'Oct 5, 2026', title:'Endless Shop', notes:[
     'Every Rebirth Shop perk now levels up, with prices that rise each level',
     '6 new perks, including Buzz Boost and Iron Finger with no level cap',
