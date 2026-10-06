@@ -254,7 +254,7 @@ body.light #live{background:rgba(30,150,100,.12);color:#1e9664}
 #wPrev{position:relative;height:170px;margin:10px 0;border-radius:14px;background:var(--panel);overflow:hidden}
 #wPrev img,#wAura{position:absolute}
 #wJun{width:96px;left:50%;top:44px;transform:translateX(-50%)}
-#wHat{width:91px;left:50%;top:12px;transform:translateX(-50%)}
+#wHat{width:96px;left:50%;top:2px;transform:translateX(-50%)}
 #wAcc{left:50%;transform:translateX(-50%)}
 #jwings{position:absolute;left:0;top:0;pointer-events:none;z-index:0;display:none;will-change:transform}
 #wWings{width:190px;left:50%;top:56px;transform:translateX(-50%)}
@@ -929,7 +929,7 @@ const asu = id => !!S.aup[id];
 // cosmetics. hat/acc/aura show on Jun; title + name colour + hat emoji show on the leaderboard (flex)
 const emojiImg = (e, sq) => 'data:image/svg+xml,' + encodeURIComponent(sq
   ? `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='84' font-size='86' text-anchor='middle'>${e}</text></svg>`
-  : `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'><text x='50' y='62' font-size='60' text-anchor='middle'>${e}</text></svg>`);
+  : `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'><text x='50' y='64' font-size='76' text-anchor='middle'>${e}</text></svg>`);
 const wingSvg = (fill, stroke, bat) => {
   const L = bat
     ? 'M100 58 L80 22 L68 40 L52 14 L42 42 L20 26 L26 58 C46 54 66 62 86 70 Z'
@@ -941,9 +941,9 @@ const COS = {
   hat:[['cap','🧢','Backwards Cap',5], ['flower','🌸','Flower Crown',4], ['bow','🎀','Big Bow',6], ['helmet','⛑️','Rescue Helmet',6], ['grad','🎓','Grad Cap',8],
        ['army','🪖','Army Helmet',8], ['tophat','🎩','Top Hat',10], ['star','⭐','Star Power',15], ['fire','🔥','Head on Fire',25], ['crown','👑','Royal Crown',50],
        ['halo','😇','Halo Mode',0, () => S.asc >= 1, 'Ascend once']],
-  acc:[['eyes','👀','Googly Eyes',3,null,null,.42,.6], ['glasses','👓','Nerd Glasses',5,null,null,.43,.66], ['goggles','🥽','Swim Goggles',8,null,null,.42,.7],
-       ['shades','🕶️','Cool Shades',10,null,null,.43,.68], ['chain','📿','Gold Chain',12,null,null,1.0,.55], ['medal','🏅','Medal',15,null,null,1.02,.35],
-       ['trophy','🏆','Champion Trophy',0, () => S.rebirths >= 300 || S.asc > 0, 'Beat Click Jun',1.0,.4]],
+  acc:[['eyes','👀','Googly Eyes',3,null,null,.44,.5,.55], ['glasses','👓','Nerd Glasses',5,null,null,.45,.66,.55], ['goggles','🥽','Swim Goggles',8,null,null,.44,.72,.55],
+       ['shades','🕶️','Cool Shades',10,null,null,.45,.66,.55], ['chain','📿','Gold Chain',12,null,null,1.0,.7,.5], ['medal','🏅','Medal',15,null,null,1.05,.32,.5],
+       ['trophy','🏆','Champion Trophy',0, () => S.rebirths >= 300 || S.asc > 0, 'Beat Click Jun',1.05,.36,.5]],
   aura:[['gold','✨','Golden Aura',20,null,null,'rgba(255,201,77,.75)'], ['fire','🔥','Fire Aura',30,null,null,'rgba(255,90,40,.8)'],
         ['ice','❄️','Ice Aura',30,null,null,'rgba(120,220,255,.8)'], ['void','🌑','Void Aura',45,null,null,'rgba(150,60,255,.85)'],
         ['rainbow','🌈','Rainbow Aura',60,null,null,'rgba(255,80,80,.8)'], ['inf','♾️','Infinity Aura',0, () => S.trueEnd, 'Reach ∞','rgba(255,255,255,.9)']],
@@ -956,7 +956,7 @@ const COS = {
          ['purple','🟣','Royal Purple',20,null,null,'#c77dff'], ['fire','🟠','Fire',25,null,null,'#ff8a3d'], ['gold','🟡','Gold',40,null,null,'#ffc94d'],
          ['rainbow','🌈','Rainbow',80,null,null,'rainbow']],
 };
-for (const t in COS) COS[t] = COS[t].map(([id, ic, nm, cost, unlock, how, a, b]) => ({id, ic, nm, cost, unlock, how, a, b}));
+for (const t in COS) COS[t] = COS[t].map(([id, ic, nm, cost, unlock, how, a, b, cx]) => ({id, ic, nm, cost, unlock, how, a, b, cx}));
 const cosItem = (t, id) => COS[t].find(c => c.id === id);
 const cosOwned = (t, c) => c.unlock ? c.unlock() : !!S.cos.owned[t + ':' + c.id];
 // display names: up to 16 characters, no control characters or angle brackets, trimmed
@@ -1129,7 +1129,7 @@ function mover(el, speed, hat){
   const m = {el, hat, x:100, y:150, vx:speed, vy:speed*.8, a:0, w:0, h:0, pressed:0};
   el.addEventListener('pointerdown', () => m.pressed = performance.now());
   m.step = dt => {
-    if (!m.w) { m.w = el.offsetWidth; m.h = el.offsetHeight; if (hat) hat.style.width = m.w*.95 + 'px'; }   // brim spans the buzzcut
+    if (!m.w) { m.w = el.offsetWidth; m.h = el.offsetHeight; }
     const W = SW - m.w, H = SH - m.h;
     m.x += m.vx*dt; m.y += m.vy*dt; m.a += dt*2;
     if (m.x < 0 || m.x > W) { m.vx *= -1; m.x = Math.max(0, Math.min(W, m.x)); }
@@ -1139,7 +1139,9 @@ function mover(el, speed, hat){
     el.style.transform = `translate3d(${m.x}px,${m.y}px,0) ${rot}${squish}`;
     if (m === jun) placeCos(m, rot);
     if (hat) {
-      hat.style.transform = `translate3d(${m.x + m.w*.02}px,${m.y - m.w*.33}px,0) ${rot}`;   // centred, brim on the hairline
+      const cos = document.body.classList.contains('hatcos'), hw = cos ? 1 : .95, hx = cos ? 0 : .02, hy = cos ? .44 : .33;
+      const wpx = m.w*hw + 'px'; if (hat.style.width !== wpx) { hat.style.width = wpx; hat.style.transformOrigin = `50% ${(.67 + hy)/(.7*hw)*100}%`; }   // pivot on the head's centre
+      hat.style.transform = `translate3d(${m.x + m.w*hx}px,${m.y - m.w*hy}px,0) ${rot}`;   // centred, brim on the hairline
       if (!hat.classList.contains('show')) hat.classList.add('show');
     }
   };
@@ -2524,8 +2526,8 @@ let wTab = 'hat';
 function placeCos(m, rot){
   const acc = cosItem('acc', S.cos.acc), A = $('jacc');
   if (acc) {
-    const sz = m.w*acc.b, x = m.x + m.w/2 - sz/2, y = m.y + m.h*acc.a - sz/2;
-    A.style.display = 'block'; A.style.width = sz + 'px'; A.style.transformOrigin = `${sz/2}px ${m.y + m.h/2 - y}px`;
+    const sz = m.w*acc.b, x = m.x + m.w*(acc.cx ?? .5) - sz/2, y = m.y + m.h*acc.a - sz/2;
+    A.style.display = 'block'; A.style.width = sz + 'px'; A.style.transformOrigin = `${m.x + m.w/2 - x}px ${m.y + m.h/2 - y}px`;   // pivot on the head's centre
     A.style.transform = `translate3d(${x}px,${y}px,0) ${rot}`;
   } else A.style.display = 'none';
   const W = $('jwings');
@@ -2560,7 +2562,8 @@ function renderWardrobe(){
   const h = cosItem('hat', S.cos.hat), ac = cosItem('acc', S.cos.acc);
   $('wHat').src = h ? emojiImg(h.ic) : ''; $('wHat').style.display = h ? 'block' : 'none';
   const wg = cosItem('back', S.cos.back); $('wWings').src = wg ? WINGS[wg.id] : ''; $('wWings').style.display = wg ? 'block' : 'none';
-  if (ac) { $('wAcc').src = emojiImg(ac.ic, true); $('wAcc').style.width = 96*ac.b + 'px'; $('wAcc').style.top = 44 + 128*ac.a - 48*ac.b + 'px'; }
+  if (ac) { $('wAcc').src = emojiImg(ac.ic, true); $('wAcc').style.width = 96*ac.b + 'px'; $('wAcc').style.top = 44 + 128*ac.a - 48*ac.b + 'px';
+    $('wAcc').style.transform = 'none'; $('wAcc').style.left = '50%'; $('wAcc').style.marginLeft = -48 + 96*(ac.cx ?? .5) - 48*ac.b + 'px'; }   // offset from the preview's centre
   $('wAcc').style.display = ac ? 'block' : 'none';
   nameHtml($('wCard'), S.display, window.myName?.() || 'you', S.cos.title, S.cos.color);
   document.querySelectorAll('#wTabs button').forEach(b => b.classList.toggle('on', b.dataset.t === wTab));
@@ -2639,7 +2642,7 @@ function autoBuyer(){
 function seeded(str){ let h = 2166136261; for (const c of str) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ h >>> 15, 2246822507) ^ Math.imul(h ^ h >>> 13, 3266489909)) >>> 0) / 4294967296; }
 function makeQuest(Q, d){
   const t = typeof Q.t === 'function' ? Q.t() : Q.t;
-  return {id:Q.id, d, n:t[d], base:Q.abs ? 0 : Q.cur(), done:false};
+  return {id:Q.id, d, n:Math.max(1, Math.min(1e299, Number(t[d]) || 1)), base:Q.abs ? 0 : Q.cur(), done:false};   // always a real target ≥ 1
 }
 function ensureQuests(){
   const today = dayKey();
