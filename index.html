@@ -184,11 +184,7 @@ body.rainbow .flake{font-size:14px!important}
 .up.dis{opacity:.55;cursor:not-allowed}
 .up .star{position:absolute;top:0;right:0;font-size:18px;line-height:1;color:var(--dim);cursor:pointer;padding:8px 10px;z-index:2}
 .up .star.on{color:var(--gold)}
-#clickUps,#kUps,#autoUps{max-height:310px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y proximity;padding-right:4px;
-  -webkit-mask-image:linear-gradient(#000 88%,transparent);mask-image:linear-gradient(#000 88%,transparent)}
-#clickUps .up,#kUps .up,#autoUps .up{scroll-snap-align:start}
-#clickUps::-webkit-scrollbar,#kUps::-webkit-scrollbar,#autoUps::-webkit-scrollbar{width:4px}
-#clickUps::-webkit-scrollbar-thumb,#kUps::-webkit-scrollbar-thumb,#autoUps::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.upMore{text-align:center;font-size:12px;color:var(--dim);padding:8px 0 2px}
 #resRow{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;overscroll-behavior:contain}
 .res{flex:0 0 76px;height:86px;border-radius:12px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text);font:inherit;cursor:pointer;padding:4px}
 .res .ri{font-size:24px}
@@ -1129,10 +1125,14 @@ function earn(n){ n *= MULT; if (!(n > 0)) return; if (S.week !== CUR_WEEK) { S.
 
 // shop
 function renderShop(){
+  shopSig = UPS.filter(u => own(u)).length;
   $('favWrap').hidden = !UPS.some(u => S.stars[u.id]);
   for (const [box,t] of [[$('favUps'),'*'],[$('clickUps'),'c'],[$('kUps'),'k'],[$('autoUps'),'a']]) {
     box.innerHTML = '';
-    for (const u of UPS.filter(u => t === '*' ? S.stars[u.id] : u.t === t && !S.stars[u.id])) {
+    let list = UPS.filter(u => t === '*' ? S.stars[u.id] : u.t === t && !S.stars[u.id]), hid = 0;
+    if (t !== '*') { const all = UPS.filter(u => u.t === t), f = all.findIndex(u => !own(u)), lim = f < 0 ? all.length : f + 2;
+      const keep = new Set(all.slice(0, lim)); hid = list.length - list.filter(u => keep.has(u)).length; list = list.filter(u => keep.has(u)); }
+    for (const u of list) {
       const b = document.createElement('button');
       b.className = 'up'; b.dataset.id = u.id; b._u = u;
       b.innerHTML = `<div class="ic">${u.ic}</div><div style="flex:1;min-width:0"><div class="nm">${u.nm}</div><div class="ds">${u.ds}</div>
@@ -1152,15 +1152,17 @@ function renderShop(){
       b._r = Object.fromEntries(['p', 'v', 'cnt', 'buyn', 'ms', 'bar'].map(c => [c, b.querySelector('.' + c)]));
       box.appendChild(b);
     }
+    if (hid) box.insertAdjacentHTML('beforeend', `<div class="upMore">🔒 ${hid} more to unlock</div>`);
   }
   shopBtns = [...document.querySelectorAll('.up[data-id]')];
 }
-let shopBtns = [];
+let shopBtns = [], shopSig = -1;
 const setText = (el, t) => { if (el.textContent !== t) el.textContent = t; };
 function refresh(){
   const fz = frenzy() > 1 ? ` · 💎 FRENZY ${Math.ceil((frenzyUntil - performance.now())/1000)}s` : '';
   $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}`;
   document.title = `${fmt(S.coins)} coins · Click Jun`;
+  if (UPS.filter(u => own(u)).length !== shopSig) renderShop();   // a first purchase (any path, or a reset) changes which upgrades are revealed
   const pc = perClick();
   for (const b of shopBtns) {
     const u = b._u, r = b._r, p = cost(u), can = S.coins >= p, next = MILES.find(m => own(u) < m);
