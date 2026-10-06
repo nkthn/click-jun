@@ -586,9 +586,9 @@ function refresh(){
   }
   const g = rbGain(), n = rbCan(S.rbN) ? S.rbN : 1, gn = rbGainN(n);
   $('rbBp').textContent = S.bp; $('rbBoost').textContent = `+${S.bp*10}%`;
-  for (const b of rbRowBtns) { const k = +b.dataset.n; b.disabled = !rbCan(k); b.classList.toggle('on', k === n); b.title = rbCan(k) ? `+${rbGainN(k)} points` : `need ${fmt(k*1e6 / rbMult()**3)} coins this run`; }
+  for (const b of rbRowBtns) { const k = +b.dataset.n; b.disabled = !rbCan(k); b.classList.toggle('on', k === n); b.title = rbCan(k) ? `+${rbGainN(k)} points, ${tokenGain(rbGainN(k), k)} tokens` : `need ${fmt(k*1e6 / rbMult()**3)} coins this run`; }
   $('rbBtn').disabled = g < 1;
-  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(1e6 / rbMult()**3)} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} for +${gn} Buzz Point${gn > 1 ? 's' : ''}`;
+  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(1e6 / rbMult()**3)} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} for +${gn} Buzz Point${gn > 1 ? 's' : ''} · ${tokenGain(gn, n)} 💈`;
   setText($('hcBal'), String(S.hc));
   $('rbNext').textContent = `${fmt(((g+1)/rbMult())**3*1e6 - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far (×${rbMult().toFixed(2)} points)`;
 }
@@ -687,15 +687,16 @@ const rbGain = () => Math.floor(Math.cbrt(S.total / 1e6) * rbMult());
 // No extra points from splitting, so it's a modest long-term boost rather than a multiplier exploit.
 const rbGainN = n => { let m = 0; for (let i = 0; i < n; i++) m += rbMult(S.rebirths + i); return Math.floor(Math.cbrt(S.total / 1e6) * m / n); };
 const rbCan = n => rbGainN(n) >= 1;
-const tokenGain = g => Math.floor(g * (1 + .1*lv('tokens')));
+// tokens scale with how many rebirths you do at once: ×10 multi-rebirth pays 10× tokens
+const tokenGain = (g, n = 1) => Math.floor(g * (1 + .1*lv('tokens'))) * n;
 const rbRowBtns = [...$('rbRow').children];
 rbRowBtns.forEach(b => b.onclick = () => { S.rbN = +b.dataset.n; save(); refresh(); });
 $('rbBtn').onclick = () => {
   const n = rbCan(S.rbN) ? S.rbN : 1; if (!rbCan(n)) return;
   const g = rbGainN(n);
-  if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but gain ${g} Buzz Point${g > 1 ? 's' : ''} (+${g*10}% to everything, forever) and ${tokenGain(g)} 💈 tokens for the Rebirth Shop.`)) return;
+  if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but gain ${g} Buzz Point${g > 1 ? 's' : ''} (+${g*10}% to everything, forever) and ${tokenGain(g, n)} 💈 tokens for the Rebirth Shop.`)) return;
   const L = lv('headstart');
-  Object.assign(S, {coins:S.coins * .02*lv('keep'), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, bp:S.bp + g, hc:S.hc + tokenGain(g), rebirths:S.rebirths + n, research:{}}); shown = S.coins; recalcResearch();
+  Object.assign(S, {coins:S.coins * .02*lv('keep'), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, bp:S.bp + g, hc:S.hc + tokenGain(g, n), rebirths:S.rebirths + n, research:{}}); shown = S.coins; recalcResearch();
   save(); refresh(); toast(`🔁 Reborn! +${g} Buzz Points`);
 };
 
@@ -1430,7 +1431,7 @@ const UPDATES = [
     '6 new perks, including Buzz Boost and Iron Finger with no level cap',
     'Token Printer perk: earn more tokens per rebirth',
     'Rebirth scaling toned down: the per-rebirth bonus now has diminishing returns',
-    'Multi-rebirth no longer multiplies points, it just adds rebirths faster']},
+    'Multi-rebirth no longer multiplies points, it just adds rebirths faster (tokens still scale ×2/×5/×10)']},
   {v:'2.5', date:'Oct 5, 2026', title:'Venture Capital', notes:[
     '💼 Rare VC funding offers: accept, decline, or negotiate for 50% more',
     'Every successful negotiation makes the next one riskier. Push too far and they walk away with nothing',
