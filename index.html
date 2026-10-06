@@ -763,7 +763,7 @@ const PERKS = [
 const lv = id => S.perks[id] || 0;
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'',
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -1506,14 +1506,15 @@ addEventListener('keydown', e => {
 });
 $('fbest').textContent = S.best;
 // replaces S with an untrusted save object, keeping only known fields with sane values
-function applyState(d){
+function applyState(d, keepCheat = true){
   const num = v => Number.isFinite(v) && v >= 0 ? v : 0, int = v => Math.floor(num(v));
   const own = {};
   for (const u of UPS) if (d.own && d.own[u.id]) own[u.id] = int(d.own[u.id]);
   S = {...DEF(), coins:num(d.coins), total:num(d.total), lifetime:Math.max(num(d.lifetime), num(d.total)), own,
     best:int(d.best), hwins:int(d.hwins), twins:int(d.twins), pwins:int(d.pwins), xmas:d.xmas !== false, fx:d.fx !== false,
     buy:[1, 10, 25, 50, 'max'].includes(d.buy) ? d.buy : 1, rbN:[1, 2, 5, 10, 'max'].includes(d.rbN) ? d.rbN : 1, rebirths:int(d.rebirths), bp:int(d.bp), diamonds:int(d.diamonds),
-    cheater:d.cheater === true || S.cheater,   // once a cheater, always a cheater
+    cheater:d.cheater === true || (keepCheat && S.cheater),   // once a cheater, always a cheater (on that account)
+    owner:typeof d.owner === 'string' ? d.owner.slice(0, 128) : '',
     theme:['none', 'xmas', 'spooky'].includes(d.theme) || (d.theme === 'rainbow' && d.rainbow === true) ? d.theme : d.xmas === false ? 'none' : 'xmas', rainbow:d.rainbow === true,
     hc:(d.hc === undefined ? int(d.bp) : int(d.hc)) + (d.perks && d.perks.maxbuy ? 5 : 0), golds:int(d.golds), clicks:int(d.clicks), maxCombo:num(d.maxCombo) || 1, candy:int(d.candy), vcDeals:int(d.vcDeals),
     ach:Object.fromEntries(ACH.filter(a => d.ach && d.ach[a.id] === true).map(a => [a.id, true])),
@@ -2546,6 +2547,12 @@ const petTake = id => { if (!id) return; S.pets[id]--; if (S.pets[id] <= 0) { de
 if (!S.started) S.started = Date.now();
 applyAppearance(); applyCos(); renderDaily();
 setTimeout(() => { if (dailyState().can && !document.querySelector('dialog[open]') && $('ending').hidden) { renderDaily(); $('daily').showModal(); } }, 2500);
+// --- accounts: a local save belongs to the account it was synced with ---
+function resetLocal(){
+  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx};
+  S = {...DEF(), ...keep, started:Date.now()}; shown = 0;
+  recalcResearch(); applyPerks(); applyCos(); applyXmas(); applyAppearance(); applyBuy(); renderAch(); renderPets(); renderShop(); refresh(); save();
+}
 // --- Ascension Shop ---
 function renderAshop(){
   $('apBal2').textContent = S.ap; $('apBig').textContent = fmt(S.ap); $('aList').innerHTML = '';
@@ -2612,15 +2619,20 @@ if (FIREBASE) {
   $('signIn').onclick = go(signInWithEmailAndPassword);
   $('signUp').onclick = go(createUserWithEmailAndPassword);
   $('uPass').addEventListener('keydown', e => e.key === 'Enter' && $('signIn').click());
-  $('signOut').onclick = () => signOut(auth);
+  $('signOut').onclick = async () => {
+    await push();                       // make sure the cloud has your latest progress
+    await signOut(auth); resetLocal();  // then start this browser fresh so the next account doesn't inherit it
+    toast('Signed out. Your progress is saved to your account.');
+  };
 
   let user = null;
   // leaderboard/{uid} = {name, score: lifetime coins, rebirths}. Admin-panel users are removed and never re-added.
   const push = () => {
-    if (!user) return;
-    setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
+    if (!user) return Promise.resolve();
+    const saved = setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
     (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
+    return saved;
   };
   window.onCheat = () => { push(); loadBoard(); };
   let lbKey = 'score';   // 'score' = lifetime coins, 'rebirths' = total rebirths across all Ascensions, 'asc' = Ascensions
@@ -3003,7 +3015,11 @@ if (FIREBASE) {
     // keep whichever save has more lifetime coins, so signing in never wipes progress
     const snap = await getDoc(doc(db, 'saves', u.uid)).catch(() => null);
     const cloud = snap && snap.exists() ? snap.data() : null;
-    if (cloud && Math.max(cloud.lifetime || 0, cloud.total || 0) >= S.lifetime) { applyState(cloud); toast('Cloud save loaded!'); }
+    // a save from a different account never merges into this one; guest progress can still be adopted on first sign-in
+    const mine = S.owner === u.uid;
+    if (S.owner && !mine) resetLocal();
+    if (cloud && Math.max(cloud.lifetime || 0, cloud.total || 0) >= S.lifetime) { applyState(cloud, mine); toast('Cloud save loaded!'); }
+    S.owner = u.uid; save();
     await syncGuild(); push(); loadBoard(); frPoll();
   });
   setInterval(push, 15000);
