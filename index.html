@@ -64,7 +64,8 @@ h2.shut::after{transform:rotate(-90deg)}
 .up .nm{font-weight:600;font-size:15px}
 .up .ds{font-size:12px;color:var(--dim);margin-top:2px}
 .up .ct{font-size:13px;color:var(--gold);margin-top:4px}
-.up .own{margin-left:auto;font-size:22px;font-weight:700;color:var(--dim)}
+.up .own{margin-left:auto;font-size:22px;font-weight:700;color:var(--dim);text-align:right;line-height:1.1}
+.up .buyn{display:block;font-size:12px;color:var(--gold)}
 #flappy{position:absolute;inset:0;z-index:10;display:none;background:linear-gradient(#1d1850,#0b0d12)}
 #fc{width:100%;height:100%;display:block;cursor:pointer}
 #fclose{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;cursor:pointer}
@@ -577,7 +578,7 @@ function renderShop(){
       const b = document.createElement('button');
       b.className = 'up'; b.dataset.id = u.id; b._u = u;
       b.innerHTML = `<div class="ic">${u.ic}</div><div style="flex:1;min-width:0"><div class="nm">${u.nm}</div><div class="ds">${u.ds}</div>
-        <div class="ct">🪙 <span class="p"></span> · +<span class="v"></span>${u.t === 'c' ? '/click' : '/sec'} each</div><div class="ms"></div></div><div class="own"></div><div class="bar"></div><span class="star${S.stars[u.id] ? ' on' : ''}" title="Star to pin at the top">${S.stars[u.id] ? '★' : '☆'}</span>`;
+        <div class="ct">🪙 <span class="p"></span> · +<span class="v"></span>${u.t === 'c' ? '/click' : '/sec'} each</div><div class="ms"></div></div><div class="own"><span class="cnt"></span><span class="buyn"></span></div><div class="bar"></div><span class="star${S.stars[u.id] ? ' on' : ''}" title="Star to pin at the top">${S.stars[u.id] ? '★' : '☆'}</span>`;
       b.querySelector('.star').onclick = e => {
         e.stopPropagation();
         if (S.stars[u.id]) delete S.stars[u.id]; else S.stars[u.id] = true;
@@ -590,7 +591,7 @@ function renderShop(){
         b.animate([{background:'rgba(255,201,77,.25)'}, {background:'var(--panel)'}], {duration:350});
         save(); refresh();
       };
-      b._r = Object.fromEntries(['p', 'v', 'own', 'ms', 'bar'].map(c => [c, b.querySelector('.' + c)]));
+      b._r = Object.fromEntries(['p', 'v', 'cnt', 'buyn', 'ms', 'bar'].map(c => [c, b.querySelector('.' + c)]));
       box.appendChild(b);
     }
   }
@@ -605,9 +606,9 @@ function refresh(){
   const pc = perClick();
   for (const b of shopBtns) {
     const u = b._u, r = b._r, p = cost(u), can = S.coins >= p, next = MILES.find(m => own(u) < m);
-    const n = buyN(u); setText(r.p, fmt(p) + (n > 1 ? ` for ${n}` : ''));
+    const n = buyN(u); setText(r.p, fmt(p)); setText(r.buyn, S.buy === 1 ? '' : `+${fmt(n)}`);   // how many this tap buys
     setText(r.v, fmt(u.t === 'k' ? u.v * umult(u) * AUTO * pc : u.v * umult(u) * prestige()));
-    setText(r.own, String(own(u) || ''));
+    setText(r.cnt, String(own(u) || ''));
     setText(r.ms, next ? `×2 output at ${next} owned` : 'All milestones reached');
     const w = Math.min(100, S.coins / p * 100).toFixed(1) + '%';
     if (r.bar.style.width !== w) r.bar.style.width = w;
