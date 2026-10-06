@@ -417,9 +417,9 @@ function refresh(){
   const g = rbGain();
   $('rbBp').textContent = S.bp; $('rbBoost').textContent = `+${S.bp*10}%`;
   $('rbBtn').disabled = g < 1;
-  $('rbBtn').textContent = g < 1 ? '🔁 Rebirth (need 1M coins this run)' : `🔁 Rebirth for +${g} Buzz Point${g > 1 ? 's' : ''}`;
+  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(1e6 / rbMult()**3)} coins this run)` : `🔁 Rebirth for +${g} Buzz Point${g > 1 ? 's' : ''}`;
   setText($('hcBal'), String(S.hc));
-  $('rbNext').textContent = `${fmt((g+1)**3*1e6 - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far`;
+  $('rbNext').textContent = `${fmt(((g+1)/rbMult())**3*1e6 - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far (×${rbMult()} points)`;
 }
 
 // floating heads
@@ -509,8 +509,9 @@ $('diamond').addEventListener('pointerdown', e => {
 });
 setTimeout(spawnDiamond, diaDelay());
 
-// rebirth: Buzz Points = cube root of this run's coins in millions
-const rbGain = () => Math.floor(Math.cbrt(S.total / 1e6));
+// rebirth: Buzz Points = cube root of this run's coins in millions, ×(1 + 25% per past rebirth)
+const rbMult = () => 1 + .25 * S.rebirths;
+const rbGain = () => Math.floor(Math.cbrt(S.total / 1e6) * rbMult());
 $('rbBtn').onclick = () => {
   const g = rbGain(); if (g < 1) return;
   if (!confirm(`Rebirth? You lose your coins and upgrades, but gain ${g} Buzz Point${g > 1 ? 's' : ''} (+${g*10}% to everything, forever) and ${g} 💈 tokens for the Rebirth Shop.`)) return;
