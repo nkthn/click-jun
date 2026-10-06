@@ -274,7 +274,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
 </dialog>
 <dialog id="rshop">
   <h3>Rebirth <span>Shop</span></h3>
-  <div style="color:var(--dim);font-size:13px;margin-top:4px">Every rebirth gives 💈 Buzz Tokens equal to the Buzz Points you earn. Perks are permanent. You have <b id="hcBal2" style="color:var(--gold)"></b> tokens.</div>
+  <div style="color:var(--dim);font-size:13px;margin-top:4px">Every rebirth gives 💈 Buzz Tokens equal to the Buzz Points you earn. Perks level up and are permanent; ⚡ and 👊 never cap. You have <b id="hcBal2" style="color:var(--gold)"></b> tokens.</div>
   <div id="perkList"></div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
 </dialog>
@@ -361,7 +361,7 @@ const ACH = [
   ['collector', '🗂️', 'Collector', 'Own at least one of every upgrade', () => UPS.every(u => own(u))],
   ['reb1', '🔁', 'Born Again Bald', 'Rebirth once', () => S.rebirths >= 1],
   ['reb10', '♾️', 'Reincarnation Addict', 'Rebirth 10 times', () => S.rebirths >= 10],
-  ['perk', '🛒', 'Retail Therapy', 'Buy a Rebirth Shop perk', () => Object.keys(S.perks).length >= 1],
+  ['perk', '🛒', 'Retail Therapy', 'Buy a Rebirth Shop perk', () => Object.values(S.perks).some(v => v > 0)],
   ['flappy', '🐦', 'Frequent Flyer', 'Score 10 in Flappy Jun', () => S.best >= 10],
   ['hang', '🪢', 'Wordsmith', 'Solve 5 Jun-Man words', () => S.hwins >= 5],
   ['tank', '🪖', 'Tank Commander', 'Beat Evil Jun in Tank Jun', () => S.twins >= 1],
@@ -372,19 +372,27 @@ const ACH = [
   ['hacker', '🕶️', 'Hacker Man', 'Unlock the admin panel', () => S.cheater],
 ].map(([id, ic, nm, ds, ok]) => ({id, ic, nm, ds, ok}));
 
-// rebirth shop perks, bought once with Buzz Tokens
+// rebirth shop perks: every perk levels up; price = cost × growth^level. max:0 means no cap (a token sink that never runs out)
 const PERKS = [
-  {id:'luck',      cost:2,  ic:'🍀', nm:'Lucky Scalp',     ds:'Golden Juns show up twice as often.'},
-  {id:'headstart', cost:2,  ic:'🏁', nm:'Head Start',      ds:'Start every run with 10 Buzzcut Polish and 10 Guys Behind the Blinds.'},
-  {id:'linger',    cost:3,  ic:'🐌', nm:'Slow Gold',       ds:'Golden and Diamond Juns stay on screen 50% longer.'},
-  {id:'offline',   cost:3,  ic:'🌙', nm:'Night Shift',     ds:'Offline earnings at 100% instead of 50%, for up to 48 hours.'},
-  {id:'combo',     cost:4,  ic:'🔥', nm:'Combo Master',    ds:'Your click combo can reach 5× instead of 3×.'},
-  {id:'keep',      cost:5,  ic:'🐷', nm:'Rainy Day Fund',  ds:'Keep 5% of your coins when you rebirth.'},
-  {id:'shine',     cost:5,  ic:'🌟', nm:'Extra Shiny',     ds:'Each achievement gives +3% instead of +2%.'},
-  {id:'diamond',   cost:6,  ic:'🧲', nm:'Diamond Magnet',  ds:'Diamond Juns show up twice as often.'},
-  {id:'auto',      cost:8,  ic:'🦾', nm:'Robot Hands',     ds:'Auto clicks are worth 20% of your click value instead of 10%.'},
-  {id:'cheap',     cost:10, ic:'✂️', nm:'Coupon Clipper',  ds:'All upgrades cost 10% less.'},
+  {id:'power',     ic:'⚡', nm:'Buzz Boost',       cost:3, g:1.35, max:0,  fx:L => `+${5*L}% to everything`},
+  {id:'click',     ic:'👊', nm:'Iron Finger',      cost:2, g:1.35, max:0,  fx:L => `+${10*L}% click power`},
+  {id:'tokens',    ic:'🖨️', nm:'Token Printer',    cost:4, g:1.6,  max:10, fx:L => `+${10*L}% tokens from rebirths`},
+  {id:'luck',      ic:'🍀', nm:'Lucky Scalp',      cost:2, g:1.6,  max:8,  fx:L => `Golden Juns ${25*L}% more often`},
+  {id:'gold',      ic:'🪙', nm:'Golden Payday',    cost:2, g:1.5,  max:10, fx:L => `Golden Juns pay +${20*L}%`},
+  {id:'linger',    ic:'🐌', nm:'Slow Gold',        cost:3, g:1.6,  max:10, fx:L => `Golden & Diamond Juns stay ${15*L}% longer`},
+  {id:'diamond',   ic:'🧲', nm:'Diamond Magnet',   cost:5, g:1.7,  max:8,  fx:L => `Diamond Juns ${25*L}% more often`},
+  {id:'frenzy',    ic:'💎', nm:'Long Frenzy',      cost:4, g:1.6,  max:5,  fx:L => `Diamond frenzy lasts ${20 + 3*L}s`},
+  {id:'headstart', ic:'🏁', nm:'Head Start',       cost:2, g:1.5,  max:10, fx:L => L ? `Start runs with ${10*L} Polish, Blinds, Gel & Gym Bros` : 'Start runs with nothing'},
+  {id:'offline',   ic:'🌙', nm:'Night Shift',      cost:3, g:1.6,  max:5,  fx:L => `Offline earnings at ${50 + 10*L}% for up to ${24 + 6*L}h`},
+  {id:'combo',     ic:'🔥', nm:'Combo Master',     cost:3, g:1.6,  max:6,  fx:L => `Combo caps at ${3 + .5*L}×`},
+  {id:'keep',      ic:'🐷', nm:'Rainy Day Fund',   cost:4, g:1.6,  max:10, fx:L => `Keep ${2*L}% of coins when you rebirth`},
+  {id:'shine',     ic:'🌟', nm:'Extra Shiny',      cost:4, g:1.6,  max:6,  fx:L => `Achievements give +${2 + .5*L}% each`},
+  {id:'auto',      ic:'🦾', nm:'Robot Hands',      cost:5, g:1.6,  max:10, fx:L => `Auto clicks worth ${10 + 2*L}% of a click`},
+  {id:'cheap',     ic:'✂️', nm:'Coupon Clipper',   cost:6, g:1.7,  max:10, fx:L => `Upgrades cost ${3*L}% less`},
+  {id:'vc',        ic:'💼', nm:'Angel Network',    cost:4, g:1.6,  max:5,  fx:L => `VC offers ${20*L}% bigger and more frequent`},
 ];
+const lv = id => S.perks[id] || 0;
+const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
   diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, lastSeen:0, cheater:false});
 let S = DEF();
@@ -394,6 +402,7 @@ if (saved) {
   S = {...S, ...saved};
   if (!('hc' in saved)) S.hc = S.bp;                                    // tokens for players who rebirthed before the shop existed
   if (!('theme' in saved)) S.theme = saved.xmas === false ? 'none' : 'xmas';
+  for (const k in S.perks) if (S.perks[k] === true) S.perks[k] = 1;
 }
 if (!S.lifetime) S.lifetime = S.total;
 const save = () => { S.lastSeen = Date.now(); try { localStorage.setItem('clickjun', JSON.stringify(S)); } catch {} };
@@ -403,11 +412,11 @@ const own = u => S.own[u.id] || 0;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length;
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => (1 + .1 * S.bp) * (1 + (S.perks.shine ? .03 : .02) * achCount());
+const prestige = () => (1 + .1 * S.bp) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power'));
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.t === 'k' ? 1.3 : 1.15;
-const cost = (u, n = S.buy) => { const g = growth(u); return Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (S.perks.cheap ? .9 : 1)); };
-const perClick = () => (1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0)) * prestige();
+const cost = (u, n = S.buy) => { const g = growth(u); return Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap'))); };
+const perClick = () => (1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0)) * prestige() * (1 + .1*lv('click'));
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
 const autoCps = () => UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0);
 const perSec = () => UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige();
@@ -468,7 +477,7 @@ function refresh(){
   $('rbBtn').disabled = g < 1;
   $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(1e6 / rbMult()**3)} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} for +${gn} Buzz Point${gn > 1 ? 's' : ''}`;
   setText($('hcBal'), String(S.hc));
-  $('rbNext').textContent = `${fmt(((g+1)/rbMult())**3*1e6 - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far (×${rbMult()} points)`;
+  $('rbNext').textContent = `${fmt(((g+1)/rbMult())**3*1e6 - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far (×${rbMult().toFixed(2)} points)`;
 }
 
 // floating heads
@@ -521,7 +530,7 @@ function sparks(e){
 }
 $('jun').addEventListener('pointerdown', e => {
   const now = performance.now();
-  combo = now - lastClick < 450 ? Math.min(S.perks.combo ? 5 : 3, combo + .04) : Math.max(1, combo - .2); lastClick = now;
+  combo = now - lastClick < 450 ? Math.min(3 + .5*lv('combo'), combo + .04) : Math.max(1, combo - .2); lastClick = now;
   S.clicks++; S.maxCombo = Math.max(S.maxCombo, combo);
   const n = perClick() * combo * frenzy(); earn(n); pop('+'+fmt(n), e); sparks(e);
   // nudge him away from the cursor so he feels alive
@@ -529,15 +538,15 @@ $('jun').addEventListener('pointerdown', e => {
   refresh();
 });
 
-function goldDelay(){ return (45000 + Math.random()*45000) / (S.perks.luck ? 2 : 1); }
+function goldDelay(){ return (45000 + Math.random()*45000) / (1 + .25*lv('luck')); }
 // golden Jun: shows up every 45–90s, worth 60s of income (min 100× click)
 let goldUntil = 0;
 function spawnGold(){
   Object.assign(gold, {x:0, y:Math.random()*(stage.clientHeight-100), vx:380, vy:(Math.random()-.5)*400});
-  $('golden').style.display = 'block'; goldUntil = performance.now() + 7000 * (S.perks.linger ? 1.5 : 1);
+  $('golden').style.display = 'block'; goldUntil = performance.now() + 7000 * (1 + .15*lv('linger'));
 }
 $('golden').addEventListener('pointerdown', e => {
-  const n = Math.max(perSec()*60, perClick()*100); earn(n); S.golds++; pop('+'+fmt(n)+' ✨', e);
+  const n = Math.max(perSec()*60, perClick()*100) * (1 + .2*lv('gold')); earn(n); S.golds++; pop('+'+fmt(n)+' ✨', e);
   toast(`GOLDEN JUN! +${fmt(n)} coins`); $('golden').style.display = 'none'; goldUntil = 0;
   setTimeout(spawnGold, goldDelay()); refresh();
 });
@@ -546,31 +555,34 @@ setTimeout(spawnGold, goldDelay());
 // diamond Jun: rare (every 3–6 min), tiny, fast, 4s on screen. Worth 10 min of income + click frenzy
 const dia = mover($('diamond'), 600);
 let diaUntil = 0;
-const diaDelay = () => (180000 + Math.random()*180000) / (S.perks.diamond ? 2 : 1);
+const diaDelay = () => (180000 + Math.random()*180000) / (1 + .25*lv('diamond'));
 function spawnDiamond(){
   Object.assign(dia, {x:0, y:Math.random()*(stage.clientHeight-80), vx:600, vy:(Math.random()-.5)*600});
-  $('diamond').style.display = 'block'; diaUntil = performance.now() + 4000 * (S.perks.linger ? 1.5 : 1);
+  $('diamond').style.display = 'block'; diaUntil = performance.now() + 4000 * (1 + .15*lv('linger'));
 }
 $('diamond').addEventListener('pointerdown', e => {
-  const n = Math.max(perSec()*600, perClick()*1000); earn(n); S.diamonds++; frenzyUntil = performance.now() + 20000;
+  const n = Math.max(perSec()*600, perClick()*1000); earn(n); S.diamonds++; frenzyUntil = performance.now() + (20 + 3*lv('frenzy'))*1000;
   pop('+'+fmt(n)+' 💎', e); toast(`💎 DIAMOND JUN! +${fmt(n)} and 7× clicks for 20s`);
   $('diamond').style.display = 'none'; diaUntil = 0; setTimeout(spawnDiamond, diaDelay()); save(); refresh();
 });
 setTimeout(spawnDiamond, diaDelay());
 
-// rebirth: Buzz Points = cube root of this run's coins in millions, ×(1 + 25% per past rebirth)
-const rbMult = () => 1 + .25 * S.rebirths;
+// rebirth: Buzz Points = cube root of this run's coins in millions × rbMult
+const rbMult = (r = S.rebirths) => 1 + .1 * Math.sqrt(r);   // diminishing: 1 rebirth ×1.1, 4 → ×1.2, 25 → ×1.5, 100 → ×2
 const rbGain = () => Math.floor(Math.cbrt(S.total / 1e6) * rbMult());
-// multi-rebirth ×n: as if this run's coins were split over n back-to-back rebirths, each one raising the multiplier
-const rbGainN = n => { let g = 0; for (let i = 0; i < n; i++) g += Math.floor(Math.cbrt(S.total / n / 1e6) * (1 + .25*(S.rebirths + i))); return g; };
-const rbCan = n => Math.floor(Math.cbrt(S.total / n / 1e6) * rbMult()) >= 1;   // every split must earn at least 1 point
+// multi-rebirth ×n: same coins, points use the average multiplier across the n rebirths, and the rebirth count goes up by n.
+// No extra points from splitting, so it's a modest long-term boost rather than a multiplier exploit.
+const rbGainN = n => { let m = 0; for (let i = 0; i < n; i++) m += rbMult(S.rebirths + i); return Math.floor(Math.cbrt(S.total / 1e6) * m / n); };
+const rbCan = n => rbGainN(n) >= 1;
+const tokenGain = g => Math.floor(g * (1 + .1*lv('tokens')));
 const rbRowBtns = [...$('rbRow').children];
 rbRowBtns.forEach(b => b.onclick = () => { S.rbN = +b.dataset.n; save(); refresh(); });
 $('rbBtn').onclick = () => {
   const n = rbCan(S.rbN) ? S.rbN : 1; if (!rbCan(n)) return;
   const g = rbGainN(n);
-  if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but gain ${g} Buzz Point${g > 1 ? 's' : ''} (+${g*10}% to everything, forever) and ${g} 💈 tokens for the Rebirth Shop.`)) return;
-  Object.assign(S, {coins:S.perks.keep ? S.coins*.05 : 0, total:0, own:S.perks.headstart ? {buzz:10, blind:10} : {}, bp:S.bp + g, hc:S.hc + g, rebirths:S.rebirths + n}); shown = S.coins;
+  if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but gain ${g} Buzz Point${g > 1 ? 's' : ''} (+${g*10}% to everything, forever) and ${tokenGain(g)} 💈 tokens for the Rebirth Shop.`)) return;
+  const L = lv('headstart');
+  Object.assign(S, {coins:S.coins * .02*lv('keep'), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, bp:S.bp + g, hc:S.hc + tokenGain(g), rebirths:S.rebirths + n}); shown = S.coins;
   save(); refresh(); toast(`🔁 Reborn! +${g} Buzz Points`);
 };
 
@@ -761,7 +773,7 @@ function applyState(d){
     theme:['none', 'xmas', 'spooky'].includes(d.theme) ? d.theme : d.xmas === false ? 'none' : 'xmas',
     hc:d.hc === undefined ? int(d.bp) : int(d.hc), golds:int(d.golds), clicks:int(d.clicks), maxCombo:num(d.maxCombo) || 1, candy:int(d.candy), vcDeals:int(d.vcDeals),
     ach:Object.fromEntries(ACH.filter(a => d.ach && d.ach[a.id] === true).map(a => [a.id, true])),
-    perks:Object.fromEntries(PERKS.filter(k => d.perks && d.perks[k.id] === true).map(k => [k.id, true])),
+    perks:Object.fromEntries(PERKS.filter(k => d.perks && d.perks[k.id]).map(k => [k.id, d.perks[k.id] === true ? 1 : Math.min(int(d.perks[k.id]), k.max || Infinity)])),   // old saves stored true = level 1
     stars:Object.fromEntries(UPS.filter(u => d.stars && d.stars[u.id] === true).map(u => [u.id, true]))};
   shown = S.coins; save(); applyXmas(); applyFx(); applyBuy(); applyPerks(); renderAch(); renderShop(); refresh();
   ['fbest', 'hwins', 'twins', 'pwins'].forEach(id => $(id).textContent = S[id === 'fbest' ? 'best' : id]);
@@ -1184,7 +1196,7 @@ function renderAch(){
     b.onclick = () => toast(`${a.ic} ${a.nm}: ${a.ds}${got ? ' ✓' : ' (locked)'}`);
     $('achGrid').appendChild(b);
   }
-  $('achCount').textContent = `${achCount()}/${ACH.length} · Shine +${Math.round(achCount() * (S.perks.shine ? 3 : 2))}%`;
+  $('achCount').textContent = `${achCount()}/${ACH.length} · Shine +${Math.round(achCount() * (2 + .5*lv('shine')))}%`;
 }
 function checkAch(){
   let changed = false;
@@ -1193,19 +1205,21 @@ function checkAch(){
 }
 
 // rebirth shop
-function applyPerks(){ AUTO = S.perks.auto ? .2 : .1; }
+function applyPerks(){ AUTO = .1 + .02*lv('auto'); }
 function renderPerks(){
   $('hcBal2').textContent = S.hc;
   $('perkList').innerHTML = '';
   for (const k of PERKS) {
-    const b = document.createElement('button'), owned = !!S.perks[k.id];
-    b.className = 'up perk' + (owned ? ' owned' : '');
-    b.innerHTML = `<div class="ic">${k.ic}</div><div style="flex:1;min-width:0"><div class="nm">${k.nm}</div><div class="ds">${k.ds}</div>
-      <div class="ct">${owned ? 'Owned ✓' : `💈 ${k.cost} tokens`}</div></div>`;
-    b.disabled = owned || S.hc < k.cost;
+    const L = lv(k.id), maxed = k.max && L >= k.max, c = perkCost(k), b = document.createElement('button');
+    b.className = 'up perk' + (L ? ' owned' : '');
+    b.innerHTML = `<div class="ic">${k.ic}</div><div style="flex:1;min-width:0"><div class="nm"></div><div class="ds"></div><div class="ct"></div></div>`;
+    b.querySelector('.nm').textContent = `${k.nm} · Lv ${L}${k.max ? '/' + k.max : ''}`;
+    b.querySelector('.ds').textContent = L ? `Now: ${k.fx(L)}${maxed ? '' : ` → ${k.fx(L + 1)}`}` : k.fx(1);
+    b.querySelector('.ct').textContent = maxed ? 'Maxed ✓' : `💈 ${c} tokens`;
+    b.disabled = maxed || S.hc < c;
     b.onclick = () => {
-      if (owned || S.hc < k.cost) return;
-      S.hc -= k.cost; S.perks[k.id] = true; applyPerks(); save(); renderPerks(); renderAch(); refresh(); toast(`${k.ic} ${k.nm} unlocked!`);
+      if (maxed || S.hc < c) return;
+      S.hc -= c; S.perks[k.id] = L + 1; applyPerks(); save(); renderPerks(); renderAch(); refresh(); toast(`${k.ic} ${k.nm} Lv ${L + 1}!`);
     };
     $('perkList').appendChild(b);
   }
@@ -1259,13 +1273,13 @@ news();
 // offline earnings: passive + auto clicks at 50% (100% with Night Shift), capped at 24h (48h)
 const dur = s => s >= 3600 ? `${Math.floor(s/3600)}h ${Math.floor(s%3600/60)}m` : `${Math.floor(s/60)}m`;
 function offline(ms){
-  const sec = Math.min(ms/1000, (S.perks.offline ? 48 : 24) * 3600);
+  const sec = Math.min(ms/1000, (24 + 6*lv('offline')) * 3600);
   if (sec < 60) return;
-  const n = (perSec() + autoCps()*AUTO*perClick()) * sec * (S.perks.offline ? 1 : .5);
+  const n = (perSec() + autoCps()*AUTO*perClick()) * sec * (.5 + .1*lv('offline'));
   if (n < 1) return;
   earn(n); save(); refresh();
   $('awayTxt').innerHTML = `You were gone <b>${dur(sec)}</b>. Jun kept grinding and earned <b style="color:var(--gold)">${fmt(n)}</b> coins` +
-    (S.perks.offline ? '.' : '.<br><span style="color:var(--dim);font-size:13px">That\'s at 50% speed. Get Night Shift in the Rebirth Shop for 100%.</span>');
+    (lv('offline') >= 5 ? '.' : `.<br><span style="color:var(--dim);font-size:13px">That's at ${50 + 10*lv('offline')}% speed. Level up Night Shift in the Rebirth Shop to earn more.</span>`);
   if (!$('away').open) $('away').showModal();
 }
 let hiddenAt = 0;
@@ -1276,6 +1290,12 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'2.6', date:'Oct 5, 2026', title:'Endless Shop', notes:[
+    'Every Rebirth Shop perk now levels up, with prices that rise each level',
+    '6 new perks, including Buzz Boost and Iron Finger with no level cap',
+    'Token Printer perk: earn more tokens per rebirth',
+    'Rebirth scaling toned down: the per-rebirth bonus now has diminishing returns',
+    'Multi-rebirth no longer multiplies points, it just adds rebirths faster']},
   {v:'2.5', date:'Oct 5, 2026', title:'Venture Capital', notes:[
     '💼 Rare VC funding offers: accept, decline, or negotiate for 50% more',
     'Every successful negotiation makes the next one riskier. Push too far and they walk away with nothing',
@@ -1343,7 +1363,7 @@ const VCS = ['Buzzcut Ventures', 'Andreessen Bald-owitz', 'Y Combjunator', 'Soft
 const VC_YES = ['Fine. You drive a hard bargain.', 'Our partners are sweating, but okay.', 'We\'ll have to sell a yacht. Deal on the table.',
   'This is highway robbery. We respect it.', 'Our lawyers are crying. Here\'s the new number.'];
 const VC = {name:'', amt:0, odds:0};
-const vcSchedule = () => setTimeout(vcPing, 480000 + Math.random()*420000);
+const vcSchedule = () => setTimeout(vcPing, (480000 + Math.random()*420000) / (1 + .2*lv('vc')));
 function vcPing(){
   if (document.hidden || $('vc').open || !$('vcPing').hidden) return vcSchedule();
   $('vcPing').hidden = false;
@@ -1357,7 +1377,7 @@ function vcShow(msg){
 function vcEnd(msg){ $('vc').close(); toast(msg); vcSchedule(); }
 $('vcPing').onclick = () => {
   $('vcPing').hidden = true;
-  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(perSec()*300, perClick()*500, 1000) * (.8 + Math.random()*.7), odds:.7});
+  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(perSec()*300, perClick()*500, 1000) * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});
   $('vcName').textContent = '💼 ' + VC.name;
   vcShow('We love what you\'re doing with the forehead. Here\'s our offer:');
   $('vc').showModal();
