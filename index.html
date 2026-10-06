@@ -53,6 +53,16 @@ h2.shut::after{transform:rotate(-90deg)}
 #rbBtn:disabled{opacity:.35;cursor:not-allowed}
 #rbRow button:disabled{opacity:.3;cursor:not-allowed}
 #rbNext{color:var(--dim);font-size:12px;margin-top:6px}
+#ascBtn{width:100%;margin-top:10px;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);border:0;color:#111;border-radius:10px;padding:10px;font:inherit;font-weight:800;cursor:pointer}
+#ascBtn[hidden],#ascLine[hidden]{display:none}
+#ascLine{margin-top:8px;font-size:13px;color:#ffd166;font-weight:600}
+#ending{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 45%,#3a2160,#05030a 70%);overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ending[hidden]{display:none}
+#ending .end-btn{background:linear-gradient(90deg,#ffd166,#ff8a3d);border:0;color:#111;border-radius:999px;padding:12px 22px;font:inherit;font-weight:800;cursor:pointer;margin:6px}
+#ending .end-btn.alt{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+#lbTabs{display:flex;gap:6px;margin-bottom:8px}
+#lbTabs button{flex:1;padding:6px 0;border-radius:9px;border:1px solid var(--line);background:none;color:var(--dim);font:inherit;font-weight:700;cursor:pointer}
+#lbTabs button.on{background:var(--accent);color:#fff;border-color:transparent}
 #lbList{list-style:none;padding:0}
 #lbList li{display:flex;gap:10px;padding:8px 10px;border-radius:10px;font-size:14px}
 #lbList li:nth-child(odd){background:var(--panel)}
@@ -240,6 +250,8 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
     <div>Rebirths: <b id="rbBp">0</b> · boosting everything <b id="rbBoost">+0%</b></div>
     <div id="rbRow"><button data-n="1">×1</button><button data-n="2">×2</button><button data-n="5">×5</button><button data-n="10">×10</button><button data-n="max">MAX</button></div>
     <button id="rbBtn"></button>
+    <button id="ascBtn" hidden>✨ Ascend</button>
+    <div id="ascLine" hidden></div>
     <div id="rbNext"></div>
     <button class="ab" id="shopBtn" style="width:100%;margin-top:10px">🛒 Rebirth Shop · <span id="hcBal">0</span> 💈 tokens</button>
   </div>
@@ -267,6 +279,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <button class="up" id="pplay"><div class="ic">👻</div><div><div class="nm">Pac-Jun</div><div class="ds">Eat dots, dodge the Evil Juns. Clear the maze for 100× your click value.</div><div class="ct">Mazes cleared: <span id="pwins">0</span></div></div></button>
   <div id="lb" hidden>
     <h2>🏆 Leaderboard</h2>
+    <div id="lbTabs"><button data-k="score" class="on">🪙 Coins</button><button data-k="rebirths">🔁 Rebirths</button></div>
     <ol id="lbList"><li>Loading…</li></ol>
     <div id="lbNote"></div>
   </div>
@@ -300,6 +313,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <div class="row" style="margin-top:16px"><button class="ab" id="vcAccept">✅ Accept</button><button class="ab" id="vcNeg">📈 Negotiate +50%</button></div>
   <div class="row" style="margin-top:6px"><button class="ab" id="vcDecline">Decline</button></div>
 </dialog>
+<div id="ending" hidden></div>
 <dialog id="welcome">
   <h3>Welcome to Click <span>Jun</span></h3>
   <div style="color:var(--dim);font-size:13px;margin:4px 0 14px">Make an account so your progress saves across devices and you can get on the leaderboard. Takes 5 seconds.</div>
@@ -343,7 +357,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <label>Jun speed: <span id="aSpdV">180</span></label>
   <input type="range" id="aSpd" min="0" max="900" step="10" value="180">
   <label>Cheats</label>
-  <div class="row"><button class="ab" id="aUps">+10 every upgrade</button><button class="ab" id="aGold">Spawn Golden Jun</button><button class="ab" id="aDia">Spawn Diamond Jun</button><button class="ab" id="aVc">Spawn VC offer</button><button class="ab" id="aEvt">Start 4× frenzy</button><button class="ab" id="aBest">Reset Flappy best</button></div>
+  <div class="row"><button class="ab" id="aUps">+10 every upgrade</button><button class="ab" id="aGold">Spawn Golden Jun</button><button class="ab" id="aDia">Spawn Diamond Jun</button><button class="ab" id="aVc">Spawn VC offer</button><button class="ab" id="aEvt">Start 4× frenzy</button><button class="ab" id="aEnd">Play ending</button><button class="ab" id="aBest">Reset Flappy best</button></div>
   <div class="row" style="margin-top:18px"><button class="ab" id="aClose" style="flex:1">Close</button></div>
 </dialog>
 <script>
@@ -366,6 +380,16 @@ const UPS = [
   {id:'quasar', t:'c', v:1.2e14, cost:2e20,  ic:'🔆', nm:'Quasar Knuckles',            ds:'Brightest object in the universe, after the forehead.'},
   {id:'flick',  t:'c', v:2.4e16, cost:2e23,  ic:'🧿', nm:'Fifth-Dimensional Flick',    ds:'You click Jun from directions that don\'t exist yet.'},
   {id:'create', t:'c', v:4.8e18, cost:2e26,  ic:'✴️', nm:'Finger of Creation',         ds:'Every click creates a new universe. Each one has a Jun.'},
+  {id:'tide', t:'c', v:5.76e20, cost:2e29, ic:'🌊', nm:'Tidal Wave Tap', ds:'Every poke sends a tsunami across the forehead.'},
+  {id:'boom', t:'c', v:6.91e22, cost:2e32, ic:'🪃', nm:'Boomerang Boop', ds:'It always comes back for another click.'},
+  {id:'thunder', t:'c', v:8.29e24, cost:2e35, ic:'🌩️', nm:'Thunder Thumb', ds:'Zeus retired. You took his job.'},
+  {id:'bull', t:'c', v:9.95e26, cost:2e38, ic:'🎯', nm:'Bullseye Forehead', ds:'Hits the exact centre of the buzzcut every time.'},
+  {id:'excal', t:'c', v:1.19e29, cost:2e41, ic:'🗡️', nm:'Excalipoke', ds:'Pulled from the stone. Used only on Jun.'},
+  {id:'tornado', t:'c', v:1.43e31, cost:2e44, ic:'🌪️', nm:'Tornado Tapper', ds:'Spins at 300 clicks per rotation.'},
+  {id:'prophecy', t:'c', v:1.72e33, cost:2e47, ic:'🔮', nm:'Prophecy Poke', ds:'Foretold for centuries: one finger, one forehead.'},
+  {id:'nuke', t:'c', v:2.06e35, cost:2e50, ic:'☢️', nm:'Nuclear Knuckle', ds:'Fusion powered. Forehead rated.'},
+  {id:'rainbow', t:'c', v:2.48e37, cost:2e53, ic:'🌈', nm:'Rainbow Bridge Boop', ds:'Connects every realm to one bald head.'},
+  {id:'lastpoke', t:'c', v:2.97e39, cost:2e56, ic:'🫳', nm:'The Last Poke', ds:'There will never be a stronger click. Probably.'},
   // type k = auto clicks per second on Jun, each worth AUTO (10%) of your click value
   {id:'twitch', t:'k', v:.5,     cost:800,   ic:'🫨', nm:'Nervous Finger Twitch',      ds:'Clicks on its own. Doctors are concerned.'},
   {id:'cat',    t:'k', v:1,      cost:1e4,   ic:'🐈', nm:'Cat On The Mouse',           ds:'Refuses to move. Paws keep clicking.'},
@@ -381,6 +405,16 @@ const UPS = [
   {id:'nano',   t:'k', v:4e5,    cost:2e17,  ic:'🦠', nm:'Nanobot Clickers',           ds:'Trillions of tiny robots, all aiming for the forehead.'},
   {id:'dyson',  t:'k', v:1.6e6,  cost:8e19,  ic:'🛰️', nm:'Dyson Click Sphere',         ds:'Harnesses an entire star to power one finger.'},
   {id:'divine', t:'k', v:6.4e6,  cost:3e22,  ic:'🔱', nm:'Divine Autoclicker',         ds:'The gods themselves have joined the grind.'},
+  {id:'hive', t:'k', v:2.56e07, cost:1.2e25, ic:'🐝', nm:'Hive Mind Clickers', ds:'A billion bees, one shared goal.'},
+  {id:'factory', t:'k', v:1.02e08, cost:4.8e27, ic:'🏭', nm:'Click Factory', ds:'Manufactures clicks on an assembly line.'},
+  {id:'express', t:'k', v:4.1e08, cost:1.92e30, ic:'🚂', nm:'Click Express', ds:'All aboard the forehead line.'},
+  {id:'sat', t:'k', v:1.64e09, cost:7.68e32, ic:'📡', nm:'Satellite Tappers', ds:'Clicking from orbit since last Tuesday.'},
+  {id:'wizard', t:'k', v:6.55e09, cost:3.07e35, ic:'🧙', nm:'Wizard of Clicks', ds:'Casts Poke III on repeat.'},
+  {id:'alien', t:'k', v:2.62e10, cost:1.23e38, ic:'👽', nm:'Alien Click Fleet', ds:'They came in peace. They stayed for Jun.'},
+  {id:'clock', t:'k', v:1.05e11, cost:4.92e40, ic:'🕰️', nm:'Grandfather Clock Clicker', ds:'Clicks every second for all of eternity.'},
+  {id:'cryo', t:'k', v:4.19e11, cost:1.97e43, ic:'🧊', nm:'Cryo-Clickers', ds:'Frozen mid-click. Still counts.'},
+  {id:'upload', t:'k', v:1.68e12, cost:7.86e45, ic:'💽', nm:'Uploaded Consciousness', ds:'Your mind lives in the cloud now. It just clicks.'},
+  {id:'flare', t:'k', v:6.71e12, cost:3.15e48, ic:'🌞', nm:'Solar Flare Clicker', ds:'The sun clicks Jun twice a second.'},
   {id:'blind',  t:'a', v:1,      cost:50,    ic:'🪟', nm:'Guy Behind the Blinds',      ds:'He watches. He clicks. Slowly.'},
   {id:'gym',    t:'a', v:4,      cost:300,   ic:'🏋️', nm:'Gym Bro Spotter',            ds:'"All you bro." Every rep: one coin.'},
   {id:'mom',    t:'a', v:8,      cost:700,   ic:'📞', nm:"Jun's Mom On Speed Dial",   ds:'"Are you eating?" Every call: coins.'},
@@ -402,6 +436,16 @@ const UPS = [
   {id:'dark',   t:'a', v:1e15,   cost:4e21,  ic:'🌑', nm:'Dark Matter Barbershops',    ds:'Invisible. Profitable. Nobody knows who\'s getting haircuts.'},
   {id:'dna',    t:'a', v:2e17,   cost:4e24,  ic:'🧬', nm:'Jun DNA In Everything',      ds:'Every living thing now has a tiny buzzcut gene.'},
   {id:'heat',   t:'a', v:4e19,   cost:4e27,  ic:'🌋', nm:'Heat Death Hustle',          ds:'The universe ended. Jun is still earning.'},
+  {id:'island', t:'a', v:4.8e21, cost:4e30, ic:'🏝️', nm:'Private Island Resort', ds:'Every guest gets a free buzzcut.'},
+  {id:'casino', t:'a', v:5.76e23, cost:4e33, ic:'🎰', nm:'Jun Casino', ds:'The house always wins. The house is Jun.'},
+  {id:'stadium', t:'a', v:6.91e25, cost:4e36, ic:'🏟️', nm:'Jun Stadium', ds:'Sold out every night. The show is one selfie.'},
+  {id:'movie', t:'a', v:8.29e27, cost:4e39, ic:'🎬', nm:'Jun: The Movie', ds:'Out-grossed every film ever made combined.'},
+  {id:'statue', t:'a', v:9.95e29, cost:4e42, ic:'🗽', nm:'Statue of Jun', ds:'Replaced the old one. Nobody complained.'},
+  {id:'junnet', t:'a', v:1.19e32, cost:4e45, ic:'🌐', nm:'The Junternet', ds:'The internet, but every page is Jun.'},
+  {id:'ministry', t:'a', v:1.43e34, cost:4e48, ic:'🏛️', nm:'Ministry of Buzzcuts', ds:'Government funded. Haircuts are mandatory.'},
+  {id:'philo', t:'a', v:1.72e36, cost:4e51, ic:'⚗️', nm:'Philosopher\'s Scalp', ds:'Turns anything into gold. Mostly coins.'},
+  {id:'rerun', t:'a', v:2.06e38, cost:4e54, ic:'🎇', nm:'Big Bang Rerun', ds:'The universe restarted just to watch Jun again.'},
+  {id:'allsee', t:'a', v:2.48e40, cost:4e57, ic:'👁️', nm:'The All-Seeing Jun', ds:'He sees every click. He appreciates every click.'},
 ];
 const $ = id => document.getElementById(id);
 // Jun's head outline as % of the cropped photo (traced: buzzcut, left ear, cheeks, jaw). Used by CSS and the canvas minigames.
@@ -449,6 +493,9 @@ const ACH = [
   ['reb200', '🌀', 'Eternal Recurrence', 'Rebirth 200 times', () => S.rebirths >= 200],
   ['earn1sx', '🌌', 'Sextillionaire', 'Earn 1Sx coins all-time', () => S.lifetime >= 1e21],
   ['earn1oc', '🕳️', 'Octillion Odyssey', 'Earn 1Oc coins all-time', () => S.lifetime >= 1e27],
+  ['beat', '👑', 'Click Jun Beaten', `Reach 300 rebirths`, () => S.rebirths >= 300 || S.asc > 0],
+  ['asc1', '✨', 'Ascended', 'Ascend once', () => S.asc >= 1],
+  ['asc5', '🌟', 'Ascension Addict', 'Ascend 5 times', () => S.asc >= 5],
   ['candy', '🎃', 'Trick or Treat', 'Catch a Halloween pumpkin', () => S.candy >= 1],
   ['night', '🦉', 'Past Your Bedtime', 'Play between 2 and 4 AM', () => [2, 3].includes(new Date().getHours())],
   ['hacker', '🕶️', 'Hacker Man', 'Unlock the admin panel', () => S.cheater],
@@ -477,7 +524,7 @@ const PERKS = [
 const lv = id => S.perks[id] || 0;
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, lastSeen:0, cheater:false});
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, lastSeen:0, cheater:false});
 let S = DEF();
 let saved = null;
 try { saved = JSON.parse(localStorage.getItem('clickjun')); } catch {}
@@ -569,7 +616,7 @@ const rbBoost = (r = S.rebirths) => 1 + .2 * r ** .85;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 1) * RM[u.t];
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => evtMult() * rbBoost() * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
+const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.t === 'k' ? 1.3 : 1.15;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
@@ -642,10 +689,14 @@ function refresh(){
   $('rbBp').textContent = S.rebirths; $('rbBoost').textContent = `+${fmt(Math.round((rbBoost() - 1)*100))}%`;
   const gainPct = fmt(Math.round((rbBoost(S.rebirths + n) - rbBoost())*100));
   for (const b of rbRowBtns) { const v = b.dataset.n === 'max' ? 'max' : +b.dataset.n, k = rbPick(v); b.disabled = !rbCan(k); b.classList.toggle('on', v === S.rbN && rbCan(k)); b.title = rbCan(k) ? `${k} rebirths: +${rbGainN(k)} points, ${tokenGain(rbGainN(k))} tokens` : `need ${fmt(rbCost(k))} coins this run`; }
-  $('rbBtn').disabled = g < 1;
-  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
+  const capped = S.rebirths >= MAXR;
+  $('ascBtn').hidden = !capped;
+  $('ascLine').hidden = !S.asc && !capped;
+  $('ascLine').textContent = `✨ Ascensions: ${S.asc} · ×${fmt(3 ** S.asc)} everything · rebirths ${fmt(10 ** S.asc)}× cheaper`;
+  $('rbBtn').disabled = g < 1 || capped;
+  $('rbBtn').textContent = capped ? '👑 You beat Click Jun! Ascend to climb again' : g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
   setText($('hcBal'), String(S.hc));
-  $('rbNext').textContent = g < 1 ? 'Each rebirth needs 20% more coins than the last' : `${fmt(rbBase() * 10 ** ((g + 1)/rbMult() - 1) - S.total)} more coins this run for +1 💈 token`;
+  $('rbNext').textContent = capped ? `${MAXR}/${MAXR} rebirths` : g < 1 ? `Rebirth ${S.rebirths}/${MAXR} · each one needs more coins than the last` : `${fmt(rbBase() * 10 ** ((g + 1)/rbMult() - 1) - S.total)} more coins this run for +1 💈 token`;
 }
 
 // floating heads
@@ -738,7 +789,9 @@ setTimeout(spawnDiamond, diaDelay());
 // rebirth tokens per rebirth = (1 + log10 of how far past the requirement this run got) × rbMult, so huge runs pay more but don't explode
 const rbMult = (r = S.rebirths) => 1 + .1 * Math.sqrt(r);   // diminishing: 1 rebirth ×1.1, 4 → ×1.2, 25 → ×1.5, 100 → ×2
 // the base requirement climbs 20% with every rebirth you've done: 100 rebirths → 8e13, 200 → 7e21, 300 → 6e29
-const rbBase = (r = S.rebirths) => 1e6 * 1.2 ** r;
+const MAXR = 300;   // beat the game at 300 rebirths, then Ascend
+// +20% per rebirth, sharply steeper past 200, and 10× cheaper for every Ascension
+const rbBase = (r = S.rebirths) => 1e6 * 1.2 ** r * (r > 200 ? 10 ** ((r - 200) ** 2 / 1000) : 1) / 10 ** S.asc;
 const rbReq = r => rbBase(r);                           // coins this run needed to rebirth at all, only ever goes up
 const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbBase()) * rbMult());
 // multi-rebirth ×n: n real rebirths in one go. Needs the coins of n back-to-back rebirths (each requirement 10% higher),
@@ -751,11 +804,11 @@ const rbGainN = n => {
   for (let i = 0; i < n; i++) g += Math.floor(k * rbMult(S.rebirths + i));
   return g;
 };
-const rbCan = n => rbGainN(n) >= 1;
-// MAX: as many rebirths as this run's coins cover, each requirement 10% higher than the last
-function rbMaxN(){ let n = 0, c = 0; while (n < 1000 && c + rbReq(S.rebirths + n) <= S.total) c += rbReq(S.rebirths + n++); return n; }
+const rbCan = n => S.rebirths + n <= MAXR && rbGainN(n) >= 1;
+// MAX: as many rebirths as this run's coins cover (up to the 300 cap)
+function rbMaxN(){ let n = 0, c = 0; while (S.rebirths + n < MAXR && c + rbReq(S.rebirths + n) <= S.total) c += rbReq(S.rebirths + n++); return n; }
 const rbPick = v => v === 'max' ? rbMaxN() : v;          // resolve a selector value (1/2/5/10/'max') to a count
-const tokenGain = g => Math.floor(g * (1 + .1*lv('tokens')) * (1 + .1*petLv('whale')));
+const tokenGain = g => Math.floor(g * (1 + .1*lv('tokens')) * (1 + .1*petLv('whale')) * (1 + .5*S.asc));
 const rbRowBtns = [...$('rbRow').children];
 rbRowBtns.forEach(b => b.onclick = () => { S.rbN = b.dataset.n === 'max' ? 'max' : +b.dataset.n; save(); refresh(); });
 $('rbBtn').onclick = () => {
@@ -764,9 +817,54 @@ $('rbBtn').onclick = () => {
   const pct = r => fmt(Math.round((rbBoost(r) - 1)*100));
   if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but your rebirth boost goes from +${pct(S.rebirths)}% to +${pct(S.rebirths + n)}% and you get ${tokenGain(g)} 💈 tokens for the Rebirth Shop.`)) return;
   const L = lv('headstart');
-  Object.assign(S, {coins:S.coins * .02*lv('keep'), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, hc:S.hc + tokenGain(g), rebirths:S.rebirths + n, research:{}}); shown = S.coins; recalcResearch();
+  Object.assign(S, {coins:S.coins * .02*lv('keep'), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, hc:S.hc + tokenGain(g), rebirths:S.rebirths + n, rebTotal:S.rebTotal + n, research:{}}); shown = S.coins; recalcResearch();
   save(); refresh(); toast(`🔁 Reborn! Rebirth boost is now +${fmt(Math.round((rbBoost() - 1)*100))}%`);
+  if (S.rebirths >= MAXR && !S.beaten) { S.beaten = true; save(); playEnding(); }
 };
+// Ascension: reset everything (coins, upgrades, research, rebirths, tokens, perks) but keep lifetime coins, pets,
+// achievements and stars. Each one: ×3 to everything, rebirths 10× cheaper, +50% tokens. Leaderboard rebirths keep counting.
+function ascend(){
+  if (S.rebirths < MAXR) return;
+  if (!confirm(`✨ Ascend? You reset coins, upgrades, research, rebirths, tokens and perks.\n\nYou keep lifetime coins (your leaderboard spot), pets, achievements and stars, your ${MAXR} rebirths still count on the Rebirths leaderboard, and you gain:\n• ×3 to everything (stacks every Ascension)\n• Rebirths 10× cheaper\n• +50% rebirth tokens`)) return;
+  Object.assign(S, {coins:0, total:0, own:{}, research:{}, rebirths:0, hc:0, perks:{}, beaten:false, asc:S.asc + 1});
+  shown = 0; recalcResearch(); applyPerks(); save(); refresh(); window.pushNow?.();
+  toast(`✨ Ascension ${S.asc}! Everything ×${fmt(3 ** S.asc)}`);
+}
+$('ascBtn').onclick = ascend;
+
+// the ending: Jun sweats, a giant finger rises, one last poke sends him spinning into another dimension
+function playEnding(){
+  const E = $('ending'); E.innerHTML = ''; E.hidden = false;
+  const el = (tag, css, html = '') => { const d = document.createElement(tag); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
+  const go = (node, frames, o) => node.animate(frames, {fill:'forwards', easing:'ease-in-out', ...o});
+  const title = el('div', 'top:10%;width:100%;text-align:center;font-weight:800;font-size:clamp(26px,6vw,44px);color:#ffd166;opacity:0', `REBIRTH ${MAXR}`);
+  const head = el('img', 'width:min(260px,55vw);left:50%;top:46%;transform:translate(-50%,-50%)');
+  head.src = $('jun').src; head.style.clipPath = getComputedStyle($('jun')).clipPath;
+  const finger = el('div', 'font-size:clamp(70px,16vw,120px);left:50%;top:110%;transform:translateX(-50%)', '👆');
+  go(title, [{opacity:0, transform:'scale(.6)'}, {opacity:1, transform:'scale(1)'}], {duration:800});
+  go(head, Array.from({length:12}, (_, i) => ({transform:`translate(calc(-50% + ${i % 2 ? 9 : -9}px),-50%) rotate(${i % 2 ? 4 : -4}deg)`})), {duration:1400, delay:700});
+  setTimeout(() => el('div', 'left:58%;top:30%;font-size:40px', '💦').animate([{opacity:0}, {opacity:1, transform:'translateY(20px)'}, {opacity:0, transform:'translateY(50px)'}], {duration:1200, fill:'forwards'}), 900);
+  go(finger, [{top:'110%'}, {top:'64%'}], {duration:900, delay:1900, easing:'cubic-bezier(.2,1.4,.4,1)'});
+  setTimeout(() => {
+    el('div', 'inset:0;background:#fff').animate([{opacity:.9}, {opacity:0}], {duration:450, fill:'forwards'});
+    go(finger, [{transform:'translateX(-50%) translateY(0)'}, {transform:'translateX(-50%) translateY(-40px)'}, {transform:'translateX(-50%) translateY(0)'}], {duration:300});
+    go(head, [{transform:'translate(-50%,-50%) rotate(0) scale(1)', opacity:1}, {transform:'translate(-50%,-260%) rotate(1080deg) scale(.05)', opacity:0}], {duration:1600, easing:'cubic-bezier(.5,0,.8,.4)'});
+    for (let i = 0; i < 40; i++) {
+      const c = el('div', `left:${Math.random()*100}%;top:-10%;font-size:${18 + Math.random()*22}px`, Math.random() < .8 ? '🪙' : '✨');
+      c.animate([{transform:'translateY(0) rotate(0)'}, {transform:`translateY(120vh) rotate(${Math.random()*720}deg)`}], {duration:2200 + Math.random()*1800, delay:Math.random()*900, fill:'forwards', easing:'ease-in'});
+    }
+  }, 2900);
+  setTimeout(() => {
+    go(finger, [{opacity:1}, {opacity:0}], {duration:500});
+    const box = el('div', 'left:0;right:0;top:38%;text-align:center;color:#fff;padding:0 20px;opacity:0',
+      `<div style="font-size:clamp(30px,7vw,54px);font-weight:800;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent">👑 YOU BEAT CLICK JUN 👑</div>
+       <div style="margin:10px 0 22px;color:#c9cce0">Jun has been clicked into another dimension.<br>Ascend to bring him back, stronger. Your ${MAXR} rebirths stay on the leaderboard.</div>
+       <button class="end-btn" id="endAsc">✨ Ascend now</button><button class="end-btn alt" id="endStay">Keep playing</button>`);
+    go(box, [{opacity:0, transform:'translateY(20px)'}, {opacity:1, transform:'translateY(0)'}], {duration:700});
+    $('endStay').onclick = () => { E.hidden = true; };
+    $('endAsc').onclick = () => { E.hidden = true; ascend(); };
+  }, 4700);
+}
 
 // bulk buy
 const buyBtns = [...$('buyRow').children];
@@ -965,7 +1063,7 @@ function applyState(d){
     research:Object.fromEntries(RES.filter(r => d.research && d.research[r.id] === true).map(r => [r.id, true])),
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, 3) : [],
-    hatches:int(d.hatches)};
+    hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, rebTotal:int(d.rebTotal) || int(d.asc)*300 + int(d.rebirths)};
   shown = S.coins; recalcResearch(); save(); applyXmas(); applyFx(); applyBuy(); applyPerks(); renderAch(); renderPets(); renderShop(); refresh();
   ['fbest', 'hwins', 'twins', 'pwins'].forEach(id => $(id).textContent = S[id === 'fbest' ? 'best' : id]);
 }
@@ -1448,6 +1546,7 @@ const NEWS = [
   [0, () => S.diamonds ? 'Diamond Jun spotted again. Jewelers in shambles.' : ''],
   [0, () => S.clicks > 1000 ? `Jun's forehead has now been poked ${fmt(S.clicks)} times. He says it tickles.` : ''],
   [0, () => S.vcDeals ? `Jun closes ${S.vcDeals > 1 ? 'yet another' : 'his first'} funding round. Pitch deck was one selfie.` : ''],
+  [0, () => S.asc ? `Jun returns from another dimension for the ${ord(S.asc + 1)} time. Somehow balder.` : ''],
   [0, () => S.cheater ? 'BREAKING: Local player caught using the admin panel. The community is disappointed.' : ''],
   [0, () => S.theme === 'spooky' ? 'Halloween costume sales: 90% of shoppers choose "Jun in a witch hat."' : ''],
   [0, () => S.theme === 'spooky' ? 'Haunted house reports a ghost that only says "click me."' : ''],
@@ -1483,6 +1582,14 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'4.0', date:'Oct 5, 2026', title:'The Ending', notes:[
+    '👑 Click Jun can now be beaten: reach 300 rebirths for the ending cutscene',
+    'Rebirths get much steeper past 200 on the way to the finish',
+    '✨ Ascension: reset everything (even rebirths) for ×3 to everything, 10× cheaper rebirths and +50% tokens, forever and stacking',
+    'Ascending keeps your lifetime coins, pets, achievements and stars, so you never lose your leaderboard spot',
+    'New Rebirths leaderboard tab: total rebirths across all Ascensions, with 👑 for every time you\'ve beaten the game',
+    '30 new upgrades: 10 click, 10 auto clicker and 10 passive, up to The All-Seeing Jun 👁️',
+    '3 new achievements']},
   {v:'3.1', date:'Oct 5, 2026', title:'Endgame', notes:[
     '11 new late-game upgrades, all the way up to Heat Death Hustle 🌋 (4Oc)',
     '5 new special research cards, including The Final Research 🗿 (everything ×5)',
@@ -1689,9 +1796,12 @@ $('eggBtn').onclick = () => {
 $('buyEvt2').onclick = () => { if (S.hc < 2) return toast('Not enough 💈 tokens'); S.hc -= 2; save(); renderPerks(); startEvt(2, 60); };
 $('buyEvt4').onclick = () => { if (S.hc < 5) return toast('Not enough 💈 tokens'); S.hc -= 5; save(); renderPerks(); startEvt(4, 30); };
 $('aEvt').onclick = () => { A.close(); startEvt(4, 30); };
+$('aEnd').onclick = () => { A.close(); playEnding(); };
 evtSchedule();
 
 applyPerks(); renderAch(); renderPets();
+if (!S.rebTotal) S.rebTotal = S.asc*MAXR + S.rebirths;   // all-time rebirths (never resets) for the Rebirths leaderboard
+if (S.rebirths >= MAXR && !S.beaten) { S.beaten = true; save(); setTimeout(playEnding, 1200); }
 offline(S.lastSeen ? Date.now() - S.lastSeen : 0);
 renderShop(); refresh(); requestAnimationFrame(tick);
 </script>
@@ -1733,20 +1843,26 @@ if (FIREBASE) {
     if (!user) return;
     setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
-    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebirths, updated:Date.now()})).catch(() => {});
+    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, updated:Date.now()})).catch(() => {});
   };
   window.onCheat = () => { push(); loadBoard(); };
+  let lbKey = 'score';   // 'score' = lifetime coins, 'rebirths' = total rebirths across all Ascensions
+  document.querySelectorAll('#lbTabs button').forEach(b => b.onclick = () => {
+    lbKey = b.dataset.k; document.querySelectorAll('#lbTabs button').forEach(x => x.classList.toggle('on', x === b)); loadBoard();
+  });
+  window.pushNow = () => push();
   async function loadBoard(){
     const list = $('lbList');
     try {
-      const qs = await getDocs(query(collection(db, 'leaderboard'), orderBy('score', 'desc'), limit(10)));
+      const qs = await getDocs(query(collection(db, 'leaderboard'), orderBy(lbKey, 'desc'), limit(10)));
       list.innerHTML = ''; let i = 0;
       qs.forEach(d => {
         const r = d.data(), li = document.createElement('li');
         if (user && d.id === user.uid) li.className = 'me';
         li.innerHTML = `<span class="rk">${++i}</span><span class="nmx"></span><span class="sc"></span>`;
-        li.querySelector('.nmx').textContent = String(r.name) + (r.rebirths ? ` 🔁${r.rebirths}` : '');
-        li.querySelector('.sc').textContent = fmt(Number(r.score) || 0);
+        const reb = Number(r.rebirths) || 0, crowns = Math.floor(reb / MAXR);
+        li.querySelector('.nmx').textContent = String(r.name) + (crowns ? ` 👑${crowns > 1 ? crowns : ''}` : '') + (lbKey === 'score' && reb ? ` 🔁${reb}` : '');
+        li.querySelector('.sc').textContent = lbKey === 'score' ? fmt(Number(r.score) || 0) : `${reb} 🔁`;
         list.appendChild(li);
       });
       if (!i) list.innerHTML = '<li>No one yet. Be the first!</li>';
