@@ -15,9 +15,9 @@
 <style>
 :root{--bg:#0b0d12;--panel:rgba(255,255,255,.04);--line:rgba(255,255,255,.08);--text:#e8eaf0;--dim:#8a90a2;--gold:#ffc94d;--accent:#7c5cff}
 *{box-sizing:border-box;margin:0}
-body{background:radial-gradient(1200px 600px at 30% 20%,#1a1640 0%,var(--bg) 60%);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;height:100vh;display:grid;grid-template-columns:1fr 360px;overflow:hidden;user-select:none}
+body{background:radial-gradient(1200px 600px at 30% 20%,#1a1640 0%,var(--bg) 60%);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;height:100vh;height:100dvh;display:grid;grid-template-columns:1fr 360px;overflow:hidden;user-select:none}
 /* explicit cells: browser extensions sometimes inject elements into <body>, which used to push the game into a 0px corner */
-body{grid-template-rows:100vh;grid-auto-rows:0}
+body{grid-template-rows:100vh;grid-template-rows:100dvh;grid-auto-rows:0}
 #stage{position:relative;overflow:hidden;grid-column:1;grid-row:1;min-height:0}
 aside{grid-column:2;grid-row:1;min-height:0}
 #hud{position:absolute;top:28px;left:0;right:0;text-align:center;pointer-events:none;z-index:5}
@@ -28,7 +28,7 @@ aside{grid-column:2;grid-row:1;min-height:0}
 .pop{position:absolute;pointer-events:none;font-weight:700;color:var(--gold);font-size:22px;animation:up 1s ease-out forwards;z-index:6;text-shadow:0 2px 8px #000}
 @keyframes up{to{transform:translateY(-80px);opacity:0}}
 #toast{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);background:var(--gold);color:#111;padding:10px 18px;border-radius:999px;font-weight:700;opacity:0;transition:opacity .3s;z-index:7}
-aside{border-left:1px solid var(--line);background:rgba(10,12,18,.92);overflow-y:auto;padding:24px 18px}
+aside{border-left:1px solid var(--line);background:rgba(10,12,18,.92);overflow-y:auto;padding:24px 18px calc(32px + env(safe-area-inset-bottom))}
 h1{font-size:28px;letter-spacing:-.5px}h1 span{color:var(--accent)}
 h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin:24px 0 10px;cursor:pointer;user-select:none}
 h2::after{content:' ▾';display:inline-block;transition:transform .15s}
@@ -316,13 +316,13 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 #dpad button:active{background:rgba(255,255,255,.22)}
 @media(pointer:coarse){#dpad{display:grid}}
 @media(max-width:760px){#flappy,#hang,#tank,#pac{position:fixed;z-index:30}
-body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}#stage{grid-column:1;grid-row:1}aside{grid-column:1;grid-row:2;border-left:0;border-top:1px solid var(--line)}#coins{font-size:40px}.jun{width:110px}}
+body{grid-template-columns:1fr;grid-template-rows:55vh 45vh;grid-template-rows:55dvh 45dvh}#stage{grid-column:1;grid-row:1}aside{grid-column:1;grid-row:2;border-left:0;border-top:1px solid var(--line)}#coins{font-size:40px}.jun{width:110px}}
 
 /* ===== design system: one font pair, one accent, one radius, 3 button styles, chunky "mobile game" depth ===== */
 :root{--bg:#12131c;--panel:#1c1e2b;--panel2:#262939;--line:rgba(255,255,255,.07);--text:#f3f4fb;--dim:#9aa0b8;--accent:#7c5cff;--accent-d:#5a3fd6;--gold:#ffcf4a;--good:#3ddc97;--r:16px;--depth:0 3px 0 rgba(0,0,0,.35)}
 body{font-family:'Nunito',system-ui,sans-serif;background:radial-gradient(900px 520px at 30% 0%,#1f1b40 0%,#12131c 70%)}
 h1,h3,.up .nm,#coins,#tabs button,.fxText,#vcAmt,.bal b,#hword{font-family:'Fredoka','Nunito',sans-serif}
-aside{background:#161824;border-left:1px solid var(--line);padding:20px 16px}
+aside{background:#161824;border-left:1px solid var(--line);padding:20px 16px 40px}
 .logo{display:flex;align-items:center;gap:10px;font-size:28px;font-weight:700;letter-spacing:-.5px}
 .logo img{width:38px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
 .logo b{color:var(--accent);font-weight:700}
@@ -759,6 +759,7 @@ const UPS = [
   {id:'rerun', t:'a', v:2.06e38, cost:4e54, ic:'🎇', nm:'Big Bang Rerun', ds:'The universe restarted just to watch Jun again.'},
   {id:'allsee', t:'a', v:2.48e40, cost:4e57, ic:'👁️', nm:'The All-Seeing Jun', ds:'He sees every click. He appreciates every click.'},
 ];
+UPS.forEach(u => { if (u.t === 'a') u.v *= 25; });   // passive buffed ×25 so it keeps up with click power × auto clickers
 const $ = id => document.getElementById(id);
 // late-game pricing: from the 9th upgrade in each list, every step further down costs an extra ×4 on top of its base price,
 // and each copy you buy raises the price faster (×1.15 → up to ~×1.27 per copy; auto clickers ×1.3 → ~×1.39)
