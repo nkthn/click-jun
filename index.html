@@ -895,7 +895,7 @@ const PERKS = [
   {id:'diamond',   ic:'🧲', nm:'Diamond Magnet',   cost:5, g:1.7,  max:8,  fx:L => `Diamond Juns ${25*L}% more often`},
   {id:'frenzy',    ic:'💎', nm:'Long Frenzy',      cost:4, g:1.6,  max:5,  fx:L => `Diamond frenzy lasts ${20 + 3*L}s`},
   {id:'headstart', ic:'🏁', nm:'Head Start',       cost:2, g:1.5,  max:10, fx:L => L ? `Start runs with ${10*L} Polish, Blinds, Gel & Gym Bros` : 'Start runs with nothing'},
-  {id:'offline',   ic:'🌙', nm:'Night Shift',      cost:3, g:1.6,  max:5,  fx:L => `Offline earnings at ${50 + 10*L}% for up to ${24 + 6*L}h`},
+  {id:'offline',   ic:'🌙', nm:'Night Shift',      cost:3, g:1.5,  max:10, fx:L => `Offline earnings +${5*L}% speed and +${6*L}h longer`},
   {id:'combo',     ic:'🔥', nm:'Combo Master',     cost:3, g:1.6,  max:6,  fx:L => `Combo caps at ${3 + .5*L}×`},
   {id:'shine',     ic:'🌟', nm:'Extra Shiny',      cost:4, g:1.6,  max:6,  fx:L => `Achievements give +${2 + .5*L}% each`},
   {id:'auto',      ic:'🦾', nm:'Robot Hands',      cost:5, g:1.6,  max:10, fx:L => `Auto clicks worth ${10 + 2*L}% of a click`},
@@ -1045,7 +1045,7 @@ const RARC = {Common:'#9aa3b5', Rare:'#4cc9f0', Epic:'#c77dff', Legendary:'#ffc9
 const AUP = [
   {id:'rich',   ic:'💰', nm:'Trust Fund',    ds:'Start every climb and every rebirth with 1M coins', cost:1},
   {id:'gold',   ic:'🍀', nm:'Golden Touch',  ds:'Golden Juns appear twice as often', cost:1},
-  {id:'night',  ic:'🌙', nm:'Never Sleeps',  ds:'Offline earnings at 100% for up to 72 hours', cost:1},
+  {id:'night',  ic:'🌙', nm:'Never Sleeps',  ds:'Offline earnings ×2 speed and last 72 hours longer', cost:1},
   {id:'luck',   ic:'🥚', nm:'Lucky Eggs',    ds:'Rare, Epic, Legendary and Mythic pets are twice as likely', cost:1},
   {id:'tokens', ic:'💈', nm:'Token Magnet',  ds:'Rebirth tokens ×2', cost:2},
   {id:'lab',    ic:'🔬', nm:'Lab Notes',     ds:'Keep your research when you rebirth', cost:2},
@@ -2366,16 +2366,17 @@ function news(){
 }
 news();
 
-// offline earnings: passive + auto clicks at 50% (100% with Night Shift), capped at 24h (48h)
+// offline earnings: passive + auto clicks at 75% for up to 24h, boosted by Night Shift, Never Sleeps, Hoot and Shelly
 const dur = s => s >= 3600 ? `${Math.floor(s/3600)}h ${Math.floor(s%3600/60)}m` : `${Math.floor(s/60)}m`;
 function offline(ms){
-  const sec = Math.min(ms/1000, ((asu('night') ? 72 : 24 + 6*lv('offline')) + 2*petLv('turtle')) * 3600);
+  const hrs = 24 + (asu('night') ? 72 : 0) + 6*lv('offline') + 2*petLv('turtle'), rate = (.75 + .05*lv('offline') + .1*petLv('owl')) * (asu('night') ? 2 : 1);
+  const sec = Math.min(ms/1000, hrs * 3600);
   if (sec < 60) return;
-  const n = income() * sec * (asu('night') ? 1 : .5 + .1*lv('offline') + .1*petLv('owl'));
+  const n = income() * sec * rate;
   if (n < 1) return;
   earn(n); save(); refresh();
   $('awayTxt').innerHTML = `You were gone <b>${dur(sec)}</b>. Jun kept grinding and earned <b style="color:var(--gold)">${fmt(n)}</b> coins` +
-    (lv('offline') >= 5 ? '.' : `.<br><span style="color:var(--dim);font-size:13px">That's at ${50 + 10*lv('offline')}% speed. Level up Night Shift in the Rebirth Shop to earn more.</span>`);
+    `.<br><span style="color:var(--dim);font-size:13px">Offline speed ${Math.round(rate*100)}% · up to ${hrs}h away${lv('offline') < 10 ? ' · level up 🌙 Night Shift in the Rebirth Shop for more' : ''}</span>`;
   if (!$('away').open) $('away').showModal();
 }
 let hiddenAt = 0;
