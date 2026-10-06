@@ -145,7 +145,7 @@ body.spooky #lights i:nth-child(odd){background:#ff7a18;color:#ff7a18}
 body.spooky #lights i:nth-child(even){background:#9b5de5;color:#9b5de5}
 /* rainbow theme (secret) */
 body.rainbow{--accent:#ff4fa3;--gold:#ffe066;background:#140c24}
-body.rainbow::before{content:'';position:fixed;inset:-20%;z-index:-1;background:conic-gradient(from 0deg,#ff5c7a,#ffc94d,#57cc99,#4cc9f0,#9b5de5,#ff5c7a);opacity:.35;filter:blur(60px);animation:rbspin 30s linear infinite}
+body.rainbow::before{content:'';position:fixed;left:50%;top:50%;width:250vmax;height:250vmax;margin:-125vmax 0 0 -125vmax;border-radius:50%;pointer-events:none;z-index:-1;background:conic-gradient(from 0deg,#ff5c7a,#ffc94d,#57cc99,#4cc9f0,#9b5de5,#ff5c7a);opacity:.35;filter:blur(60px);animation:rbspin 30s linear infinite}
 @keyframes rbspin{to{transform:rotate(360deg)}}
 body.rainbow aside{background:rgba(20,12,36,.9)}
 body.rainbow #lights i:nth-child(6n){background:#ff5c7a;color:#ff5c7a}body.rainbow #lights i:nth-child(6n+1){background:#ff9f43;color:#ff9f43}
@@ -179,7 +179,7 @@ body.rainbow .flake{font-size:14px!important}
 #vcOdds{color:var(--dim);font-size:13px}
 #vc .row button{flex:1}
 .up.dis{opacity:.55;cursor:not-allowed}
-.up .star{position:absolute;top:4px;right:8px;font-size:15px;color:var(--dim);cursor:pointer;padding:2px}
+.up .star{position:absolute;top:0;right:0;font-size:18px;line-height:1;color:var(--dim);cursor:pointer;padding:8px 10px;z-index:2}
 .up .star.on{color:var(--gold)}
 #clickUps,#kUps,#autoUps{max-height:310px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y proximity;padding-right:4px;
   -webkit-mask-image:linear-gradient(#000 88%,transparent);mask-image:linear-gradient(#000 88%,transparent)}
@@ -264,6 +264,17 @@ body.light .flake{color:#8fb0dc}
 body.light #hkeys button:disabled{background:#e4e5ea}
 .bal{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;padding:10px;border-radius:12px;background:rgba(255,201,77,.12);border:1px solid rgba(255,201,77,.35);font-size:15px}
 .bal b{font-size:24px;color:var(--gold);font-variant-numeric:tabular-nums}
+#chatBox{height:min(46vh,360px);overflow-y:auto;display:flex;flex-direction:column-reverse;gap:8px;margin-top:10px;padding:10px;background:var(--panel);border-radius:12px;overscroll-behavior:contain}
+.msg{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.msg .who{font-weight:700;cursor:pointer}
+.msg .t{color:var(--dim);font-size:11px;margin-left:6px}
+.ttl-in{color:var(--gold);font-size:10px;font-weight:600;margin-left:6px}
+.modtag{background:#ff5c7a;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;margin-left:5px;vertical-align:middle}
+.mact{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.mact .ab{padding:4px 8px;font-size:12px}
+.frCard{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;color:var(--text);font:inherit;cursor:pointer}
+.frCard span{flex:1;font-size:12px;color:var(--dim)}
+.frCard i{font-style:normal;color:var(--dim);font-size:20px}
 #reset,#adminBtn{margin-top:20px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;width:100%}
 #dpad{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px}
 #dpad button{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);font-size:22px;touch-action:none}
@@ -314,7 +325,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
 </main>
 <aside>
   <h1>Click <span>Jun</span></h1>
-  <div id="topBtns"><button id="setBtn">⚙️ Settings</button><button id="statBtn">📊 Stats</button><button id="cosBtn">👕 Wardrobe</button><button id="dailyBtn">📅 Daily</button><button id="friendBtn">👥 Friends</button><button id="updBtn">📜 Updates</button></div>
+  <div id="topBtns"><button id="setBtn">⚙️ Settings</button><button id="statBtn">📊 Stats</button><button id="cosBtn">👕 Wardrobe</button><button id="dailyBtn">📅 Daily</button><button id="friendBtn">👥 Friends</button><button id="tradeBtn">🤝 Trades</button><button id="guildBtn">🛡️ Guild</button><button id="chatBtn">💬 Chat</button><button id="updBtn">📜 Updates</button></div>
   <nav id="tabs"><button data-tab="shop">🛒 Shop</button><button data-tab="home">🏠 Home</button><button data-tab="games">🎮 Games</button><button data-tab="social">🏆 Social</button></nav>
   <div class="tabp" data-tab="shop">
   <h2>Upgrades</h2>
@@ -431,22 +442,74 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Done</button></form>
 </dialog>
 <dialog id="friends">
-  <h3>👥 <span>Friends</span></h3>
-  <div id="frOut" class="dimtxt" style="margin-top:8px">Sign in to add friends, send gifts and trade.</div>
-  <div id="frIn" hidden>
-    <div class="row" style="margin-top:12px"><input id="frName" class="tin" placeholder="Friend's username" autocapitalize="off" maxlength="20"><button class="ab" id="frAdd">Add</button></div>
-    <div id="frMsg" class="dimtxt" style="margin-top:4px"></div>
-    <div id="frList"></div>
+  <div id="frHome">
+    <h3>👥 <span>Friends</span></h3>
+    <div id="frOut" class="dimtxt" style="margin-top:8px">Sign in to add friends.</div>
+    <div id="frIn" hidden>
+      <div class="row" style="margin-top:12px"><input id="frName" class="tin" placeholder="Add a friend by username" autocapitalize="off" maxlength="20"><button class="ab" id="frAdd">Add</button></div>
+      <div id="frMsg" class="dimtxt" style="margin-top:4px"></div>
+      <div id="frList"></div>
+    </div>
+  </div>
+  <div id="frProfile" hidden>
+    <button class="ab" id="frBack">← Friends</button>
+    <div id="pfCard" style="font-size:20px;font-weight:800;margin-top:12px"></div>
+    <div id="pfStats" class="dimtxt" style="margin-top:4px"></div>
+    <div class="row" style="margin-top:12px"><button class="ab" id="pfChat">💬 Message</button><button class="ab" id="pfTrade">🤝 Trade</button><button class="ab" id="pfRemove">✕ Remove</button></div>
     <label>🎁 Send tokens</label>
-    <div class="row"><select id="giftTo" class="tin"></select><input id="giftAmt" class="tin" type="number" min="1" max="1000" value="5" style="width:80px;flex:none"><button class="ab" id="giftSend">Send</button></div>
-    <label>🤝 Trade</label>
+    <div class="row"><input id="giftAmt" class="tin" type="number" min="1" max="1000" value="5"><button class="ab" id="giftSend">Send gift</button></div>
+    <div id="pfMsg" class="dimtxt" style="margin-top:6px"></div>
+  </div>
+  <form method="dialog"><button class="ab" style="width:100%;margin-top:14px">Close</button></form>
+</dialog>
+<dialog id="trades">
+  <h3>🤝 <span>Trades</span></h3>
+  <div id="trOut" class="dimtxt" style="margin-top:8px">Sign in to trade with friends.</div>
+  <div id="trIn" hidden>
+    <label>📥 Offers for you</label><div id="tradeInbox"></div>
+    <label>📤 Your offers</label><div id="tradeOut"></div>
+    <label>✍️ New offer</label>
     <div class="row"><select id="tradeTo" class="tin"></select></div>
     <div class="row" style="margin-top:6px;align-items:center"><span class="dimtxt" style="width:40px">Give</span><input id="tgTok" class="tin" type="number" min="0" value="0" style="width:70px;flex:none">💈<select id="tgPet" class="tin"></select></div>
     <div class="row" style="margin-top:6px;align-items:center"><span class="dimtxt" style="width:40px">Want</span><input id="twTok" class="tin" type="number" min="0" value="0" style="width:70px;flex:none">💈<select id="twPet" class="tin"></select></div>
-    <button class="ab" id="tradeSend" style="width:100%;margin-top:8px">Send trade offer</button>
-    <div id="tradeList"></div>
+    <button class="ab" id="tradeSend" style="width:100%;margin-top:8px">Send offer</button>
+    <div class="dimtxt" style="margin-top:6px">What you give is held until they accept or decline, so trades are always fair.</div>
+    <div id="trMsg" class="dimtxt" style="margin-top:6px"></div>
   </div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:14px">Close</button></form>
+</dialog>
+<dialog id="guild">
+  <h3>🛡️ <span>Guild</span></h3>
+  <div id="gOut" class="dimtxt" style="margin-top:8px">Sign in to create or join a guild.</div>
+  <div id="gNone" hidden>
+    <label>Create a guild</label>
+    <div class="row"><input id="gName" class="tin" maxlength="20" placeholder="Guild name"><input id="gTag" class="tin" maxlength="4" placeholder="TAG" style="width:76px;flex:none;text-transform:uppercase"></div>
+    <button class="ab" id="gCreate" style="width:100%;margin-top:6px">Create guild</button>
+    <label>Join with an invite code</label>
+    <div class="row"><input id="gCode" class="tin" maxlength="6" placeholder="ABC123" style="text-transform:uppercase" autocapitalize="characters"><button class="ab" id="gJoin">Join</button></div>
+    <label>Or pick a guild</label>
+    <div id="gBrowse"></div>
+  </div>
+  <div id="gIn" hidden>
+    <div id="gHead" style="font-size:20px;font-weight:800;margin-top:10px"></div>
+    <div class="bal">Invite code <b id="gInvite"></b><button class="ab" id="gCopy">Copy</button></div>
+    <div id="gTotal" class="dimtxt"></div>
+    <div id="gMembers"></div>
+    <div class="row" style="margin-top:10px"><button class="ab" id="gChat">💬 Guild chat</button><button class="ab" id="gLeave">Leave guild</button></div>
+  </div>
+  <div id="gMsg" class="dimtxt" style="margin-top:6px"></div>
+  <form method="dialog"><button class="ab" style="width:100%;margin-top:14px">Close</button></form>
+</dialog>
+<dialog id="chat">
+  <h3>💬 <span>Chat</span></h3>
+  <div class="seg" id="chatTabs"><button data-r="global">🌍 Global</button><button data-r="friends">👥 Friends</button><button data-r="guild">🛡️ Guild</button></div>
+  <select id="chatFriend" class="tin" hidden style="margin-top:8px;width:100%"></select>
+  <div id="chatBox"></div>
+  <div id="chatNote" class="dimtxt" style="margin-top:4px;min-height:16px"></div>
+  <div class="row" id="chatForm" style="margin-top:4px"><input id="chatIn" class="tin" maxlength="200" placeholder="Say something nice…" autocomplete="off"><button class="ab" id="chatSend">Send</button></div>
+  <div class="dimtxt" style="margin-top:6px;font-size:11px">Be kind. Tap a name to mute someone. Links and bad words are filtered.</div>
+  <div id="modBox" hidden><label>🔨 Banned from chat</label><div id="banList"></div></div>
+  <form method="dialog"><button class="ab" style="width:100%;margin-top:10px">Close</button></form>
 </dialog>
 <dialog id="welcome">
   <h3>Welcome to Click <span>Jun</span></h3>
@@ -590,6 +653,12 @@ const UPS = [
   {id:'allsee', t:'a', v:2.48e40, cost:4e57, ic:'👁️', nm:'The All-Seeing Jun', ds:'He sees every click. He appreciates every click.'},
 ];
 const $ = id => document.getElementById(id);
+// late-game pricing: from the 9th upgrade in each list, every step further down costs an extra ×4 on top of its base price,
+// and each copy you buy raises the price faster (×1.15 → up to ~×1.27 per copy; auto clickers ×1.3 → ~×1.39)
+for (const t of ['c', 'k', 'a']) UPS.filter(u => u.t === t).forEach((u, i) => {
+  if (i >= 8) u.cost *= 4 ** (i - 8);
+  u.g = (t === 'k' ? 1.3 : 1.15) + .004 * i;
+});
 // Jun's head outline as % of the cropped photo (traced: buzzcut, left ear, cheeks, jaw). Used by CSS and the canvas minigames.
 const HEAD = [[50, 2.5], [60, 3.5], [70, 7], [79, 12], [87, 20], [92, 28], [94, 38], [95, 48], [96, 58], [95, 66], [92, 72], [88, 77], [83, 82], [77, 87], [70, 91.5], [61, 95], [50, 96], [40, 94.5], [31, 90.5], [24, 85], [19, 79], [15, 74], [12, 70.5], [7, 68.5], [3, 64], [1.5, 57], [2.5, 51], [5, 48], [4, 40], [5, 31], [9, 22], [15, 15], [22, 9], [31, 5], [40, 3]];
 function headClip(g, x, y, w, h){ g.beginPath(); HEAD.forEach(([a, b], i) => g[i ? 'lineTo' : 'moveTo'](x + a/100*w, y + b/100*h)); g.closePath(); g.clip(); }
@@ -668,7 +737,7 @@ const PERKS = [
 const lv = id => S.perks[id] || 0;
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true, rainbow:false,
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, autoBuy:true, rainbow:false, muted:[], guild:'',
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -711,7 +780,7 @@ const RES = [
     // late tiers cost ~100× the upgrade's own price at the unlock count, so they're a real investment
     ...[[150, 4, ['Quantum', 'Galactic', 'Ultra']], [250, 8, ['Transcendent', 'Divine', 'Infinite']], [400, 16, ['Omega', 'Final Form', 'Godlike']]]
       .map(([n, x, names], t) => ({id:u.id + (t + 3), ic:u.ic, nm:`${names[i % 3]} ${u.nm}`, ds:`${u.nm} ×${x}`,
-        cost:u.cost * (u.t === 'k' ? 1.3 : 1.15) ** n * 100, need:() => has(u.id, n), up:u.id, x})),
+        cost:u.cost * u.g ** n * 100, need:() => has(u.id, n), up:u.id, x})),
   ]),
 ];
 // frenzy events: random 2× (60s) or rarer 4× (30s) multiplier on all income, or bought with tokens in the Rebirth Shop
@@ -803,6 +872,12 @@ function cleanCos(c){
   for (const t in COS) if (typeof c[t] === 'string' && cosItem(t, c[t])) o[t] = c[t];
   return o;
 }
+// chat filter: strips control characters and links, stars out bad words (also with spaces/dots between letters)
+const BAD = ['fuck', 'motherf', 'shit', 'bitch', 'cunt', 'dick', 'pussy', 'asshole', 'bastard', 'slut', 'whore', 'nigg', 'fag', 'retard', 'cock', 'twat', 'wank', 'rape', 'kys'];
+const BAD_RE = new RegExp('\\b(?:' + BAD.map(w => w.split('').join('[\\s._*-]*')).join('|') + ')', 'gi');
+const cleanChat = t => String(t).replace(/[\u0000-\u001f\u007f]/g, '')
+  .replace(/(https?:\/\/|www\.)\S+/gi, '[link removed]').replace(/\b[\w-]+\.(com|net|org|io|gg|xyz|ru|ly|co|me|tv)\b\S*/gi, '[link removed]')
+  .replace(BAD_RE, m => '*'.repeat(m.length));
 const nameColor = id => { const c = cosItem('color', id); return c ? c.a : ''; };
 const petLv = id => S.equip.includes(id) ? (S.pets[id] || 0) : 0;
 
@@ -815,7 +890,7 @@ const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
 const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
-const growth = u => u.t === 'k' ? 1.3 : 1.15;
+const growth = u => u.g;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
 const buyN = u => S.buy === 'max' ? Math.max(1, maxN(u)) : S.buy;
 function maxN(u){
@@ -1347,6 +1422,8 @@ function applyState(d){
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
     friends:Array.isArray(d.friends) ? [...new Set(d.friends.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)))].slice(0, 30) : [], ap:d.ap === undefined ? int(d.asc) : int(d.ap), aup:Object.fromEntries(AUP.filter(a => d.aup && d.aup[a.id] === true).map(a => [a.id, true])), autoBuy:d.autoBuy !== false,
+    muted:Array.isArray(d.muted) ? d.muted.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)).slice(-100) : [],
+    guild:typeof d.guild === 'string' && /^[A-Z0-9]{6}$/.test(d.guild) ? d.guild : '',
     rebTotal:int(d.rebTotal) || int(d.asc)*300 + int(d.rebirths)};
   shown = S.coins; recalcResearch(); save(); applyXmas(); applyFx(); applyBuy(); applyPerks(); renderAch(); renderPets(); renderShop(); refresh();
   ['fbest', 'hwins', 'twins', 'pwins'].forEach(id => $(id).textContent = S[id === 'fbest' ? 'best' : id]);
@@ -1878,6 +1955,13 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'4.3', date:'Oct 5, 2026', title:'Chat & Guilds', notes:[
+    '💬 Live chat: Global, friend DMs and guild chat',
+    'Chat is moderated: bad words and links are filtered, 1 message every 3 seconds, mute anyone, mods can delete and ban',
+    '🛡️ Guilds: create one with a name and tag, invite friends with a code (up to 30), see your guild ranking and combined coins',
+    'Your guild tag shows next to your name on the leaderboard and in chat',
+    '👥 Friends got cleaner: tap a friend to open their profile to message or gift them',
+    '🤝 Trading has its own window now']},
   {v:'4.2', date:'Oct 5, 2026', title:'Social Update', notes:[
     'New tabs (🛒 Shop · 🏠 Home · 🎮 Games · 🏆 Social) so the side panel is quicker to get around',
     '👕 Wardrobe: hats, glasses, auras, titles and name colours. Your hat, title and colour show on the leaderboard',
@@ -2249,6 +2333,9 @@ document.querySelectorAll('#wTabs button').forEach(b => b.onclick = () => { wTab
 $('cosBtn').onclick = () => { renderWardrobe(); $('wardrobe').showModal(); };
 // friends needs Firebase; the module replaces this handler when it loads
 $('friendBtn').onclick = () => { $('friends').showModal(); };
+$('tradeBtn').onclick = () => { $('trades').showModal(); };
+$('guildBtn').onclick = () => { $('guild').showModal(); };
+$('chatBtn').onclick = () => { $('chatNote').textContent = 'Chat is offline right now'; $('chat').showModal(); };
 // pet trading helpers (used by the friends module)
 const petGive = id => { if (!id) return; if ((S.pets[id] || 0) >= PET_MAX) S.hc += 1; else S.pets[id] = (S.pets[id] || 0) + 1; };
 const petTake = id => { if (!id) return; S.pets[id]--; if (S.pets[id] <= 0) { delete S.pets[id]; S.equip = S.equip.filter(x => x !== id); } };
@@ -2307,7 +2394,7 @@ if (FIREBASE) {
   const V = 'https://www.gstatic.com/firebasejs/10.12.2/';
   const {initializeApp} = await import(V + 'firebase-app.js');
   const {getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut} = await import(V + 'firebase-auth.js');
-  const {getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, orderBy, limit, getDocs, where, addDoc, updateDoc} = await import(V + 'firebase-firestore.js');
+  const {getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, orderBy, limit, getDocs, where, addDoc, updateDoc, onSnapshot, writeBatch, serverTimestamp, arrayUnion, arrayRemove} = await import(V + 'firebase-firestore.js');
   const app = initializeApp(FIREBASE), auth = getAuth(app), db = getFirestore(app);
   const msg = t => $('acctMsg').textContent = t;
   const email = () => {
@@ -2330,7 +2417,7 @@ if (FIREBASE) {
     if (!user) return;
     setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
-    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, updated:Date.now()})).catch(() => {});
+    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
   };
   window.onCheat = () => { push(); loadBoard(); };
   let lbKey = 'score';   // 'score' = lifetime coins, 'rebirths' = total rebirths across all Ascensions, 'asc' = Ascensions
@@ -2352,7 +2439,7 @@ if (FIREBASE) {
         li.innerHTML = `<span class="rk">${++i}</span><span class="nmx"></span><span class="sc"></span>`;
         const reb = Number(r.rebirths) || 0, crowns = Math.floor(reb / MAXR);
         const nm = li.querySelector('.nmx'); nameHtml(nm, cleanName(r.display), String(r.name), r.title, r.color);
-        const hat = cosItem('hat', r.badge); if (hat) nm.prepend(hat.ic + ' ');
+        const hat = cosItem('hat', r.badge); if (typeof r.guild === 'string' && /^[A-Z0-9]{1,4}$/.test(r.guild)) nm.prepend(`[${r.guild}] `); if (hat) nm.prepend(hat.ic + ' ');
         nm.firstElementChild.append((crowns ? ` 👑${crowns > 1 ? crowns : ''}` : '') + (lbKey === 'score' && reb ? ` 🔁${reb}` : ''));
         li.querySelector('.sc').textContent = weekly ? fmt(Number(r.wscore) || 0) : lbKey === 'score' ? fmt(Number(r.score) || 0) : lbKey === 'asc' ? `${Number(r.asc) || 0} ✨` : `${reb} 🔁`;
         list.appendChild(li);
@@ -2365,36 +2452,49 @@ if (FIREBASE) {
   // ---------- friends, gifts and trades ----------
   // gifts/{id} = {from, to, amount}; trades/{id} = {from, to, give:{tokens, pet}, want:{tokens, pet}, status:'open'|'accepted'|'declined'}.
   // The sender's side of a trade is held (escrowed) when the offer is made, so nobody can back out after the other side accepts.
+  // UI: friend list; tap a friend for their profile (message, gift, trade, remove). Trades live in their own 🤝 Trades window.
   const me = () => user ? user.email.split('@')[0] : '';
   window.myName = me;
-  const frMsg = t => $('frMsg').textContent = t;
+  let pf = '';   // friend whose profile is open
+  const frMsg = t => $('frMsg').textContent = t, pfMsg = t => $('pfMsg').textContent = t, trMsg = t => $('trMsg').textContent = t;
   const tok = v => Math.max(0, Math.min(1e6, Math.floor(Number(v) || 0)));
   const petOk = id => (id && PETS.some(q => q.id === id)) ? id : '';
   const petLabel = id => { const q = PETS.find(q => q.id === id); return q ? `${q.ic} ${q.nm}` : ''; };
   const deal = x => [x.tokens ? `${x.tokens} 💈` : '', petLabel(x.pet)].filter(Boolean).join(' + ') || 'nothing';
+  const clean = t => ({give:{tokens:tok(t.give?.tokens), pet:petOk(t.give?.pet)}, want:{tokens:tok(t.want?.tokens), pet:petOk(t.want?.pet)}});
   async function findPlayer(name){
     const qs = await getDocs(query(collection(db, 'leaderboard'), where('name', '==', name), limit(1)));
     let r = null; qs.forEach(d => r = d.data()); return r;
   }
-  function fillPets(){
-    $('tgPet').innerHTML = '<option value="">no pet</option>' + PETS.filter(q => S.pets[q.id]).map(q => `<option value="${q.id}">${q.ic} ${q.nm} (Lv ${S.pets[q.id]})</option>`).join('');
-    $('twPet').innerHTML = '<option value="">no pet</option>' + PETS.map(q => `<option value="${q.id}">${q.ic} ${q.nm}</option>`).join('');
-  }
+  function showFr(view){ $('frHome').hidden = view !== 'home'; $('frProfile').hidden = view !== 'profile'; }
   async function frRender(){
+    showFr('home');
     $('frOut').hidden = !!user; $('frIn').hidden = !user; if (!user) return;
-    const opts = S.friends.map(n => `<option value="${n}">${n}</option>`).join('') || '<option value="">add a friend first</option>';
-    $('giftTo').innerHTML = opts; $('tradeTo').innerHTML = opts; fillPets();
     const list = $('frList'); list.innerHTML = S.friends.length ? '' : '<div class="dimtxt" style="margin-top:8px">No friends yet. Add someone by their username.</div>';
     for (const n of S.friends) {
-      const row = document.createElement('div'); row.className = 'frRow';
-      row.innerHTML = '<b></b><span>…</span><button class="ab">✕</button>';
+      const row = document.createElement('button'); row.className = 'frCard';
+      row.innerHTML = '<b></b><span>…</span><i>›</i>';
       row.querySelector('b').textContent = n;
       findPlayer(n).then(r => { row.querySelector('span').textContent = r ? `🪙 ${fmt(Number(r.score) || 0)} · 🔁 ${Number(r.rebirths) || 0} · ✨ ${Number(r.asc) || 0}` : 'not on the leaderboard'; }).catch(() => {});
-      row.querySelector('button').onclick = () => { S.friends = S.friends.filter(x => x !== n); save(); frRender(); };
+      row.onclick = () => openProfile(n);
       list.appendChild(row);
     }
     await frPoll();
   }
+  async function openProfile(n){
+    pf = n; showFr('profile'); pfMsg('');
+    $('pfCard').textContent = n; $('pfStats').textContent = 'Loading…';
+    const r = await findPlayer(n).catch(() => null);
+    if (r) {
+      nameHtml($('pfCard'), cleanName(r.display), n, r.title, r.color);
+      const hat = cosItem('hat', r.badge); if (hat) $('pfCard').prepend(hat.ic + ' ');
+      $('pfStats').textContent = `🪙 ${fmt(Number(r.score) || 0)} lifetime · 🔁 ${Number(r.rebirths) || 0} rebirths · ✨ ${Number(r.asc) || 0} ascensions` + (typeof r.guild === 'string' && r.guild ? ` · 🛡️ [${r.guild}]` : '');
+    } else $('pfStats').textContent = 'Not on the leaderboard right now';
+  }
+  $('frBack').onclick = () => frRender();
+  $('pfChat').onclick = () => { $('friends').close(); window.openChat?.('dm', pf); };
+  $('pfTrade').onclick = () => { $('friends').close(); openTrades(pf); };
+  $('pfRemove').onclick = () => { S.friends = S.friends.filter(x => x !== pf); save(); frRender(); };
   $('friendBtn').onclick = () => { frMsg(''); $('friends').showModal(); frRender(); };
   $('frAdd').onclick = async () => {
     const n = $('frName').value.trim().toLowerCase();
@@ -2406,23 +2506,32 @@ if (FIREBASE) {
     S.friends.push(n); save(); $('frName').value = ''; frMsg(`Added ${n}!`); frRender();
   };
   $('giftSend').onclick = async () => {
-    const to = $('giftTo').value, amount = tok($('giftAmt').value);
-    if (!to) return frMsg('Add a friend first');
-    if (amount < 1 || amount > 1000) return frMsg('Send between 1 and 1000 tokens');
-    if (S.hc < amount) return frMsg(`You only have ${S.hc} 💈`);
+    const to = pf, amount = tok($('giftAmt').value);
+    if (amount < 1 || amount > 1000) return pfMsg('Send between 1 and 1000 tokens');
+    if (S.hc < amount) return pfMsg(`You only have ${S.hc} 💈`);
     S.hc -= amount; save(); refresh();
-    try { await addDoc(collection(db, 'gifts'), {from:me(), to, amount, ts:Date.now()}); frMsg(`🎁 Sent ${amount} 💈 to ${to}`); sfx('coin'); }
-    catch { S.hc += amount; save(); frMsg('Could not send, your tokens were refunded'); }
+    try { await addDoc(collection(db, 'gifts'), {from:me(), to, amount, ts:Date.now()}); pfMsg(`🎁 Sent ${amount} 💈 to ${to}`); sfx('coin'); }
+    catch { S.hc += amount; save(); pfMsg('Could not send, your tokens were refunded'); }
   };
+  // --- trades window ---
+  function openTrades(friend){
+    trMsg(''); $('trOut').hidden = !!user; $('trIn').hidden = !user;
+    $('tradeTo').innerHTML = S.friends.length ? S.friends.map(n => `<option value="${n}"${n === friend ? ' selected' : ''}>${n}</option>`).join('') : '<option value="">add a friend in 👥 Friends first</option>';
+    $('tgPet').innerHTML = '<option value="">no pet</option>' + PETS.filter(q => S.pets[q.id]).map(q => `<option value="${q.id}">${q.ic} ${q.nm} (Lv ${S.pets[q.id]})</option>`).join('');
+    $('twPet').innerHTML = '<option value="">no pet</option>' + PETS.map(q => `<option value="${q.id}">${q.ic} ${q.nm}</option>`).join('');
+    if (!$('trades').open) $('trades').showModal();
+    frPoll();
+  }
+  $('tradeBtn').onclick = () => openTrades();
   $('tradeSend').onclick = async () => {
     const to = $('tradeTo').value, give = {tokens:tok($('tgTok').value), pet:petOk($('tgPet').value)}, want = {tokens:tok($('twTok').value), pet:petOk($('twPet').value)};
-    if (!to) return frMsg('Add a friend first');
-    if (!give.tokens && !give.pet && !want.tokens && !want.pet) return frMsg('Put something in the trade');
-    if (S.hc < give.tokens) return frMsg(`You only have ${S.hc} 💈`);
-    if (give.pet && !S.pets[give.pet]) return frMsg("You don't own that pet");
+    if (!to) return trMsg('Pick a friend to trade with');
+    if (!give.tokens && !give.pet && !want.tokens && !want.pet) return trMsg('Put something in the trade');
+    if (S.hc < give.tokens) return trMsg(`You only have ${S.hc} 💈`);
+    if (give.pet && !S.pets[give.pet]) return trMsg("You don't own that pet");
     S.hc -= give.tokens; petTake(give.pet); save(); renderPets(); refresh();          // escrow
-    try { await addDoc(collection(db, 'trades'), {from:me(), to, give, want, status:'open', ts:Date.now()}); frMsg(`🤝 Offer sent to ${to}`); frPoll(); }
-    catch { S.hc += give.tokens; petGive(give.pet); save(); renderPets(); frMsg('Could not send the offer, refunded'); }
+    try { await addDoc(collection(db, 'trades'), {from:me(), to, give, want, status:'open', ts:Date.now()}); trMsg(`🤝 Offer sent to ${to}`); openTrades(to); }
+    catch { S.hc += give.tokens; petGive(give.pet); save(); renderPets(); trMsg('Could not send the offer, refunded'); }
   };
   async function frPoll(){
     if (!user) return;
@@ -2434,30 +2543,35 @@ if (FIREBASE) {
         try { await deleteDoc(d.ref); S.hc += amount; toast(`🎁 ${String(g.from)} sent you ${amount} 💈`); sfx('gold'); } catch {}
       }
       const [inc, out] = await Promise.all([getDocs(query(collection(db, 'trades'), where('to', '==', me()))), getDocs(query(collection(db, 'trades'), where('from', '==', me())))]);
-      const box = $('tradeList'); box.innerHTML = '';
+      // incoming offers
+      const inbox = $('tradeInbox'); inbox.innerHTML = '';
       for (const d of inc.docs) {
         const t = d.data(); if (t.status !== 'open') continue;
-        const give = {tokens:tok(t.give?.tokens), pet:petOk(t.give?.pet)}, want = {tokens:tok(t.want?.tokens), pet:petOk(t.want?.pet)};
+        const {give, want} = clean(t);
         const row = document.createElement('div'); row.className = 'trRow';
         row.innerHTML = '<div></div><div class="row"><button class="ab">✅ Accept</button><button class="ab">❌ Decline</button></div>';
-        row.firstChild.textContent = `${String(t.from)} offers ${deal(give)} for your ${deal(want)}`;
+        row.firstChild.textContent = `🤝 ${String(t.from)} offers ${deal(give)} for your ${deal(want)}`;
         const [acc, dec] = row.querySelectorAll('button');
         acc.onclick = async () => {
-          if (S.hc < want.tokens || (want.pet && !S.pets[want.pet])) return frMsg("You don't have what they want");
-          try { await updateDoc(d.ref, {status:'accepted'}); } catch { return frMsg('That offer is no longer available'); }
+          if (S.hc < want.tokens || (want.pet && !S.pets[want.pet])) return trMsg("You don't have what they want");
+          try { await updateDoc(d.ref, {status:'accepted'}); } catch { return trMsg('That offer is no longer available'); }
           S.hc -= want.tokens; petTake(want.pet); S.hc += give.tokens; petGive(give.pet);
           save(); renderPets(); refresh(); sfx('gold'); toast(`🤝 Trade with ${String(t.from)} done!`); frPoll();
         };
         dec.onclick = async () => { try { await updateDoc(d.ref, {status:'declined'}); } catch {} frPoll(); };
-        box.appendChild(row);
+        inbox.appendChild(row);
       }
+      if (!inbox.children.length) inbox.innerHTML = '<div class="dimtxt">No offers right now.</div>';
+      $('tradeBtn').classList.toggle('new', !!inbox.querySelector('.trRow'));
+      // your offers: finish accepted ones, refund declined ones, list the open ones
+      const mine = $('tradeOut'); mine.innerHTML = '';
       for (const d of out.docs) {
-        const t = d.data(), give = {tokens:tok(t.give?.tokens), pet:petOk(t.give?.pet)}, want = {tokens:tok(t.want?.tokens), pet:petOk(t.want?.pet)};
+        const t = d.data(), {give, want} = clean(t);
         if (t.status === 'accepted') { try { await deleteDoc(d.ref); S.hc += want.tokens; petGive(want.pet); toast(`🤝 ${String(t.to)} accepted your trade!`); sfx('gold'); } catch {} continue; }
         if (t.status === 'declined') { try { await deleteDoc(d.ref); S.hc += give.tokens; petGive(give.pet); toast(`${String(t.to)} declined your trade, items returned`); } catch {} continue; }
         const row = document.createElement('div'); row.className = 'trRow';
         row.innerHTML = '<div></div><div class="row"><button class="ab">Cancel offer</button></div>';
-        row.firstChild.textContent = `Waiting on ${String(t.to)}: your ${deal(give)} for their ${deal(want)}`;
+        row.firstChild.textContent = `⏳ Waiting on ${String(t.to)}: your ${deal(give)} for their ${deal(want)}`;
         row.querySelector('button').onclick = async () => {
           // re-check first: if they accepted in the meantime, the trade completes instead of being cancelled
           try {
@@ -2466,13 +2580,198 @@ if (FIREBASE) {
           } catch {}
           frPoll();
         };
-        box.appendChild(row);
+        mine.appendChild(row);
       }
-      if (!box.children.length) box.innerHTML = '<div class="dimtxt" style="margin-top:8px">No open trades.</div>';
+      if (!mine.children.length) mine.innerHTML = '<div class="dimtxt">No offers sent.</div>';
       save(); renderPets(); refresh();
     } catch {}
   }
   setInterval(frPoll, 30000);
+  // ---------- guilds ----------
+  // guilds/{CODE} = {name, tag, owner, members:[usernames], createdAt}. The doc id doubles as the 6-character invite code.
+  // Rules: anyone signed in can create one (as owner) or add/remove only themselves; the owner can kick or disband; max 30 members.
+  let guildTag = '', guildDoc = null;
+  const gMsg = t => $('gMsg').textContent = t;
+  const newCode = () => Array.from({length:6}, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random()*32|0]).join('');
+  async function syncGuild(){
+    guildDoc = null; guildTag = '';
+    if (!user || !S.guild) return;
+    const g = await getDoc(doc(db, 'guilds', S.guild)).catch(() => null);
+    if (g && g.exists() && (g.data().members || []).includes(me())) { guildDoc = g.data(); guildTag = String(guildDoc.tag || ''); }
+    else if (g) { S.guild = ''; save(); }          // guild gone or you were removed
+  }
+  async function gRender(){
+    $('gOut').hidden = !!user; $('gNone').hidden = !user || !!guildDoc; $('gIn').hidden = !guildDoc;
+    if (!user) return;
+    if (!guildDoc) {
+      const box = $('gBrowse'); box.innerHTML = '<div class="dimtxt">Loading…</div>';
+      const qs = await getDocs(query(collection(db, 'guilds'), orderBy('createdAt', 'desc'), limit(20))).catch(() => null);
+      box.innerHTML = '';
+      qs?.forEach(d => {
+        const g = d.data(), n = (g.members || []).length, row = document.createElement('div'); row.className = 'frRow';
+        row.innerHTML = '<b></b><span></span><button class="ab">Join</button>';
+        row.querySelector('b').textContent = `[${String(g.tag)}] ${String(g.name)}`;
+        row.querySelector('span').textContent = `${n}/30 members`;
+        row.querySelector('button').disabled = n >= 30;
+        row.querySelector('button').onclick = () => joinGuild(d.id);
+        box.appendChild(row);
+      });
+      if (!box.children.length) box.innerHTML = '<div class="dimtxt">No guilds yet. Create the first one!</div>';
+      return;
+    }
+    const g = guildDoc, mine = g.owner === me();
+    $('gHead').textContent = `[${g.tag}] ${g.name}`; $('gInvite').textContent = S.guild;
+    $('gLeave').textContent = mine ? 'Disband guild' : 'Leave guild';
+    const members = (g.members || []).slice(0, 30), box = $('gMembers'); box.innerHTML = '<div class="dimtxt">Loading members…</div>';
+    const qs = await getDocs(query(collection(db, 'leaderboard'), where('name', 'in', members))).catch(() => null);
+    const stats = {}; qs?.forEach(d => stats[d.data().name] = d.data());
+    const ranked = members.map(n => ({n, s:Number(stats[n]?.score) || 0, r:Number(stats[n]?.rebirths) || 0})).sort((a, b) => b.s - a.s);
+    $('gTotal').textContent = `${members.length}/30 members · 🪙 ${fmt(ranked.reduce((t, m) => t + m.s, 0))} combined lifetime coins`;
+    box.innerHTML = '';
+    ranked.forEach((m, i) => {
+      const row = document.createElement('div'); row.className = 'frRow';
+      row.innerHTML = '<b></b><span></span>';
+      row.querySelector('b').textContent = `${i + 1}. ${m.n}${m.n === g.owner ? ' 👑' : ''}`;
+      row.querySelector('span').textContent = `🪙 ${fmt(m.s)} · 🔁 ${m.r}`;
+      if (mine && m.n !== me()) {
+        const k = Object.assign(document.createElement('button'), {className:'ab', textContent:'Kick'});
+        k.onclick = async () => { try { await updateDoc(doc(db, 'guilds', S.guild), {members:arrayRemove(m.n)}); await syncGuild(); gRender(); } catch { gMsg("Couldn't kick"); } };
+        row.appendChild(k);
+      }
+      box.appendChild(row);
+    });
+  }
+  async function joinGuild(code){
+    code = String(code).trim().toUpperCase();
+    if (!/^[A-Z0-9]{6}$/.test(code)) return gMsg('Invite codes are 6 letters/numbers');
+    const g = await getDoc(doc(db, 'guilds', code)).catch(() => null);
+    if (!g || !g.exists()) return gMsg('No guild with that code');
+    if ((g.data().members || []).length >= 30) return gMsg('That guild is full');
+    try { await updateDoc(g.ref, {members:arrayUnion(me())}); } catch { return gMsg("Couldn't join that guild"); }
+    S.guild = code; save(); await syncGuild(); push(); sfx('gold'); toast(`🛡️ You joined [${guildTag}]!`); gMsg(''); gRender();
+  }
+  $('gCreate').onclick = async () => {
+    const name = cleanName($('gName').value).slice(0, 20), tag = $('gTag').value.trim().toUpperCase();
+    if (name.length < 3) return gMsg('Guild names need at least 3 characters');
+    if (!/^[A-Z0-9]{1,4}$/.test(tag)) return gMsg('Tags are 1–4 letters or numbers');
+    let code = newCode();
+    for (let i = 0; i < 5 && (await getDoc(doc(db, 'guilds', code)).catch(() => null))?.exists(); i++) code = newCode();
+    try { await setDoc(doc(db, 'guilds', code), {name:cleanChat(name), tag, owner:me(), members:[me()], createdAt:Date.now()}); }
+    catch { return gMsg("Couldn't create the guild"); }
+    S.guild = code; save(); await syncGuild(); push(); sfx('gold'); toast(`🛡️ [${tag}] ${name} created! Share code ${code}`); gMsg(''); gRender();
+  };
+  $('gJoin').onclick = () => joinGuild($('gCode').value);
+  $('gCopy').onclick = () => { navigator.clipboard?.writeText(S.guild).then(() => toast('Invite code copied!'), () => {}); };
+  $('gChat').onclick = () => { $('guild').close(); window.openChat?.('guild'); };
+  $('gLeave').onclick = async () => {
+    const mine = guildDoc?.owner === me();
+    if (!confirm(mine ? 'Disband your guild? Everyone will be removed.' : 'Leave this guild?')) return;
+    try { if (mine) await deleteDoc(doc(db, 'guilds', S.guild)); else await updateDoc(doc(db, 'guilds', S.guild), {members:arrayRemove(me())}); } catch { return gMsg('Something went wrong'); }
+    S.guild = ''; save(); await syncGuild(); push(); gRender();
+  };
+  $('guildBtn').onclick = async () => { gMsg(''); $('guild').showModal(); await syncGuild(); gRender(); };
+  // ---------- chat: global room + friend DMs, with moderation ----------
+  // global/{id} and dms/{a__b}/msgs/{id} = {from, text, ts, display, badge, title, color}.
+  // Firestore rules enforce: 1-200 chars, server timestamp, 1 message per 3s (via chatmeta/{uid}), banned players can't post,
+  // DMs readable only by the two people in them, mods (nkthn) can delete anything and ban/unban.
+  const MODS = ['nkthn'];
+  const isMod = () => MODS.includes(me());
+  let unsub = null, room = 'global', chatFriend = '', banned = false, latestGlobal = 0;
+  const pairId = (a, b) => [a, b].sort().join('__');
+  const roomRef = () => room === 'global' ? collection(db, 'global') : room === 'guild' ? collection(db, 'guilds', S.guild, 'msgs') : collection(db, 'dms', pairId(me(), chatFriend), 'msgs');
+  const chatNote = t => $('chatNote').textContent = t;
+  function msgRow(d){
+    const m = d.data({serverTimestamps:'estimate'}), from = String(m.from || '?');
+    if (S.muted.includes(from)) return null;
+    const row = document.createElement('div'); row.className = 'msg';
+    const who = document.createElement('span'); who.className = 'who';
+    const hat = cosItem('hat', m.badge), t = cosItem('title', m.title), c = nameColor(m.color);
+    const tag = typeof m.guild === 'string' && /^[A-Z0-9]{1,4}$/.test(m.guild) ? `[${m.guild}] ` : '';
+    const nm = document.createElement('span'); nm.textContent = (hat ? hat.ic + ' ' : '') + tag + (cleanName(m.display) || from);
+    if (c === 'rainbow') nm.className = 'nc-rainbow'; else if (c) nm.style.color = c;
+    who.appendChild(nm);
+    if (MODS.includes(from)) who.appendChild(Object.assign(document.createElement('span'), {className:'modtag', textContent:'MOD'}));
+    if (t) who.appendChild(Object.assign(document.createElement('span'), {className:'ttl-in', textContent:`${t.ic} ${t.nm}`}));
+    const time = m.ts?.toDate ? m.ts.toDate().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}) : '';
+    row.appendChild(who);
+    row.appendChild(Object.assign(document.createElement('span'), {className:'t', textContent:time}));
+    row.appendChild(Object.assign(document.createElement('div'), {className:'txt', textContent:cleanChat(String(m.text || ''))}));
+    // tap a name for actions: mute, message (friends), delete (own / mod), ban (mod)
+    who.onclick = () => {
+      const old = row.querySelector('.mact'); if (old) return old.remove();
+      const act = document.createElement('div'); act.className = 'mact';
+      const btn = (label, fn) => act.appendChild(Object.assign(document.createElement('button'), {className:'ab', textContent:label, onclick:fn}));
+      if (from !== me()) btn(S.muted.includes(from) ? 'Unmute' : '🔇 Mute', () => { S.muted = S.muted.includes(from) ? S.muted.filter(x => x !== from) : [...S.muted, from].slice(-100); save(); listen(); });
+      if (from !== me() && S.friends.includes(from) && room === 'global') btn('💬 Message', () => openRoom('dm', from));
+      if (from === me() || isMod()) btn('🗑️ Delete', () => deleteDoc(d.ref).catch(() => chatNote("Couldn't delete that")));
+      if (isMod() && from !== me()) btn('🔨 Ban from chat', () => setDoc(doc(db, 'bans', from), {by:me(), ts:Date.now()}).then(() => { chatNote(`${from} is banned from chat`); loadBans(); }).catch(() => chatNote('Ban failed')));
+      row.appendChild(act);
+    };
+    return row;
+  }
+  function listen(){
+    if (unsub) { unsub(); unsub = null; }
+    const box = $('chatBox'); box.innerHTML = '';
+    if (room === 'dm' && !chatFriend) return chatNote('Pick a friend to chat with');
+    if (room === 'guild' && !S.guild) return chatNote('Join or create a guild in 🛡️ Guild to use guild chat');
+    unsub = onSnapshot(query(roomRef(), orderBy('ts', 'desc'), limit(50)), snap => {
+      box.innerHTML = '';
+      snap.docs.forEach(d => { const r = msgRow(d); if (r) box.appendChild(r); });   // newest first; the box is column-reverse so it reads top to bottom
+      if (!snap.docs.length) box.appendChild(Object.assign(document.createElement('div'), {className:'dimtxt', textContent:room === 'global' ? 'No messages yet. Say hi!' : 'No messages yet.'}));
+    }, () => chatNote(user ? "Couldn't load chat" : 'Sign in to see this chat'));
+  }
+  function openRoom(r, friend){
+    room = ['dm', 'guild'].includes(r) ? r : 'global'; chatFriend = friend || chatFriend;
+    document.querySelectorAll('#chatTabs button').forEach(b => b.classList.toggle('on', b.dataset.r === (room === 'dm' ? 'friends' : room)));
+    $('chatFriend').hidden = room !== 'dm';
+    $('chatFriend').innerHTML = S.friends.length ? S.friends.map(n => `<option value="${n}"${n === chatFriend ? ' selected' : ''}>${n}</option>`).join('') : '<option value="">add friends in 👥 Friends first</option>';
+    if (room === 'dm' && !S.friends.includes(chatFriend)) chatFriend = S.friends[0] || '';
+    chatNote(''); listen();
+  }
+  async function loadBans(){
+    $('modBox').hidden = !isMod(); if (!isMod()) return;
+    const qs = await getDocs(collection(db, 'bans')).catch(() => null); const list = $('banList'); list.innerHTML = '';
+    qs?.forEach(d => {
+      const row = document.createElement('div'); row.className = 'frRow';
+      row.innerHTML = '<b></b><span></span><button class="ab">Unban</button>'; row.querySelector('b').textContent = d.id;
+      row.querySelector('button').onclick = () => deleteDoc(d.ref).then(loadBans);
+      list.appendChild(row);
+    });
+    if (!list.children.length) list.innerHTML = '<div class="dimtxt">Nobody is banned.</div>';
+  }
+  async function send(){
+    const text = cleanChat($('chatIn').value.trim()).slice(0, 200);
+    if (!user) return chatNote('Sign in to chat');
+    if (banned) return chatNote("You're banned from chat");
+    if (!text) return;
+    if (room === 'dm' && !chatFriend) return chatNote('Pick a friend first');
+    const b = writeBatch(db);
+    b.set(doc(db, 'chatmeta', user.uid), {last:serverTimestamp()});
+    b.set(doc(roomRef()), {from:me(), text, ts:serverTimestamp(), display:S.display, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, guild:guildTag});
+    try { await b.commit(); $('chatIn').value = ''; chatNote(''); sfx('coin'); }
+    catch { chatNote('Slow down! You can send one message every 3 seconds.'); }
+  }
+  $('chatSend').onclick = send;
+  $('chatIn').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  document.querySelectorAll('#chatTabs button').forEach(b => b.onclick = () => openRoom(b.dataset.r === 'friends' ? 'dm' : b.dataset.r));
+  $('chatFriend').onchange = e => { chatFriend = e.target.value; listen(); };
+  window.openChat = (r, friend) => { $('chatBtn').onclick(); openRoom(r, friend); };
+  $('chatBtn').onclick = async () => {
+    $('chat').showModal(); $('chatBtn').classList.remove('new');
+    try { localStorage.setItem('clickjun-chatseen', String(latestGlobal)); } catch {}
+    $('chatForm').hidden = !user;
+    banned = user ? (await getDoc(doc(db, 'bans', me())).catch(() => null))?.exists() : false;
+    chatNote(!user ? 'Sign in to chat. You can still read Global.' : banned ? "You're banned from chat" : '');
+    openRoom(room); loadBans();
+  };
+  $('chat').addEventListener('close', () => { if (unsub) { unsub(); unsub = null; } });
+  // red dot on 💬 when there are new global messages since you last opened chat
+  onSnapshot(query(collection(db, 'global'), orderBy('ts', 'desc'), limit(1)), snap => {
+    const d = snap.docs[0]; if (!d) return;
+    latestGlobal = d.data({serverTimestamps:'estimate'}).ts?.toMillis?.() || 0;
+    let seen = 0; try { seen = +localStorage.getItem('clickjun-chatseen') || 0; } catch {}
+    if (latestGlobal > seen && !$('chat').open && String(d.data().from) !== me()) $('chatBtn').classList.add('new');
+  }, () => {});
 
   // first visit, not signed in, no saved progress: ask them to make an account (guest is still allowed)
   const wgo = fn => async () => {
@@ -2502,7 +2801,7 @@ if (FIREBASE) {
     const snap = await getDoc(doc(db, 'saves', u.uid)).catch(() => null);
     const cloud = snap && snap.exists() ? snap.data() : null;
     if (cloud && Math.max(cloud.lifetime || 0, cloud.total || 0) >= S.lifetime) { applyState(cloud); toast('Cloud save loaded!'); }
-    push(); loadBoard(); frPoll();
+    await syncGuild(); push(); loadBoard(); frPoll();
   });
   setInterval(push, 15000);
   document.addEventListener('visibilitychange', () => document.hidden && push());
