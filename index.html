@@ -185,6 +185,7 @@ body.rainbow .flake{font-size:14px!important}
 .up .star{position:absolute;top:0;right:0;font-size:18px;line-height:1;color:var(--dim);cursor:pointer;padding:8px 10px;z-index:2}
 .up .star.on{color:var(--gold)}
 .upMore{text-align:center;font-size:12px;color:var(--dim);padding:8px 0 2px}
+#resAll{width:100%;margin-top:8px}
 #resRow{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;overscroll-behavior:contain}
 .res{flex:0 0 76px;height:86px;border-radius:12px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text);font:inherit;cursor:pointer;padding:4px}
 .res .ri{font-size:24px}
@@ -438,7 +439,7 @@ body.light .ab:hover{background:#e6e8f2}
   <h2>Upgrades</h2>
   <div id="upgWrap">
   <div id="buyRow"><button data-n="1">×1</button><button data-n="10">×10</button><button data-n="25">×25</button><button data-n="50">×50</button><button data-n="max" id="buyMax">MAX</button></div>
-  <div id="resWrap" hidden><h2>Research</h2><div id="resRow"></div></div>
+  <div id="resWrap" hidden><h2>Research</h2><div id="resRow"></div><button class="ab" id="resAll" hidden></button></div>
   <div id="favWrap" hidden><h2>Starred</h2><div id="favUps"></div></div>
   <h2>Click Power</h2><div id="clickUps"></div>
   <h2>Auto Clickers</h2><div id="kUps"></div>
@@ -2402,7 +2403,25 @@ function renderResearch(){
     }
   }
   for (const b of $('resRow').children) b.classList.toggle('can', S.coins >= b._r.cost);
+  const k = resAllPlan(); $('resAll').hidden = k.n < 2;
+  setText($('resAll'), `🔬 Buy all affordable (${k.n}) · 🪙 ${fmt(k.tot)}`);
 }
+// cheapest first, as long as coins last (cards it unlocks along the way aren't counted)
+function resAllPlan(){
+  let tot = 0, n = 0;
+  for (const r of RES.filter(r => !S.research[r.id] && r.need()).sort((a, b) => a.cost - b.cost)) { if (tot + r.cost > S.coins) break; tot += r.cost; n++; }
+  return {n, tot};
+}
+$('resAll').onclick = () => {
+  let n = 0;
+  for (;;) {   // repeat so cards unlocked by earlier purchases get bought too
+    const r = RES.filter(r => !S.research[r.id] && r.need()).sort((a, b) => a.cost - b.cost)[0];
+    if (!r || S.coins < r.cost) break;
+    S.coins -= r.cost; S.research[r.id] = true; S.resBought++; n++; recalcResearch();
+  }
+  if (!n) return;
+  save(); sfx('buy'); toast(`🔬 Bought ${n} research card${n > 1 ? 's' : ''}`); renderResearch(); refresh();
+};
 
 // pets
 // egg prices: Basic and Golden cost coins and get pricier the more you hatch (Golden is always ≥25× Basic); Cosmic costs tokens, Royal costs ✨
