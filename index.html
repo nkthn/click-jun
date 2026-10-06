@@ -262,6 +262,8 @@ body.light #coins{background:linear-gradient(180deg,#4b2fc9,#d4890a);-webkit-bac
 body.light #ticker{background:linear-gradient(transparent,rgba(255,255,255,.75))}
 body.light .flake{color:#8fb0dc}
 body.light #hkeys button:disabled{background:#e4e5ea}
+.bal{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;padding:10px;border-radius:12px;background:rgba(255,201,77,.12);border:1px solid rgba(255,201,77,.35);font-size:15px}
+.bal b{font-size:24px;color:var(--gold);font-variant-numeric:tabular-nums}
 #reset,#adminBtn{margin-top:20px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;width:100%}
 #dpad{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px}
 #dpad button{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);font-size:22px;touch-action:none}
@@ -420,6 +422,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
 </dialog>
 <dialog id="wardrobe">
   <h3>👕 <span>Wardrobe</span></h3>
+  <div class="bal">You have 💈 <b id="cosBig">0</b> tokens</div>
   <div id="wPrev"><div id="wAura"></div><img id="wJun" alt=""><img id="wHat" alt=""><img id="wAcc" alt=""></div>
   <div id="wCard"></div>
   <div class="seg" id="wTabs"><button data-t="hat">🎩</button><button data-t="acc">🕶️</button><button data-t="aura">✨</button><button data-t="title">🏷️</button><button data-t="color">🎨</button></div>
@@ -456,6 +459,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
 </dialog>
 <dialog id="ashop">
   <h3>✨ Ascension <span>Shop</span></h3>
+  <div class="bal">You have <b id="apBig">0</b> ✨ Ascension points</div>
   <div class="dimtxt" style="margin-top:4px">Cheap one-time upgrades that last forever. You earn 1 ✨ every time you Ascend. You have <b id="apBal2" style="color:var(--gold)"></b> ✨.</div>
   <div id="aList" style="margin-top:12px;max-height:55vh;overflow-y:auto"></div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
@@ -467,6 +471,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
 </dialog>
 <dialog id="rshop">
   <h3>Rebirth <span>Shop</span></h3>
+  <div class="bal">You have 💈 <b id="hcBig">0</b> tokens</div>
   <div style="color:var(--dim);font-size:13px;margin-top:4px">Every rebirth gives 💈 Buzz Tokens, and bigger runs give more. Perks level up and are permanent; ⚡ and 👊 never cap. You have <b id="hcBal2" style="color:var(--gold)"></b> tokens.</div>
   <div id="evtShop"><button class="ab" id="buyEvt2">⚡ 2× frenzy, 60s · 💈 2</button><button class="ab" id="buyEvt4">⚡ 4× frenzy, 30s · 💈 5</button></div>
   <div id="perkList"></div>
@@ -1789,7 +1794,7 @@ function applyPerks(){
   AUTO = .1 + .02*lv('auto');
 }
 function renderPerks(){
-  $('hcBal2').textContent = S.hc;
+  $('hcBal2').textContent = S.hc; $('hcBig').textContent = fmt(S.hc);
   $('perkList').innerHTML = '';
   for (const k of PERKS) {
     const L = lv(k.id), maxed = k.max && L >= k.max, c = perkCost(k), b = document.createElement('button');
@@ -2213,7 +2218,7 @@ function nameHtml(el, display, user, titleId, colorId){
   if (t) el.appendChild(Object.assign(document.createElement('span'), {className:'ttl', textContent:`${t.ic} ${t.nm}`}));
 }
 function renderWardrobe(){
-  $('cosBal').textContent = S.hc;
+  $('cosBal').textContent = S.hc; $('cosBig').textContent = fmt(S.hc);
   $('wJun').src = $('jun').src; $('wJun').style.clipPath = getComputedStyle($('jun')).clipPath;
   const h = cosItem('hat', S.cos.hat), ac = cosItem('acc', S.cos.acc);
   $('wHat').src = h ? emojiImg(h.ic) : ''; $('wHat').style.display = h ? 'block' : 'none';
@@ -2253,7 +2258,7 @@ applyAppearance(); applyCos(); renderDaily();
 setTimeout(() => { if (dailyState().can && !document.querySelector('dialog[open]') && $('ending').hidden) { renderDaily(); $('daily').showModal(); } }, 2500);
 // --- Ascension Shop ---
 function renderAshop(){
-  $('apBal2').textContent = S.ap; $('aList').innerHTML = '';
+  $('apBal2').textContent = S.ap; $('apBig').textContent = fmt(S.ap); $('aList').innerHTML = '';
   for (const a of AUP) {
     const has = asu(a.id), b = document.createElement('button');
     b.className = 'up perk' + (has ? ' owned' : '');
