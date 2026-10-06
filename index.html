@@ -117,10 +117,10 @@ body.xmas #lights,body.spooky #lights{display:flex;justify-content:space-around;
 #lights i:nth-child(4n+2){background:#ffd166;color:#ffd166;animation-delay:.6s}#lights i:nth-child(4n+3){background:#57cc99;color:#57cc99;animation-delay:.9s}
 @keyframes blink{from{opacity:.35}to{opacity:1}}
 #xmasBtn,#fxBtn,#updBtn{background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;margin-top:10px}
-#acct input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;margin-bottom:8px}
-#acct .row{display:flex;gap:8px}
-#acct .row button{flex:1;background:var(--accent);border:0;color:#fff;border-radius:10px;padding:10px;font:inherit;font-weight:600;cursor:pointer}
-#acct .row button.alt{background:none;border:1px solid var(--line);color:var(--text)}
+#acct input,#welcome input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;margin-bottom:8px}
+#acct .row,#welcome .row{display:flex;gap:8px}
+#acct .row button,#welcome .row button{flex:1;background:var(--accent);border:0;color:#fff;border-radius:10px;padding:10px;font:inherit;font-weight:600;cursor:pointer}
+#acct .row button.alt,#welcome .row button.alt{background:none;border:1px solid var(--line);color:var(--text)}
 #acctMsg{font-size:13px;color:var(--dim);margin-top:6px;min-height:18px}
 /* Halloween theme */
 body.spooky{--accent:#ff7a18;--gold:#ffb347;background:radial-gradient(1000px 600px at 30% 15%,#3b1452 0%,#160a22 55%,#08050d 100%)}
@@ -184,6 +184,7 @@ body.spooky #lights i:nth-child(even){background:#9b5de5;color:#9b5de5}
 #evtBar{font-weight:800;font-size:16px;height:22px;margin-top:2px;background:linear-gradient(90deg,#ff5c7a,#ffc94d,#57cc99);-webkit-background-clip:text;background-clip:text;color:transparent}
 #evtShop{display:flex;gap:8px;margin-top:12px}
 #evtShop button{flex:1}
+#wGuest{display:block;margin:14px auto 0;background:none;border:0;color:var(--dim);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
 #reset,#adminBtn{margin-top:20px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer;width:100%}
 #dpad{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:6px}
 #dpad button{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);font-size:22px;touch-action:none}
@@ -297,6 +298,15 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}aside{border-left:0;
   <div id="vcOdds"></div>
   <div class="row" style="margin-top:16px"><button class="ab" id="vcAccept">✅ Accept</button><button class="ab" id="vcNeg">📈 Negotiate +50%</button></div>
   <div class="row" style="margin-top:6px"><button class="ab" id="vcDecline">Decline</button></div>
+</dialog>
+<dialog id="welcome">
+  <h3>Welcome to Click <span>Jun</span></h3>
+  <div style="color:var(--dim);font-size:13px;margin:4px 0 14px">Make an account so your progress saves across devices and you can get on the leaderboard. Takes 5 seconds.</div>
+  <input id="wName" placeholder="Pick a username" autocomplete="username" autocapitalize="off" maxlength="20">
+  <input id="wPass" type="password" placeholder="Password (6+ characters)" autocomplete="new-password">
+  <div class="row"><button id="wUp">Create account</button><button id="wIn" class="alt">I have one</button></div>
+  <div id="wMsg" style="font-size:13px;color:#ff5c7a;margin-top:8px;min-height:18px"></div>
+  <button id="wGuest">Play as guest for now</button>
 </dialog>
 <dialog id="away">
   <h3>Welcome <span>back!</span></h3>
@@ -1696,7 +1706,26 @@ if (FIREBASE) {
     $('lbNote').textContent = !user ? 'Create an account below to get on the board.' : S.cheater ? 'You used the admin panel, so you’re off the board.' : '';
   }
   $('lb').hidden = false; loadBoard(); setInterval(loadBoard, 60000);
+  // first visit, not signed in, no saved progress: ask them to make an account (guest is still allowed)
+  const wgo = fn => async () => {
+    const name = $('wName').value.trim().toLowerCase();
+    if (!/^[a-z0-9_]{3,20}$/.test(name)) return $('wMsg').textContent = 'Username: 3–20 letters, numbers or _';
+    $('wMsg').textContent = '…';
+    try { await fn(auth, name + '@clickjun.app', $('wPass').value); $('welcome').close(); } catch (err) { $('wMsg').textContent = errText(err); }
+  };
+  $('wUp').onclick = wgo(createUserWithEmailAndPassword);
+  $('wIn').onclick = wgo(signInWithEmailAndPassword);
+  $('wPass').addEventListener('keydown', e => e.key === 'Enter' && $('wUp').click());
+  const guest = () => { try { localStorage.setItem('clickjun-guest', '1'); } catch {} $('welcome').close(); };
+  $('wGuest').onclick = guest;
+  $('welcome').addEventListener('cancel', guest);
+  let firstAuth = true;
   onAuthStateChanged(auth, async u => {
+    if (firstAuth) {
+      firstAuth = false;
+      let wasGuest = false; try { wasGuest = !!localStorage.getItem('clickjun-guest'); } catch {}
+      if (!u && !wasGuest && !(saved && saved.lifetime)) $('welcome').showModal();
+    }
     user = u;
     $('acctOut').hidden = !!u; $('acctIn').hidden = !u;
     if (!u) return loadBoard();
