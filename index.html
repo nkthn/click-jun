@@ -369,7 +369,7 @@ const perClick = () => (1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*o
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
 const autoCps = () => UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0);
 const perSec = () => UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige();
-const fmt = n => n < 1e3 ? Math.floor(n).toString()
+const fmt = n => n < 1e3 ? String(Math.round(n*10)/10)   // one decimal under 1K, rounded (13.26 → 13.3); K/M/B above
   : (()=>{const u=['K','M','B','T','Qa','Qi']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
 
 let MULT = 1, BASE = 180;
