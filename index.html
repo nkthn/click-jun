@@ -586,11 +586,11 @@ function refresh(){
   }
   const g = rbGain(), n = rbCan(S.rbN) ? S.rbN : 1, gn = rbGainN(n);
   $('rbBp').textContent = S.bp; $('rbBoost').textContent = `+${S.bp*10}%`;
-  for (const b of rbRowBtns) { const k = +b.dataset.n; b.disabled = !rbCan(k); b.classList.toggle('on', k === n); b.title = rbCan(k) ? `+${rbGainN(k)} points, ${tokenGain(rbGainN(k), k)} tokens` : `need ${fmt(k*1e6 / rbMult()**3)} coins this run`; }
+  for (const b of rbRowBtns) { const k = +b.dataset.n; b.disabled = !rbCan(k); b.classList.toggle('on', k === n); b.title = rbCan(k) ? `+${rbGainN(k)} points, ${tokenGain(rbGainN(k), k)} tokens` : `need ${fmt(rbCost(k))} coins this run`; }
   $('rbBtn').disabled = g < 1;
-  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(1e6 / rbMult()**3)} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} for +${gn} Buzz Point${gn > 1 ? 's' : ''} · ${tokenGain(gn, n)} 💈`;
+  $('rbBtn').textContent = g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} for +${gn} Buzz Point${gn > 1 ? 's' : ''} · ${tokenGain(gn, n)} 💈`;
   setText($('hcBal'), String(S.hc));
-  $('rbNext').textContent = `${fmt(((g+1)/rbMult())**3*1e6 - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far (×${rbMult().toFixed(2)} points)`;
+  $('rbNext').textContent = `${fmt(((g+1)/rbMult())**3*rbBase() - S.total)} more coins this run for the next point · ${S.rebirths} rebirths so far (×${rbMult().toFixed(2)} points)`;
 }
 
 // floating heads
@@ -682,11 +682,15 @@ setTimeout(spawnDiamond, diaDelay());
 
 // rebirth: Buzz Points = cube root of this run's coins in millions × rbMult
 const rbMult = (r = S.rebirths) => 1 + .1 * Math.sqrt(r);   // diminishing: 1 rebirth ×1.1, 4 → ×1.2, 25 → ×1.5, 100 → ×2
-const rbGain = () => Math.floor(Math.cbrt(S.total / 1e6) * rbMult());
-// multi-rebirth ×n: same coins, points use the average multiplier across the n rebirths, and the rebirth count goes up by n.
-// No extra points from splitting, so it's a modest long-term boost rather than a multiplier exploit.
-const rbGainN = n => { let m = 0; for (let i = 0; i < n; i++) m += rbMult(S.rebirths + i); return Math.floor(Math.cbrt(S.total / 1e6) * m / n); };
-const rbCan = n => rbGainN(n) >= 1;
+// the base requirement climbs 15% with every rebirth you've done
+const rbBase = (r = S.rebirths) => 1e6 * 1.15 ** r;
+const rbReq = r => rbBase(r);                           // coins this run needed to rebirth at all, only ever goes up
+const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbBase()) * rbMult());
+// multi-rebirth ×n: costs the coins of n back-to-back rebirths (each requirement 15% higher than the last),
+// pays the same Buzz Points as ×1, n× the tokens, and adds n to your rebirth count
+const rbCost = n => { let c = 0; for (let i = 0; i < n; i++) c += rbReq(S.rebirths + i); return c; };
+const rbGainN = () => rbGain();
+const rbCan = n => rbGain() >= 1 && S.total >= rbCost(n);
 // tokens scale with how many rebirths you do at once: ×10 multi-rebirth pays 10× tokens
 const tokenGain = (g, n = 1) => Math.floor(g * (1 + .1*lv('tokens'))) * n;
 const rbRowBtns = [...$('rbRow').children];
@@ -1413,6 +1417,10 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'2.10', date:'Oct 5, 2026', title:'Harder Rebirths', notes:[
+    'Each rebirth raises the coins needed for the next one by 15%',
+    'Multi-rebirth ×n now costs the coins of n separate rebirths, and pays n× tokens',
+    'Hover the ×2/×5/×10 buttons to see what each one costs']},
   {v:'2.9', date:'Oct 5, 2026', title:'Frenzy', notes:[
     '⚡ Random frenzy events: 2× everything for 60s, or a rare 4× for 30s',
     'Buy instant 2× and 4× frenzies with 💈 tokens in the Rebirth Shop',
