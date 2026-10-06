@@ -947,7 +947,7 @@ const PET_MAX = 25, PET_SLOTS = 4;
 const QUESTS = [
   {id:'clicks', ic:'👆', txt:n => `Click Jun ${fmt(n)} times`, cur:() => S.clicks, t:[200, 500, 1200], r:[3, 5, 8]},
   {id:'golds', ic:'✨', txt:n => `Catch ${n} Golden Jun${n > 1 ? 's' : ''}`, cur:() => S.golds, t:[1, 2, 4], r:[3, 6, 10]},
-  {id:'coins', ic:'🪙', txt:n => `Earn ${fmt(n)} coins`, cur:() => S.lifetime, t:() => [600, 1800, 3600].map(x => Math.max(5e3, Math.round((perSec() + autoCps()*AUTO*perClick())*x))), r:[3, 5, 8]},
+  {id:'coins', ic:'🪙', txt:n => `Earn ${fmt(n)} coins`, cur:() => S.lifetime, t:() => [600, 1800, 3600].map(x => Math.max(5e3, Math.round(income()*x))), r:[3, 5, 8]},
   {id:'bought', ic:'🛒', txt:n => `Buy ${n} upgrades`, cur:() => S.bought, t:[20, 50, 120], r:[3, 5, 8]},
   {id:'hatch', ic:'🥚', txt:n => `Hatch ${n} egg${n > 1 ? 's' : ''}`, cur:() => S.hatches, t:[1, 2, 4], r:[3, 5, 9]},
   {id:'combo', ic:'🔥', txt:n => `Reach a ${n}× combo`, cur:() => S.qcombo, abs:true, t:[2, 2.5, 3], r:[3, 5, 8]},
@@ -1063,6 +1063,7 @@ const cost = (u, n = buyN(u)) => { const g = growth(u); return fin(Math.ceil(u.c
 // the base click is always exactly 1; boosts multiply what your Click Power upgrades add on top of it
 const perClick = () => fin(1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .1*lv('click')) * (1 + .05*petLv('cat')) * (1 + .08*petLv('eagle')) + perSec()*RM.c2);
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
+const income = () => fin(perSec() + autoCps()*AUTO*perClick());   // steady coins/sec: passive + auto clickers
 const autoCps = () => fin(UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * (1 + .05*petLv('ham')) * (1 + .08*petLv('octo')));
 const perSec = () => fin(UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .05*petLv('pug')) * (1 + .04*petLv('eagle')));
 const fmt = n => n >= 1e300 ? '∞' : n < 1e3 ? String(Math.round(n*10)/10) : S.sci ? n.toExponential(2).replace('+', '')   // one decimal under 1K, rounded (13.26 → 13.3); K/M/B above
@@ -1251,14 +1252,14 @@ $('jun').addEventListener('pointerdown', e => {
 });
 
 function goldDelay(){ return (45000 + Math.random()*45000) / (1 + .25*lv('luck')) / (1 + .1*petLv('parrot')) / (asu('gold') ? 2 : 1); }
-// golden Jun: shows up every 45–90s, worth 60s of income (min 100× click)
+// golden Jun: shows up every 45–90s, worth 60s of income incl. auto clickers (min 100× click)
 let goldUntil = 0;
 function spawnGold(){
   Object.assign(gold, {x:0, y:Math.random()*(stage.clientHeight-100), vx:380, vy:(Math.random()-.5)*400});
   $('golden').style.display = 'block'; goldUntil = performance.now() + 7000 * (1 + .15*lv('linger'));
 }
 $('golden').addEventListener('pointerdown', e => {
-  const n = Math.max(perSec()*60, perClick()*100) * (1 + .2*lv('gold')) * RM.gold * (1 + .1*petLv('fly')); earn(n); S.golds++; sfx('gold'); pop('+'+fmt(n)+' ✨', e);
+  const n = Math.max(income()*60, perClick()*100) * (1 + .2*lv('gold')) * RM.gold * (1 + .1*petLv('fly')); earn(n); S.golds++; sfx('gold'); pop('+'+fmt(n)+' ✨', e);
   toast(`GOLDEN JUN! +${fmt(n)} coins`); $('golden').style.display = 'none'; goldUntil = 0;
   setTimeout(spawnGold, goldDelay()); refresh();
 });
@@ -1273,7 +1274,7 @@ function spawnDiamond(){
   $('diamond').style.display = 'block'; diaUntil = performance.now() + 4000 * (1 + .15*lv('linger'));
 }
 $('diamond').addEventListener('pointerdown', e => {
-  const n = Math.max(perSec()*600, perClick()*1000) * (1 + .15*petLv('ember')); earn(n); S.diamonds++; sfx('gold'); frenzyUntil = performance.now() + (20 + 3*lv('frenzy') + 2*petLv('baby'))*1000;
+  const n = Math.max(income()*600, perClick()*1000) * (1 + .15*petLv('ember')); earn(n); S.diamonds++; sfx('gold'); frenzyUntil = performance.now() + (20 + 3*lv('frenzy') + 2*petLv('baby'))*1000;
   pop('+'+fmt(n)+' 💎', e); toast(`💎 DIAMOND JUN! +${fmt(n)} and 7× clicks for 20s`);
   $('diamond').style.display = 'none'; diaUntil = 0; setTimeout(spawnDiamond, diaDelay()); save(); refresh();
 });
@@ -2068,7 +2069,7 @@ function spawnPumpkin(){
   if (S.theme !== 'spooky' || document.hidden) return;
   const b = document.createElement('button'); b.className = 'pumpkin'; b.textContent = '🎃';
   b.style.left = 10 + Math.random()*75 + '%';
-  b.onclick = e => { const n = Math.max(perSec()*30, perClick()*50); earn(n); S.candy++; sfx('gold'); pop('+' + fmt(n) + ' 🍬', e); b.remove(); refresh(); };
+  b.onclick = e => { const n = Math.max(income()*30, perClick()*50); earn(n); S.candy++; sfx('gold'); pop('+' + fmt(n) + ' 🍬', e); b.remove(); refresh(); };
   stage.appendChild(b); setTimeout(() => b.remove(), 9000);
 }
 setTimeout(spawnPumpkin, 15000);
@@ -2169,7 +2170,7 @@ const dur = s => s >= 3600 ? `${Math.floor(s/3600)}h ${Math.floor(s%3600/60)}m` 
 function offline(ms){
   const sec = Math.min(ms/1000, ((asu('night') ? 72 : 24 + 6*lv('offline')) + 2*petLv('turtle')) * 3600);
   if (sec < 60) return;
-  const n = (perSec() + autoCps()*AUTO*perClick()) * sec * (asu('night') ? 1 : .5 + .1*lv('offline') + .1*petLv('owl'));
+  const n = income() * sec * (asu('night') ? 1 : .5 + .1*lv('offline') + .1*petLv('owl'));
   if (n < 1) return;
   earn(n); save(); refresh();
   $('awayTxt').innerHTML = `You were gone <b>${dur(sec)}</b>. Jun kept grinding and earned <b style="color:var(--gold)">${fmt(n)}</b> coins` +
@@ -2343,7 +2344,7 @@ function vcShow(msg){
 function vcEnd(msg){ $('vc').close(); toast(msg); vcSchedule(); }
 $('vcPing').onclick = () => {
   $('vcPing').hidden = true;
-  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(perSec()*300, perClick()*500, 1000) * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});
+  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(income()*300, perClick()*500, 1000) * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});
   $('vcName').textContent = '💼 ' + VC.name;
   vcShow('We love what you\'re doing with the forehead. Here\'s our offer:');
   $('vc').showModal();
