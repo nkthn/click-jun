@@ -41,7 +41,7 @@ h2.shut::after{transform:rotate(-90deg)}
 .up .bar{position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--gold);opacity:.75;transition:width .25s}
 .up.can{border-color:rgba(255,201,77,.45);box-shadow:0 0 18px rgba(255,201,77,.08)}
 .up .ms{font-size:11px;color:var(--accent);margin-top:3px}
-#buyRow,#rbRow{display:flex;gap:6px;margin-bottom:10px}
+#buyRow,#rbRow,#eggN{display:flex;gap:6px;margin-bottom:10px}
 #rbRow{margin:10px 0 0}
 #buyRow button,#rbRow button{flex:1;padding:7px 0;border-radius:9px;border:1px solid var(--line);background:none;color:var(--dim);font:inherit;font-weight:700;cursor:pointer}
 #buyRow button.on,#rbRow button.on{background:var(--accent);color:#fff;border-color:transparent}
@@ -302,6 +302,9 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .fxEgg{font-size:110px}
 .fxGlow{position:absolute;width:420px;height:420px;border-radius:50%;opacity:.8}
 .fxPet{position:relative;text-align:center;color:#fff}
+.fxMany{display:grid;grid-template-columns:repeat(5,60px);gap:8px;justify-content:center;margin:14px 0;max-height:60vh;overflow-y:auto}
+.fxMany div{height:60px;border-radius:14px;background:rgba(255,255,255,.08);border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px;line-height:1}
+.fxMany small{font-size:9px;font-weight:800;margin-top:3px}
 .fxConf{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}
 .fxConf i{position:absolute;top:0;border-radius:2px}
 .fxFlash{position:absolute;inset:0;background:#fff}
@@ -360,8 +363,9 @@ body.xmas .up:hover:not(:disabled):not(.dis){background:var(--panel2)}
 #rbBtn,#dailyClaim,#acct .row button:not(.alt),#welcome .row button:not(.alt){background:var(--accent);color:#fff}
 #ascBtn{box-shadow:0 4px 0 #b9741c}
 #rbBtn:active,#ascBtn:active,#dailyClaim:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-d)}
-#buyRow button,#rbRow button,.seg button,#lbTabs button{background:var(--panel);border:0;color:var(--dim);border-radius:10px;font:700 13px 'Nunito',sans-serif;box-shadow:var(--depth)}
-#buyRow button.on,#rbRow button.on,.seg button.on,#lbTabs button.on{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-d)}
+#eggN button{flex:1;padding:7px 0;cursor:pointer}
+#buyRow button,#rbRow button,#eggN button,.seg button,#lbTabs button{background:var(--panel);border:0;color:var(--dim);border-radius:10px;font:700 13px 'Nunito',sans-serif;box-shadow:var(--depth)}
+#buyRow button.on,#rbRow button.on,#eggN button.on,.seg button.on,#lbTabs button.on{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-d)}
 #coins{background:none;-webkit-text-fill-color:currentColor;color:var(--gold);font-weight:500;font-size:62px;text-shadow:0 3px 0 rgba(0,0,0,.28)}
 body.light #coins{background:none;color:#e0a100;text-shadow:0 3px 0 rgba(0,0,0,.12)}
 #rates{font-weight:700}
@@ -457,6 +461,7 @@ body.light .ab:hover{background:#e6e8f2}
   </div>
   <h2>Pets</h2>
   <div class="card">
+    <div id="eggN"><button data-n="1" class="on">×1</button><button data-n="5">×5</button><button data-n="10">×10</button><button data-n="100">MAX</button></div>
     <div id="eggRow"></div>
     <div id="petGrid"></div>
     <div id="petDetail" hidden></div>
@@ -2401,14 +2406,22 @@ const eggCost = (t = 'basic') => t === 'basic' ? Math.ceil(25000 * 1.8 ** (S.egg
   : t === 'golden' ? Math.ceil(eggCost('basic') * 25 * 1.3 ** (S.eggs.golden || 0)) : t === 'cosmic' ? 25 : 1;   // golden always ≥25× a basic egg
 const eggCur = t => t === 'cosmic' ? '💈' : t === 'royal' ? '✨' : '🪙';
 const eggAfford = t => t === 'cosmic' ? S.hc >= 25 : t === 'royal' ? S.ap >= 1 : S.coins >= eggCost(t);
-let petSel = '';
+let petSel = '', eggN = 1;
+function eggBulk(t, want){
+  const have = t === 'cosmic' ? S.hc : t === 'royal' ? S.ap : S.coins, saved = {...S.eggs};
+  let n = 0, tot = 0;
+  for (; n < want; n++) { const c = eggCost(t); if (tot + c > have) break; tot += c; S.eggs[t] = (S.eggs[t] || 0) + 1; }
+  S.eggs = saved; return {n, tot};
+}
+$('eggN').onclick = e => { const b = e.target.closest('button'); if (!b) return; eggN = +b.dataset.n; for (const x of $('eggN').children) x.classList.toggle('on', x === b); renderPets(); };
 function renderPets(){
   $('eggRow').innerHTML = '';
   for (const e of EGGS) {
-    const b = document.createElement('button'); b.className = eggAfford(e.id) ? 'can' : '';
-    b.innerHTML = `<b>${e.ic}</b><span>${e.nm}</span><span class="dimtxt">${eggCur(e.id)} ${fmt(eggCost(e.id))}</span>`;
+    const b = document.createElement('button'), k = eggBulk(e.id, eggN), many = eggN > 1 && k.n > 1;
+    b.className = k.n ? 'can' : '';
+    b.innerHTML = `<b>${e.ic}</b><span>${e.nm}${many ? ' ×' + k.n : ''}</span><span class="dimtxt">${eggCur(e.id)} ${fmt(many ? k.tot : eggCost(e.id))}</span>`;
     b.title = Object.entries(e.odds).filter(([, v]) => v).map(([k, v]) => `${k} ${v}%`).join(' · ');
-    b.onclick = () => hatchEgg(false, e.id);
+    b.onclick = () => hatchEgg(false, e.id, eggN);
     $('eggRow').appendChild(b);
   }
   $('petGrid').innerHTML = '';
@@ -2439,12 +2452,20 @@ function renderPets(){
   }
   $('petInfo').textContent = `Equipped ${S.equip.length}/${PET_SLOTS} · ${Object.keys(S.pets).length}/${PETS.length} found · tap a pet for details · hover an egg for its odds`;
 }
-function hatchEgg(free, tier = 'basic'){
+function hatchEgg(free, tier = 'basic', want = 1){
   const egg = EGGS.find(e => e.id === tier) || EGGS[0];
   if (!free) {
-    if (!eggAfford(egg.id)) return sfx('error'), toast(`You need ${eggCur(egg.id)} ${fmt(eggCost(egg.id))} for a ${egg.nm}`);
-    if (egg.id === 'cosmic') S.hc -= 25; else if (egg.id === 'royal') S.ap -= 1; else S.coins -= eggCost(egg.id);
+    const {n, tot} = eggBulk(egg.id, want);
+    if (!n) return sfx('error'), toast(`You need ${eggCur(egg.id)} ${fmt(eggCost(egg.id))} for a ${egg.nm}`);
+    if (egg.id === 'cosmic') S.hc -= tot; else if (egg.id === 'royal') S.ap -= tot; else S.coins -= tot;
+    want = n;
   }
+  const got = [];
+  for (let i = 0; i < want; i++) got.push(rollEgg(egg));
+  petSel = got[got.length - 1].q.id; save(); renderPets(); refresh();
+  if (got.length === 1) hatchFx(egg.ic, got[0].q, got[0].note); else hatchManyFx(egg, got);
+}
+function rollEgg(egg){
   S.eggs[egg.id] = (S.eggs[egg.id] || 0) + 1; S.hatches++;
   // pick a rarity by the egg's odds (Lucky Eggs doubles the non-Common odds), then a pet of that rarity
   const odds = Object.fromEntries(Object.entries(egg.odds).map(([k, v]) => [k, v * (asu('luck') && k !== 'Common' ? 2 : 1)]));
@@ -2455,8 +2476,29 @@ function hatchEgg(free, tier = 'basic'){
   let note;
   if (L >= PET_MAX) { S.hc += 3; note = 'Already max level: +3 💈'; }
   else { S.pets[q.id] = L + 1; if (!L && S.equip.length < PET_SLOTS) S.equip.push(q.id); note = L ? `Level ${L + 1}!` : 'New pet!'; }
-  petSel = q.id; save(); renderPets(); refresh();
-  hatchFx(egg.ic, q, note);
+  return {q, note};
+}
+// bulk hatch: one wobble, then every pet pops in on a grid. One sound and one confetti for the best pull
+const RAR_ORD = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+function hatchManyFx(egg, got){
+  const F = document.createElement('div'); F.className = 'fxLayer'; F.style.background = 'rgba(8,9,16,.86)'; document.body.appendChild(F);
+  const e = Object.assign(document.createElement('div'), {className:'fxEgg', textContent:egg.ic}); F.appendChild(e);
+  e.animate([{transform:'rotate(0)'}, {transform:'rotate(-14deg)'}, {transform:'rotate(14deg)'}, {transform:'rotate(0) scale(1.15)'}], {duration:700});
+  const best = got.reduce((b, g) => RAR_ORD.indexOf(g.q.r) > RAR_ORD.indexOf(b) ? g.q.r : b, 'Common');
+  const fresh = got.filter(g => g.note === 'New pet!').length, toks = got.filter(g => g.note.startsWith('Already')).length * 3;
+  setTimeout(() => {
+    e.remove(); sfx('crack'); setTimeout(() => sfx(best === 'Mythic' || best === 'Legendary' ? 'fanfare' : best === 'Common' ? 'coin' : 'gold'), 120);
+    const glow = Object.assign(document.createElement('div'), {className:'fxGlow'}); glow.style.background = `radial-gradient(circle, ${RARC[best]} 0%, transparent 65%)`; F.appendChild(glow);
+    const box = document.createElement('div'); box.className = 'fxPet';
+    box.innerHTML = `<div style="font-size:22px;font-weight:800">${got.length} × ${egg.nm}</div><div class="fxMany">${got.map(g =>
+      `<div style="border-color:${RARC[g.q.r]}" title="${g.q.nm}: ${g.note}">${g.q.ic}<small style="color:${RARC[g.q.r]}">${g.note === 'New pet!' ? 'NEW' : g.note.startsWith('Level') ? g.note.replace('Level ', 'Lv ').replace('!', '') : '+3💈'}</small></div>`).join('')}</div>
+      <div class="dimtxt">Best: <b style="color:${RARC[best]}">${best}</b> · ${fresh} new${toks ? ` · +${toks} 💈 from maxed pets` : ''} · tap to close</div>`;
+    F.appendChild(box);
+    [...box.querySelectorAll('.fxMany div')].forEach((d, i) => d.animate([{transform:'scale(0)'}, {transform:'scale(1.15)'}, {transform:'scale(1)'}], {duration:350, delay:Math.min(i*40, 1500), easing:'ease-out', fill:'backwards'}));
+    glow.animate([{transform:'scale(.3)', opacity:0}, {transform:'scale(1)', opacity:1}], {duration:500, fill:'forwards'});
+    if (best !== 'Common') confetti(best === 'Mythic' || best === 'Legendary' ? 90 : 40);
+  }, 750);
+  F.onclick = () => { F.animate([{opacity:1}, {opacity:0}], {duration:300}).onfinish = () => F.remove(); };
 }
 // hatch animation: the egg wobbles, cracks with a flash, and the pet pops out with its rarity colour
 function hatchFx(eggIc, q, note){
