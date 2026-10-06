@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Click Jun">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0d12">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0d12;--panel:rgba(255,255,255,.04);--line:rgba(255,255,255,.08);--text:#e8eaf0;--dim:#8a90a2;--gold:#ffc94d;--accent:#7c5cff}
 *{box-sizing:border-box;margin:0}
@@ -321,6 +321,73 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 @media(pointer:coarse){#dpad{display:grid}}
 @media(max-width:760px){#flappy,#hang,#tank,#pac{position:fixed;z-index:30}
 body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}#stage{grid-column:1;grid-row:1}aside{grid-column:1;grid-row:2;border-left:0;border-top:1px solid var(--line)}#coins{font-size:40px}.jun{width:110px}}
+
+/* ===== design system: one font pair, one accent, one radius, 3 button styles, chunky "mobile game" depth ===== */
+:root{--bg:#12131c;--panel:#1c1e2b;--panel2:#262939;--line:rgba(255,255,255,.07);--text:#f3f4fb;--dim:#9aa0b8;--accent:#7c5cff;--accent-d:#5a3fd6;--gold:#ffcf4a;--good:#3ddc97;--r:16px;--depth:0 3px 0 rgba(0,0,0,.35)}
+body{font-family:'Nunito',system-ui,sans-serif;background:radial-gradient(900px 520px at 30% 0%,#1f1b40 0%,#12131c 70%)}
+h1,h3,.up .nm,#coins,#tabs button,.fxText,#vcAmt,.bal b,#hword{font-family:'Fredoka','Nunito',sans-serif}
+aside{background:#161824;border-left:1px solid var(--line);padding:20px 16px}
+.logo{display:flex;align-items:center;gap:10px;font-size:28px;font-weight:700;letter-spacing:-.5px}
+.logo img{width:38px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+.logo b{color:var(--accent);font-weight:700}
+.ico{width:20px;height:20px;flex:none}
+#topBtns{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:14px}
+#topBtns button,#socialRow button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 0 7px;border:0;border-radius:12px;background:var(--panel);color:var(--dim);font:700 11px 'Nunito',sans-serif;box-shadow:var(--depth);cursor:pointer;position:relative;transition:transform .08s,color .15s}
+#topBtns button:hover,#socialRow button:hover{color:var(--text)}
+#topBtns button:active,#socialRow button:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+#socialRow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+#socialRow button{font-size:12px;padding:12px 0 10px}
+#socialRow button.new::after{content:'';position:absolute;top:6px;right:10px;width:8px;height:8px;border-radius:50%;background:#ff5c7a}
+#topBtns button.new::after{top:5px;right:12px;width:8px;height:8px}
+#tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:16px -16px 0;padding:8px 16px;background:#161824;border-bottom:1px solid var(--line)}
+#tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:12px;font-weight:600;font-size:13px;color:var(--dim)}
+#tabs button.on{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-d)}
+#tabs button.new::after{top:5px;right:14px}
+h2{font:800 11px 'Nunito',sans-serif;letter-spacing:1.4px;color:var(--dim);margin:22px 2px 10px}
+h2::after{opacity:.5}
+.card{background:var(--panel);border:0;border-radius:var(--r);box-shadow:var(--depth);padding:14px}
+.up{background:var(--panel);border:0;border-radius:var(--r);box-shadow:var(--depth);padding:12px 14px;margin-bottom:10px}
+.up:hover:not(:disabled):not(.dis){background:var(--panel2);border-color:transparent;transform:none}
+body.xmas .up:hover:not(:disabled):not(.dis){background:var(--panel2)}
+.up.can{box-shadow:inset 0 0 0 2px rgba(255,207,74,.65),var(--depth)}
+.up.dis{opacity:.6}
+.up .nm{font-weight:600;font-size:16px}
+.up .ds{color:var(--dim)}
+.up .ct{color:var(--gold);font-weight:700}
+.up .bar{height:4px;background:var(--gold);opacity:.8;border-radius:0 2px 2px 0}
+.up .ic{font-size:28px}
+.ab{background:var(--panel2);border:0;color:var(--text);border-radius:12px;padding:9px 14px;font:700 14px 'Nunito',sans-serif;box-shadow:var(--depth);cursor:pointer;transition:transform .08s}
+.ab:hover{background:#2f3346}
+.ab:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.ab:disabled{opacity:.45;cursor:not-allowed}
+#rbBtn,#ascBtn,#dailyClaim,#acct .row button:not(.alt),#welcome .row button:not(.alt),.end-btn{border:0;border-radius:12px;font:700 15px 'Fredoka',sans-serif;box-shadow:0 4px 0 var(--accent-d);transition:transform .08s}
+#rbBtn,#dailyClaim,#acct .row button:not(.alt),#welcome .row button:not(.alt){background:var(--accent);color:#fff}
+#ascBtn{box-shadow:0 4px 0 #b9741c}
+#rbBtn:active,#ascBtn:active,#dailyClaim:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-d)}
+#buyRow button,#rbRow button,.seg button,#lbTabs button{background:var(--panel);border:0;color:var(--dim);border-radius:10px;font:700 13px 'Nunito',sans-serif;box-shadow:var(--depth)}
+#buyRow button.on,#rbRow button.on,.seg button.on,#lbTabs button.on{background:var(--accent);color:#fff;box-shadow:0 3px 0 var(--accent-d)}
+#coins{background:none;-webkit-text-fill-color:currentColor;color:var(--gold);font-weight:500;font-size:62px;text-shadow:0 3px 0 rgba(0,0,0,.28)}
+body.light #coins{background:none;color:#e0a100;text-shadow:0 3px 0 rgba(0,0,0,.12)}
+#rates{font-weight:700}
+#live{background:rgba(61,220,151,.14);color:var(--good)}
+#toast{background:var(--panel2);color:var(--text);font:700 14px 'Nunito',sans-serif;box-shadow:0 6px 0 rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.4);border:1px solid var(--line)}
+dialog{background:var(--panel);border:0;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+dialog h3{font-weight:700;font-size:22px}
+.bal{background:var(--panel2);border:0;box-shadow:var(--depth)}
+.tin,.setb,#acct input,#welcome input{background:var(--panel2);border:1px solid transparent;border-radius:12px}
+.tin:focus,#acct input:focus,#welcome input:focus,#chatIn:focus{outline:2px solid var(--accent);outline-offset:0}
+#eggRow button,#petGrid button,#achGrid button,#wGrid button,.res,.frCard,#dailyGrid div{border:0;background:var(--panel2);box-shadow:var(--depth)}
+#petGrid button.eq{box-shadow:inset 0 0 0 2px var(--accent),var(--depth)}
+#achGrid button.got{box-shadow:inset 0 0 0 2px rgba(255,207,74,.5),var(--depth)}
+#lbList li:nth-child(odd){background:var(--panel)}
+#lbList li{border-radius:12px}
+#reset,#adminBtn{border:0;background:none;color:var(--dim);font:700 13px 'Nunito',sans-serif;box-shadow:none;text-decoration:underline;text-underline-offset:3px;width:auto;margin:18px 12px 0 0;padding:4px 0}
+/* light mode keeps the same system */
+body.light{--panel:#ffffff;--panel2:#f0f1f7;--line:rgba(20,20,50,.08);--text:#1b1d27;--dim:#6b7084;--depth:0 3px 0 rgba(20,20,60,.12)}
+body.light aside,body.light #tabs{background:#f6f7fb}
+body.light .ab:hover{background:#e6e8f2}
+/* phones */
+@media(max-width:760px){.logo{font-size:24px}.logo img{width:32px}#coins{font-size:44px}}
 </style>
 </head>
 <body>
@@ -364,22 +431,22 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}#stage{grid-column:1
   <div id="flappy"><canvas id="fc"></canvas><button id="fclose">✕ Back to clicking</button></div>
 </main>
 <aside>
-  <h1>Click <span>Jun</span></h1>
-  <div id="topBtns"><button id="setBtn">⚙️ Settings</button><button id="statBtn">📊 Stats</button><button id="cosBtn">👕 Wardrobe</button><button id="dailyBtn">📅 Daily</button><button id="friendBtn">👥 Friends</button><button id="tradeBtn">🤝 Trades</button><button id="guildBtn">🛡️ Guild</button><button id="chatBtn">💬 Chat</button><button id="updBtn">📜 Updates</button></div>
-  <nav id="tabs"><button data-tab="shop">🛒 Shop</button><button data-tab="home">🏠 Home</button><button data-tab="games">🎮 Games</button><button data-tab="social">🏆 Social</button></nav>
+  <h1 class="logo"><img id="logoJun" alt=""><span>Click <b>Jun</b></span></h1>
+  <div id="topBtns"><button id="setBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span>Settings</span></button><button id="statBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>Stats</span></button><button id="cosBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg><span>Style</span></button><button id="dailyBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Daily</span></button><button id="chatBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span>Chat</span></button><button id="updBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>News</span></button></div>
+  <nav id="tabs"><button data-tab="shop"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Shop</span></button><button data-tab="home"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg><span>Home</span></button><button data-tab="games"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="3"/></svg><span>Games</span></button><button data-tab="social"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span>Social</span></button></nav>
   <div class="tabp" data-tab="shop">
   <h2>Upgrades</h2>
   <div id="upgWrap">
   <div id="buyRow"><button data-n="1">×1</button><button data-n="10">×10</button><button data-n="25">×25</button><button data-n="50">×50</button><button data-n="max" id="buyMax">MAX</button></div>
-  <div id="resWrap" hidden><h2>🔬 Research</h2><div id="resRow"></div></div>
-  <div id="favWrap" hidden><h2>⭐ Starred</h2><div id="favUps"></div></div>
+  <div id="resWrap" hidden><h2>Research</h2><div id="resRow"></div></div>
+  <div id="favWrap" hidden><h2>Starred</h2><div id="favUps"></div></div>
   <h2>Click Power</h2><div id="clickUps"></div>
   <h2>Auto Clickers</h2><div id="kUps"></div>
   <h2>Passive Jun Income</h2><div id="autoUps"></div>
   </div>
   </div>
   <div class="tabp" data-tab="home">
-  <h2>🎯 Daily Quests</h2>
+  <h2>Daily Quests</h2>
   <div class="card" id="questCard"></div>
   <h2>Rebirth</h2>
   <div class="card">
@@ -392,7 +459,7 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}#stage{grid-column:1
     <div id="rbNext"></div>
     <button class="ab" id="shopBtn" style="width:100%;margin-top:10px">🛒 Rebirth Shop · <span id="hcBal">0</span> 💈 tokens</button>
   </div>
-  <h2>🐾 Pets</h2>
+  <h2>Pets</h2>
   <div class="card">
     <div id="eggRow"></div>
     <div id="petGrid"></div>
@@ -410,8 +477,9 @@ body{grid-template-columns:1fr;grid-template-rows:55vh 45vh}#stage{grid-column:1
   <button class="up" id="pplay"><div class="ic">👻</div><div><div class="nm">Pac-Jun</div><div class="ds">Eat dots, dodge the Evil Juns. Clear the maze for 100× your click value.</div><div class="ct">Mazes cleared: <span id="pwins">0</span></div></div></button>
   </div>
   <div class="tabp" data-tab="social">
+  <div id="socialRow"><button id="friendBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Friends</span></button><button id="tradeBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg><span>Trades</span></button><button id="guildBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg><span>Guild</span></button></div>
   <div id="lb" hidden>
-    <h2>🏆 Leaderboard</h2>
+    <h2>Leaderboard</h2>
     <div id="lbTabs"><button data-k="score" class="on">🪙 Coins</button><button data-k="rebirths">🔁 Rebirths</button><button data-k="asc">✨ Ascensions</button><button data-k="week">📅 Week</button></div>
     <ol id="lbList"><li>Loading…</li></ol>
     <div id="lbNote"></div>
@@ -2692,6 +2760,7 @@ function renderQuests(){
   document.querySelector('#tabs button[data-tab=home]').classList.toggle('new', claimable);
 }
 renderQuests();
+$('logoJun').src = $('jun').src; $('logoJun').style.clipPath = getComputedStyle($('jun')).clipPath;
 applyPerks(); renderAch(); renderPets();
 if (!S.rebTotal) S.rebTotal = S.asc*MAXR + S.rebirths;   // all-time rebirths (never resets) for the Rebirths leaderboard
 if (S.rebirths >= MAXR && !S.beaten) { S.beaten = true; save(); setTimeout(playEnding, 1200); }
