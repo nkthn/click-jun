@@ -2549,9 +2549,10 @@ applyAppearance(); applyCos(); renderDaily();
 setTimeout(() => { if (dailyState().can && !document.querySelector('dialog[open]') && $('ending').hidden) { renderDaily(); $('daily').showModal(); } }, 2500);
 // --- accounts: a local save belongs to the account it was synced with ---
 function resetLocal(){
-  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx};
+  // daily is kept too, so signing out doesn't re-offer (or let you re-claim) today's reward
+  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx, daily:{...S.daily}};
   S = {...DEF(), ...keep, started:Date.now()}; shown = 0;
-  recalcResearch(); applyPerks(); applyCos(); applyXmas(); applyAppearance(); applyBuy(); renderAch(); renderPets(); renderShop(); refresh(); save();
+  recalcResearch(); applyPerks(); applyCos(); applyXmas(); applyAppearance(); applyBuy(); renderAch(); renderPets(); renderShop(); renderDaily(); refresh(); save();
 }
 // --- Ascension Shop ---
 function renderAshop(){
