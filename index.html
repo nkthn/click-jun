@@ -1744,10 +1744,10 @@ function renderChal(){
     C.innerHTML = `<div class="dimtxt">Active challenge</div><div style="font:600 18px Fredoka,sans-serif">${c.ic} ${c.nm}</div><div class="dimtxt">${c.ds}</div>
       <div class="cbar"><i style="width:${pct.toFixed(1)}%"></i></div><div class="dimtxt">${fmt(S.total)} / ${fmt(S.chal.goal)} coins this run${left}</div>
       <button class="ab" id="chalQuit" style="width:100%;margin-top:8px">Abandon challenge</button>`;
-    $('chalQuit').onclick = () => { if (confirm('Abandon this challenge? You keep playing this run normally.')) { S.chal = null; save(); recalcResearch(); renderChal(); renderShop(); refresh(); } };
+    $('chalQuit').onclick = () => { if (confirm('Quit this challenge? You go straight back to your main run.')) { endChal(); toast('↩️ Back to your main run'); } };
     return;
   }
-  C.innerHTML = `<div class="dimtxt">Restart this run under a special rule. Reach the goal to double everything forever. Now ×${chalMult()} from ${CHALS.filter(c => S.chalDone[c.id]).length}/${CHALS.length} challenges.</div>`;
+  C.innerHTML = `<div class="dimtxt">A one-time side run under a special rule; your main run is saved and comes back when it ends. Reach the goal to double everything forever. Now ×${chalMult()} from ${CHALS.filter(c => S.chalDone[c.id]).length}/${CHALS.length} challenges.</div>`;
   for (const c of CHALS) {
     const row = document.createElement('div'); row.className = 'chal' + (S.chalDone[c.id] ? ' done' : '');
     row.innerHTML = `<div class="ci">${c.ic}</div><div class="ct2"><div class="cn">${c.nm}</div><div class="dimtxt">${c.ds}</div></div>${S.chalDone[c.id] ? '' : '<button class="ab">Start</button>'}`;
@@ -1755,20 +1755,26 @@ function renderChal(){
     C.appendChild(row);
   }
 }
+function endChal(){
+  const m = S.chal?.main; S.chal = null;
+  if (m) Object.assign(S, {coins:m.coins, total:m.total, own:m.own, research:m.research});
+  shown = S.coins; recalcResearch(); save(); renderShop(); renderChal(); refresh();
+}
 function startChal(c){
   const goal = Math.max(1e6, rbReq(S.rebirths) * 3);
-  if (!confirm(`${c.ic} Start "${c.nm}"?\n\n${c.ds}.\nGoal: earn ${fmt(goal)} coins this run.\n\nYour coins, upgrades and research reset now (rebirths and everything else stay). Win for ×2 to everything, forever.`)) return;
-  Object.assign(S, {chal:{id:c.id, goal, start:Date.now()}, coins:0, total:0, own:{}, research:{}});
+  if (!confirm(`${c.ic} Start "${c.nm}"?\n\n${c.ds}.\nGoal: earn ${fmt(goal)} coins this run.\n\nIt's a fresh side run: your main run is saved and comes back exactly as it was when you win, fail or quit. Win for ×2 to everything, forever.`)) return;
+  const main = {coins:S.coins, total:S.total, own:{...S.own}, research:{...S.research}};   // your main run, put back when the challenge ends
+  Object.assign(S, {chal:{id:c.id, goal, start:Date.now(), main}, coins:0, total:0, own:{}, research:{}});
   shown = 0; recalcResearch(); save(); renderShop(); renderChal(); refresh(); sfx('rebirth');
 }
 function chalTick(){
   if (!S.chal) return;
   const c = CHALS.find(x => x.id === S.chal.id);
   if (S.total >= S.chal.goal) {
-    S.chalDone[c.id] = true; S.chal = null; recalcResearch(); save(); renderShop(); refresh();
-    sfx('fanfare'); confetti(120); toast(`${c.ic} Challenge complete: ${c.nm}! Everything ×2 forever (now ×${chalMult()})`);
+    S.chalDone[c.id] = true; endChal();
+    sfx('fanfare'); confetti(120); toast(`${c.ic} Challenge complete: ${c.nm}! ×2 forever (now ×${chalMult()}). Back to your main run`);
   } else if (c.id === 'speed' && Date.now() > S.chal.start + 600e3) {
-    S.chal = null; save(); renderShop(); refresh(); sfx('error'); toast('⏱️ Speedrun failed: out of time. Try again from the Goals tab');
+    endChal(); sfx('error'); toast('⏱️ Speedrun failed: out of time. You\'re back on your main run');
   }
   if (tab === 'goals') renderChal();
 }
@@ -2099,7 +2105,8 @@ function applyState(d, keepCheat = true){
     eggs:Object.fromEntries(EGGS.map(e => [e.id, int(d.eggs?.[e.id] ?? (e.id === 'basic' ? d.hatches : 0))])),
     guild:typeof d.guild === 'string' && /^[A-Z0-9]{6}$/.test(d.guild) ? d.guild : '',
     tr:int(d.tr), apo:int(d.apo), sing:int(d.sing), omni:int(d.omni),
-    chal:d.chal && CHALS.some(c => c.id === d.chal.id) && num(d.chal.goal) > 0 ? {id:d.chal.id, goal:num(d.chal.goal), start:num(d.chal.start) || Date.now()} : null,
+    chal:d.chal && CHALS.some(c => c.id === d.chal.id) && num(d.chal.goal) > 0 ? {id:d.chal.id, goal:num(d.chal.goal), start:num(d.chal.start) || Date.now(), main:d.chal.main ? {coins:num(d.chal.main.coins), total:num(d.chal.main.total),
+      own:Object.fromEntries(UPS.filter(u => d.chal.main.own?.[u.id]).map(u => [u.id, int(d.chal.main.own[u.id])])), research:Object.fromEntries(RES.filter(r => d.chal.main.research?.[r.id] === true).map(r => [r.id, true]))} : null} : null,
     chalDone:Object.fromEntries(CHALS.filter(c => d.chalDone && d.chalDone[c.id] === true).map(c => [c.id, true])),
     day:typeof d.day === 'string' ? d.day.slice(0, 10) : '', dcoins:num(d.dcoins), month:typeof d.month === 'string' ? d.month.slice(0, 7) : '', mcoins:num(d.mcoins),
     allCos:d.allCos === true, allUnlocked:d.allUnlocked === true,
