@@ -69,6 +69,8 @@ h2.shut::after{transform:rotate(-90deg)}
 #ascLine{margin-top:8px;font-size:13px;color:#ffd166;font-weight:600}
 #skipScene{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:101;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
 #ending:not([hidden])+#skipScene{display:block}
+#muteBtn{position:absolute;top:12px;right:12px;z-index:7;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:18px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.3)}
+#muteBtn:active{transform:translateY(2px)}
 #ending{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 45%,#3a2160,#05030a 70%);overflow:hidden;font-family:'Space Grotesk',sans-serif}
 #ending[hidden]{display:none}
 #ending .end-btn{background:linear-gradient(90deg,#ffd166,#ff8a3d);border:0;color:#111;border-radius:999px;padding:12px 22px;font:inherit;font-weight:800;cursor:pointer;margin:6px}
@@ -440,6 +442,7 @@ body.light .ab:hover{background:#e6e8f2}
 </head>
 <body>
 <main id="stage">
+  <button id="muteBtn" title="Mute / unmute (M)"></button>
   <div id="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <img id="jhat" class="hat" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M8 58 Q30 0 70 8 Q92 14 90 40 L80 42 Q78 24 64 22 Q50 30 92 58Z' fill='%23d62839'/%3E%3Crect x='2' y='52' width='96' height='16' rx='8' fill='%23fff'/%3E%3Ccircle cx='86' cy='42' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="">
   <img id="ghat" class="hat" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M8 58 Q30 0 70 8 Q92 14 90 40 L80 42 Q78 24 64 22 Q50 30 92 58Z' fill='%23d62839'/%3E%3Crect x='2' y='52' width='96' height='16' rx='8' fill='%23fff'/%3E%3Ccircle cx='86' cy='42' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="">
@@ -1309,6 +1312,7 @@ function refresh(){
   const fz = frenzy() > 1 ? ` · 💎 FRENZY ${Math.ceil((frenzyUntil - performance.now())/1000)}s` : '';
   $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}${S.chal ? ` · ⚔️ ${CHALS.find(c => c.id === S.chal.id).nm}` : ''}`;
   document.title = `${fmt(S.coins)} coins · Click Jun`;
+  setText($('muteBtn'), S.sound ? '🔊' : '🔇');
   if (UPS.filter(u => own(u)).length !== shopSig) renderShop();   // a first purchase (any path, or a reset) changes which upgrades are revealed
   const pc = perClick();
   for (const b of shopBtns) {
@@ -2959,7 +2963,11 @@ function renderSettings(){
 }
 $('setBtn').onclick = () => { renderSettings(); window.loadIdeas?.(); $('ideaMsg').textContent = ''; $('dispMsg').textContent = ''; $('settings').showModal(); };
 document.querySelectorAll('#appRow button').forEach(b => b.onclick = () => { S.appearance = b.dataset.v; save(); applyAppearance(); });
-$('sndBtn').onclick = () => { S.sound = !S.sound; save(); renderSettings(); sfx('buy'); };
+// quick mute: speaker button on the stage, the M key, and the Settings toggle all flip the same switch
+function setSound(on){ S.sound = on; save(); renderSettings(); if (on) sfx('buy'); toast(on ? '🔊 Sound on' : '🔇 Muted'); }
+$('sndBtn').onclick = () => setSound(!S.sound);
+$('muteBtn').onclick = e => { e.stopPropagation(); setSound(!S.sound); };
+addEventListener('keydown', e => { if ((e.key === 'm' || e.key === 'M') && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && !e.metaKey && !e.ctrlKey && $('hang').style.display !== 'flex') setSound(!S.sound); });   // not while Jun-Man takes letters
 $('vol').oninput = e => { S.vol = +e.target.value; save(); };
 $('vol').onchange = () => sfx('coin');
 $('animBtn').onclick = () => { S.skipAnim = !S.skipAnim; save(); renderSettings(); };
