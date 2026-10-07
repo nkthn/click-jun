@@ -949,7 +949,8 @@ if (saved) {
   if (!('ap' in saved)) S.ap = S.asc || 0;                            // ✨ points for players who ascended before the shop existed
   if (!('hc' in saved)) S.hc = S.bp;                                    // tokens for players who rebirthed before the shop existed
   if (S.perks && S.perks.maxbuy) { S.hc += 5; delete S.perks.maxbuy; }
-  if (S.perks && S.perks.keep) { S.hc += keepRefund(S.perks.keep); delete S.perks.keep; }  // MAX buy is free now: refund Bulk Buyer
+  if (S.perks && S.perks.keep) { S.hc += keepRefund(S.perks.keep); delete S.perks.keep; }
+  if (S.aup && (S.aup.rich || S.aup.keep)) { S.ap = (S.ap || 0) + (S.aup.rich ? 1 : 0) + (S.aup.keep ? 2 : 0); delete S.aup.rich; delete S.aup.keep; }  // MAX buy is free now: refund Bulk Buyer
   if (!('theme' in saved)) S.theme = saved.xmas === false ? 'none' : 'xmas';
   for (const k in S.perks) if (S.perks[k] === true) S.perks[k] = 1;
 }
@@ -1072,18 +1073,17 @@ const RARC = {Common:'#9aa3b5', Rare:'#4cc9f0', Epic:'#c77dff', Legendary:'#ffc9
 
 // Ascension Shop: cheap, one-time, permanent upgrades bought with ✨ (1 per Ascension)
 const AUP = [
-  {id:'rich',   ic:'💰', nm:'Trust Fund',    ds:'Start every climb and every rebirth with 1M coins', cost:1},
   {id:'gold',   ic:'🍀', nm:'Golden Touch',  ds:'Golden Juns appear twice as often', cost:1},
   {id:'night',  ic:'🌙', nm:'Never Sleeps',  ds:'Offline earnings ×2 speed and last 72 hours longer', cost:1},
   {id:'luck',   ic:'🥚', nm:'Lucky Eggs',    ds:'Rare, Epic, Legendary and Mythic pets are twice as likely', cost:1},
   {id:'tokens', ic:'💈', nm:'Token Magnet',  ds:'Rebirth tokens ×2', cost:2},
   {id:'lab',    ic:'🔬', nm:'Lab Notes',     ds:'Keep your research when you rebirth', cost:2},
   {id:'head',   ic:'🏁', nm:'Fast Start',    ds:'Start every climb with 10 rebirths already done', cost:2},
-  {id:'keep',   ic:'🐷', nm:'Rainy Day Fund', ds:'Keep 10% of your coins when you rebirth', cost:2},
   {id:'carry',  ic:'🧳', nm:'Carry-On',      ds:'Keep 25% of your Rebirth Shop perk levels when you Ascend', cost:2},
   {id:'auto',   ic:'🤖', nm:'Auto Buyer',    ds:'Buys the cheapest upgrade for you every second (can be switched off here)', cost:3},
 ];
 const asu = id => !!S.aup[id];
+const aupRefund = a => (a?.rich ? 1 : 0) + (a?.keep ? 2 : 0);   // Trust Fund and Rainy Day Fund were removed
 
 // prestige layers above Ascension. Each one resets everything below it (coins, upgrades, research, rebirths, tokens,
 // perks, Ascensions and lower layers) but multiplies everything forever. Every layer also adds rebirths to each climb,
@@ -1459,7 +1459,7 @@ $('rbBtn').onclick = () => {
   const pct = r => fmt(Math.round((rbBoost(r) - 1)*100));
   if (!confirm(`Rebirth${n > 1 ? ` ×${n}` : ''}? You lose your coins and upgrades, but your rebirth boost goes from +${pct(S.rebirths)}% to +${pct(S.rebirths + n)}% and you get ${tokenGain(g)} 💈 tokens for the Rebirth Shop.`)) return;
   const L = lv('headstart');
-  Object.assign(S, {coins:Math.max(asu('keep') ? S.coins * .1 : 0, asu('rich') ? 1e6 : 0), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, hc:Math.min(TOKEN_CAP, S.hc + tokenGain(g)), rebirths:S.rebirths + n, rebTotal:S.rebTotal + n, research:asu('lab') ? S.research : {}}); shown = S.coins; recalcResearch();
+  Object.assign(S, {coins:0, total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, hc:Math.min(TOKEN_CAP, S.hc + tokenGain(g)), rebirths:S.rebirths + n, rebTotal:S.rebTotal + n, research:asu('lab') ? S.research : {}}); shown = S.coins; recalcResearch();
   sfx('rebirth'); rebirthFx(n); save(); refresh(); toast(`🔁 Reborn! Rebirth boost is now +${fmt(Math.round((rbBoost() - 1)*100))}%`);
   if (S.rebirths >= ascNeed() && !S.beaten) { S.beaten = true; save(); playEnding(); }
 };
@@ -1469,7 +1469,7 @@ function ascend(){
   if (S.rebirths < ascNeed() || S.chal) return;
   if (!confirm(`✨ Ascend? You reset coins, upgrades, research, rebirths, tokens and perks.\n\nYou keep lifetime coins (your leaderboard spot), pets, achievements and stars, your ${S.rebirths} rebirths still count on the Rebirths leaderboard, and you gain:\n• ×3 to everything (stacks every Ascension)\n• Rebirths 10× cheaper (up to ×1,000,000)\n• +50% rebirth tokens\n• 1 ✨ for the Ascension Shop`)) return;
   const carried = asu('carry') ? Object.fromEntries(Object.entries(S.perks).map(([k, v]) => [k, Math.floor(v/4)]).filter(([, v]) => v > 0)) : {};
-  Object.assign(S, {coins:asu('rich') ? 1e6 : 0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1});
+  Object.assign(S, {coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
   playAscendScene();
   if (S.asc === 1) setTimeout(() => toast('🕊️ Angel Wings unlocked! Wear them in your 👕 Wardrobe'), 9000);
@@ -1496,7 +1496,7 @@ function doLayer(i){
   const lower = ['Ascensions', ...LAYERS.slice(0, i).map(x => x.pl)].join(', ');
   if (!confirm(`${L.ic} ${L.nm}? This resets coins, upgrades, research, rebirths, tokens, perks and your ${lower}.\n\nYou keep lifetime coins, pets, achievements, cosmetics, bosses, challenges and the Ascension Shop, and gain ×${fmt(L.x)} to everything (stacks every time). Climbs will need more rebirths afterwards.`)) return;
   const zero = Object.fromEntries(LAYERS.slice(0, i).map(x => [x.k, 0]));
-  Object.assign(S, zero, {[L.k]:S[L.k] + 1, coins:asu('rich') ? 1e6 : 0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:{}, beaten:false, asc:0});
+  Object.assign(S, zero, {[L.k]:S[L.k] + 1, coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:{}, beaten:false, asc:0});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
   sfx('angel'); rebirthFx(1); confetti(120); toast(`${L.ic} ${L.nm} ${S[L.k]}! Everything ×${fmt(L.x ** S[L.k])} from this layer`);
 }
@@ -1860,7 +1860,7 @@ function applyState(d, keepCheat = true){
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
-    friends:Array.isArray(d.friends) ? [...new Set(d.friends.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)))].slice(0, 30) : [], ap:d.ap === undefined ? int(d.asc) : int(d.ap), aup:Object.fromEntries(AUP.filter(a => d.aup && d.aup[a.id] === true).map(a => [a.id, true])), autoBuy:d.autoBuy !== false,
+    friends:Array.isArray(d.friends) ? [...new Set(d.friends.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)))].slice(0, 30) : [], ap:(d.ap === undefined ? int(d.asc) : int(d.ap)) + aupRefund(d.aup), aup:Object.fromEntries(AUP.filter(a => d.aup && d.aup[a.id] === true).map(a => [a.id, true])), autoBuy:d.autoBuy !== false,
     muted:Array.isArray(d.muted) ? d.muted.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)).slice(-100) : [],
     eggs:Object.fromEntries(EGGS.map(e => [e.id, int(d.eggs?.[e.id] ?? (e.id === 'basic' ? d.hatches : 0))])),
     guild:typeof d.guild === 'string' && /^[A-Z0-9]{6}$/.test(d.guild) ? d.guild : '',
@@ -2523,7 +2523,8 @@ const UPDATES = [
     'Every Ascension and every higher layer adds rebirths to each climb (300, then +10 per Ascension and more per layer), so progress can\'t loop forever',
     '⚔️ Challenge runs in 🏆 Goals: Clicks Only, Hands Off, Inflation, Pet Strike, No Science and Speedrun. Each win doubles everything forever',
     '🏆 Leaderboards: All time, Today, This week, This month, Rebirths and Ascensions. Welcome to Season 1',
-    '💡 Suggestion box in ⚙️ Settings: send your ideas straight to the dev']},
+    '💡 Suggestion box in ⚙️ Settings: send your ideas straight to the dev',
+    'Trust Fund and Rainy Day Fund were removed from the ✨ Ascension Shop. The ✨ you spent on them was refunded']},
   {v:'4.7', date:'Oct 7, 2026', title:'Friends & Fixes', notes:[
     '👋 Friend requests: send one by username, they accept or decline in 👥 Friends',
     '🖼️ Profile pictures in chat show your hat and name colour',
@@ -2565,7 +2566,7 @@ const UPDATES = [
     '📅 Daily login rewards with a 7-day streak',
     '📅 Weekly leaderboard that resets every Monday',
     '👥 Friends: add friends, send them tokens, and trade tokens and pets',
-    '✨ Ascension Shop: cheap one-time upgrades like Trust Fund, Lab Notes and the Auto Buyer',
+    '✨ Ascension Shop: cheap one-time upgrades like Lab Notes and the Auto Buyer',
     '🔊 Sound effects and 📊 a stats page']},
   {v:'4.1', date:'Oct 5, 2026', title:'To Infinity', notes:[
     '♾️ A true ending for anyone who reaches ∞ coins',
