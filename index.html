@@ -361,6 +361,15 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .mact .ab{padding:4px 8px;font-size:12px}
 .msg.announce{background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(255,92,122,.3));border:2px solid #b388ff;border-radius:14px;padding:12px;font-size:17px;font-weight:800;box-shadow:0 0 18px rgba(179,136,255,.35)}
 .msg.announce .txt{font-size:18px;line-height:1.3;margin-top:2px}
+.pc{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;background:linear-gradient(135deg,#262939,#1c1e2b);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);text-shadow:0 1px 3px rgba(0,0,0,.6);margin-top:8px}
+.pcFace{position:relative;flex:none;width:64px;height:64px}
+.pcFace img{width:64px;height:64px;object-fit:cover;clip-path:var(--jclip)}
+.pcFace i{position:absolute;font-style:normal;line-height:1}
+.pcFace b{position:absolute;left:50%;top:-24px;transform:translateX(-50%);font-size:34px;line-height:1}
+.pcInfo{flex:1;min-width:0}.pcName{font:700 17px 'Fredoka',sans-serif}.pcTitle{font-size:12px;font-weight:800;color:#ffd166}
+.pcStats{font-size:12px;font-weight:700;margin-top:2px;opacity:.95}
+.pc .ppets em{font-style:normal;font-size:11px;align-self:center;opacity:.85}
+#wGrid button.flex{box-shadow:inset 0 0 0 2px #b388ff}
 .pcard{flex-direction:column;background:var(--panel2);border-radius:12px;padding:10px;margin-top:6px}
 .pstats{font-size:13px}.pstats b{color:var(--gold)}
 .ppets{display:flex;gap:6px;margin-top:6px}.ppets span{font-size:22px;border:2px solid;border-radius:10px;padding:2px 5px;background:var(--panel)}
@@ -648,7 +657,8 @@ body.light .ab:hover{background:#e6e8f2}
   <div class="bal">You have 💈 <b id="cosBig">0</b> tokens</div>
   <div id="wPrev"><div id="wAura"></div><img id="wWings" alt=""><img id="wJun" alt=""><img id="wHat" alt=""><img id="wAcc" alt=""></div>
   <div id="wCard"></div>
-  <div class="seg" id="wTabs"><button data-t="hat">🎩</button><button data-t="acc">🕶️</button><button data-t="aura">✨</button><button data-t="back">🕊️</button><button data-t="title">🏷️</button><button data-t="color">🎨</button></div>
+  <div id="wPC"></div>
+  <div class="seg" id="wTabs"><button data-t="hat">🎩</button><button data-t="acc">🕶️</button><button data-t="aura">✨</button><button data-t="back">🕊️</button><button data-t="title">🏷️</button><button data-t="color">🎨</button><button data-t="card">🖼️</button></div>
   <div id="wGrid"></div>
   <div class="dimtxt" style="margin-top:8px">💈 <b id="cosBal"></b> tokens · tap to buy, tap again to wear or take off</div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Done</button></form>
@@ -984,7 +994,7 @@ const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
   diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
-  cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:''}, week:'', wcoins:0, friends:[], bigClick:0});
+  cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
 let saved = null;
 try { saved = JSON.parse(localStorage.getItem('clickjun')); } catch {}
@@ -1223,7 +1233,7 @@ const WINGS = {angel:wingSvg('#ffffff', '#9ec9ff'), gold:wingSvg('#ffd166', '#c8
 const COS = {
   hat:[['cap','🧢','Backwards Cap',5], ['flower','🌸','Flower Crown',4], ['bow','🎀','Big Bow',6], ['helmet','⛑️','Rescue Helmet',6], ['grad','🎓','Grad Cap',8],
        ['army','🪖','Army Helmet',8], ['tophat','🎩','Top Hat',10], ['star','⭐','Star Power',15], ['fire','🔥','Head on Fire',25], ['crown','👑','Royal Crown',50],
-       ['halo','😇','Halo Mode',0, () => S.asc >= 1, 'Ascend once']],
+       ['halo','😇','Halo Mode',0, () => S.asc >= 1, 'Ascend once'], ['planet','🪐','Planet Hat','asc:3'], ['comet','☄️','Comet Crown','tr:1'], ['sun','🌞','Sun Crown','apo:1']],
   acc:[['eyes','👀','Googly Eyes',3,null,null,.44,.5,.55], ['glasses','👓','Nerd Glasses',5,null,null,.45,.66,.55], ['goggles','🥽','Swim Goggles',8,null,null,.44,.72,.55],
        ['shades','🕶️','Cool Shades',10,null,null,.45,.66,.55], ['chain','📿','Gold Chain',12,null,null,1.0,.7,.5], ['medal','🏅','Medal',15,null,null,1.05,.32,.5],
        ['trophy','🏆','Champion Trophy',0, () => S.rebirths >= 300 || S.asc > 0, 'Beat Click Jun',1.05,.36,.5]],
@@ -1233,19 +1243,33 @@ const COS = {
   title:[['clicker','👆','Clicker',3], ['enjoyer','💈','Buzzcut Enjoyer',5], ['fanatic','🧠','Forehead Fanatic',8], ['stan','📣','Jun Stan',10],
          ['lord','🫅','Click Lord',20], ['grinder','⚙️','Certified Grinder',30], ['whale','🐋','Token Whale',100],
          ['veteran','🔄','Rebirth Veteran',0, () => S.rebTotal >= 50, '50 rebirths'], ['slayer','🗡️','Jun Slayer',0, () => S.rebirths >= 300 || S.asc > 0, 'Beat Click Jun'],
-         ['ascended','✨','Ascended One',0, () => S.asc >= 1, 'Ascend once'], ['infinite','♾️','Infinite',0, () => S.trueEnd, 'Reach ∞']],
+         ['ascended','✨','Ascended One',0, () => S.asc >= 1, 'Ascend once'], ['infinite','♾️','Infinite',0, () => S.trueEnd, 'Reach ∞'],
+         ['reborn','🔁','Reborn x100','rebirths:100'], ['ascendant','🌟','Ascendant','asc:5'], ['transcendent','🌠','Transcendent','tr:1'],
+         ['demigod','🔆','Demigod','apo:1'], ['singular','🕳️','Singular','sing:1'], ['omnipotent','🌌','Omnipotent','omni:1']],
   back:[['angel','🕊️','Angel Wings',0, () => S.asc >= 1, 'Ascend once'], ['bat','🦇','Bat Wings',40], ['gold','👼','Golden Wings',0, () => S.asc >= 5, 'Ascend 5 times']],
   color:[['mint','🟢','Mint',10,null,null,'#57cc99'], ['sky','🔵','Sky',10,null,null,'#4cc9f0'], ['pink','🩷','Pink',10,null,null,'#ff7eb6'],
          ['purple','🟣','Royal Purple',20,null,null,'#c77dff'], ['fire','🟠','Fire',25,null,null,'#ff8a3d'], ['gold','🟡','Gold',40,null,null,'#ffc94d'],
-         ['rainbow','🌈','Rainbow',80,null,null,'rainbow']],
+         ['rainbow','🌈','Rainbow',80,null,null,'rainbow'], ['ember','❤️‍🔥','Ember','rebirths:150',null,null,'#ff5c3d'], ['frost','🩵','Frost','asc:2',null,null,'#9be7ff']],
+  card:[['night','🌃','Midnight',15,null,null,'linear-gradient(135deg,#1b1f3b,#3a1d5c)'], ['sunset','🌅','Sunset',25,null,null,'linear-gradient(135deg,#ff7e5f,#feb47b)'],
+        ['ocean','🌊','Ocean',25,null,null,'linear-gradient(135deg,#1a6dff,#46d6c8)'], ['candy','🍭','Candy',40,null,null,'linear-gradient(135deg,#ff9de2,#a18cff)'],
+        ['forest','🌲','Forest',40,null,null,'linear-gradient(135deg,#134e2a,#56ab2f)'],
+        ['goldrush','🏆','Gold Rush','rebirths:100',null,null,'linear-gradient(135deg,#7a4b00,#ffcf4a,#7a4b00)'],
+        ['galaxy','🌌','Galaxy','asc:3',null,null,'radial-gradient(circle at 30% 30%,#7b5cff,#1a0f3d 60%,#000)'],
+        ['heaven','☁️','Heavenly','asc:10',null,null,'linear-gradient(180deg,#bfe6ff,#fff6dd)'],
+        ['starfall','🌠','Starfall','tr:1',null,null,'radial-gradient(circle at 70% 20%,#fff 0 2px,transparent 3px),radial-gradient(circle at 20% 60%,#fff 0 1px,transparent 2px),linear-gradient(135deg,#0b1e3a,#3a1d5c)'],
+        ['divine','🔆','Divine Light','apo:1',null,null,'repeating-conic-gradient(from 0deg,#ffcf4a 0 10deg,#fff3c4 10deg 20deg)'],
+        ['horizon','🕳️','Event Horizon','sing:1',null,null,'radial-gradient(circle,#000 25%,#b388ff 40%,#ff5c7a 55%,#000 75%)'],
+        ['omni','🌈','Omniverse','omni:1',null,null,'linear-gradient(135deg,#4cc9f0,#57cc99,#ffd166,#ff5c7a,#c77dff)']],
 };
-for (const t in COS) COS[t] = COS[t].map(([id, ic, nm, cost, unlock, how, a, b, cx]) => ({id, ic, nm, cost, unlock, how, a, b, cx}));
+// flex prices: spend real progress instead of tokens (the count really goes down)
+const PAYI = {rebirths:'🔁 rebirths', asc:'✨ Ascensions', tr:'🌠 Transcend', apo:'🔆 Apotheosis', sing:'🕳️ Singularity', omni:'🌌 Omniverse'};
+for (const t in COS) COS[t] = COS[t].map(([id, ic, nm, cost, unlock, how, a, b, cx]) => ({id, ic, nm, cost, unlock, how, a, b, cx, pay:typeof cost === 'string' ? {k:cost.split(':')[0], n:+cost.split(':')[1]} : null}));
 const cosItem = (t, id) => COS[t].find(c => c.id === id);
 const cosOwned = (t, c) => c.unlock ? c.unlock() : !!S.cos.owned[t + ':' + c.id];
 // display names: up to 16 characters, no control characters or angle brackets, trimmed
 const cleanName = v => typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f<>]/g, '').trim().slice(0, 16) : '';
 function cleanCos(c){
-  const o = {owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:''};
+  const o = {owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''};
   if (!c || typeof c !== 'object') return o;
   for (const t in COS) for (const it of COS[t]) if (c.owned && c.owned[t + ':' + it.id] === true) o.owned[t + ':' + it.id] = true;
   for (const t in COS) if (typeof c[t] === 'string' && cosItem(t, c[t])) o[t] = c[t];
@@ -2692,7 +2716,9 @@ const UPDATES = [
     '🗂️ Pets are grouped by what they boost',
     '🌌 Leaderboards show Transcend, Apotheosis, Singularity and Omniverse, with a new Prestige board',
     '💬 Tap anyone in chat for their profile: coins, rebirths, Ascensions, layers and pets, plus Add friend and Offer trade',
-    '🤝 New trade window: up to 4 pets per side, drag pets into You give / You want (or tap)']},
+    '🤝 New trade window: up to 4 pets per side, drag pets into You give / You want (or tap)',
+    '🖼️ Player cards: your Jun with hat and accessory, a custom background, title, stats and pets. Shown in chat and friend profiles',
+    '💎 Flex items paid with real progress: titles, hats, name colours and card backgrounds that cost rebirths, Ascensions or prestige layers']},
   {v:'5.0', date:'Oct 7, 2026', title:'Season 1: Beyond Ascension', notes:[
     '🌠 4 new prestige layers past Ascension: Transcend, Apotheosis, Singularity and Omniverse. Each resets the layers below for a giant permanent multiplier',
     'Rebirth costs now grow with your Ascensions, layers and challenges, so every climb to 300 rebirths takes about as long as your first: no more endless shortcut loops, and no impossible walls',
@@ -2873,7 +2899,7 @@ function vcShow(msg){
 function vcEnd(msg){ $('vc').close(); toast(msg); vcSchedule(); }
 $('vcPing').onclick = () => {
   $('vcPing').hidden = true;
-  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(income()*300, perClick()*500, 1000) * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});
+  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(income()*600, perClick()*1000, rbReq(S.rebirths)*.02, 1000) * frenzy() * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});   // scales with progress: ≥2% of your next rebirth
   $('vcName').textContent = '💼 ' + VC.name;
   vcShow('We love what you\'re doing with the forehead. Here\'s our offer:');
   $('vc').showModal();
@@ -3233,6 +3259,32 @@ function nameHtml(el, display, user, titleId, colorId){
   if (display && user && display.toLowerCase() !== user) el.appendChild(Object.assign(document.createElement('small'), {textContent:` @${user}`, style:'color:var(--dim);font-weight:400'}));
   if (t) el.appendChild(Object.assign(document.createElement('span'), {className:'ttl', textContent:`${t.ic} ${t.nm}`}));
 }
+// player card: their Jun (with hat + accessory), card background, name colour + title, stats and equipped pets
+function playerCard(r){
+  const N = x => Number(x) || 0, F = 64, bg = cosItem('card', r.card), hat = cosItem('hat', r.badge), ac = cosItem('acc', r.acc), t = cosItem('title', r.title);
+  const C = document.createElement('div'); C.className = 'pc'; if (bg) C.style.background = bg.a;
+  const face = document.createElement('div'); face.className = 'pcFace';
+  face.appendChild(Object.assign(document.createElement('img'), {src:$('jun').src, alt:''}));
+  if (ac) { const w = .75*F*ac.b, i = document.createElement('i'); i.textContent = ac.ic; i.style.cssText = `font-size:${w*.86}px;left:${F*(ac.cx ?? .5) - w/2}px;top:${F*ac.a - w/2}px`; face.appendChild(i); }
+  if (hat) face.appendChild(Object.assign(document.createElement('b'), {textContent:hat.ic}));
+  const info = document.createElement('div'); info.className = 'pcInfo';
+  const nm = document.createElement('div'); nm.className = 'pcName'; nameHtml(nm, cleanName(r.display), String(r.name || '?'), '', r.color);
+  if (typeof r.guild === 'string' && /^[A-Z0-9]{1,4}$/.test(r.guild)) nm.prepend(`[${r.guild}] `);
+  info.appendChild(nm);
+  if (t) info.appendChild(Object.assign(document.createElement('div'), {className:'pcTitle', textContent:`${t.ic} ${t.nm}`}));
+  const lay = [['🌠', r.tr], ['🔆', r.apo], ['🕳️', r.sing], ['🌌', r.omni]].filter(([, v]) => N(v)).map(([i, v]) => `${i}${N(v)}`).join(' ');
+  info.appendChild(Object.assign(document.createElement('div'), {className:'pcStats', textContent:`🪙 ${fmt(N(r.score))} · 🔁 ${fmt(N(r.rebirths))} · ✨ ${N(r.asc)}${lay ? ' · ' + lay : ''}`}));
+  const pets = (Array.isArray(r.pets) ? r.pets : []).map(id => PETS.find(q => q.id === id)).filter(Boolean);
+  if (pets.length || N(r.npets)) {
+    const pp = document.createElement('div'); pp.className = 'ppets';
+    for (const q of pets) pp.appendChild(Object.assign(document.createElement('span'), {textContent:q.ic, title:`${q.nm} (${q.r})`, style:`border-color:${RARC[q.r]}`}));
+    if (N(r.npets)) pp.appendChild(Object.assign(document.createElement('em'), {textContent:`${N(r.npets)}/${PETS.length} found`}));
+    info.appendChild(pp);
+  }
+  C.append(face, info); return C;
+}
+const myCardData = () => ({name:window.myName?.() || 'you', display:S.display, title:S.cos.title, color:S.cos.color, badge:S.cos.hat, acc:S.cos.acc, card:S.cos.card,
+  score:S.lifetime, rebirths:S.rebTotal, asc:S.asc, tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip, npets:Object.keys(S.pets).length, guild:''});
 function renderWardrobe(){
   $('cosBal').textContent = S.hc; $('cosBig').textContent = fmt(S.hc);
   $('wJun').src = $('jun').src; $('wJun').style.clipPath = getComputedStyle($('jun')).clipPath;
@@ -3243,6 +3295,7 @@ function renderWardrobe(){
     $('wAcc').style.transform = 'none'; $('wAcc').style.left = '50%'; $('wAcc').style.marginLeft = -48 + 96*(ac.cx ?? .5) - 48*ac.b + 'px'; }   // offset from the preview's centre
   $('wAcc').style.display = ac ? 'block' : 'none';
   nameHtml($('wCard'), S.display, window.myName?.() || 'you', S.cos.title, S.cos.color);
+  $('wPC').innerHTML = ''; $('wPC').appendChild(playerCard(myCardData()));
   document.querySelectorAll('#wTabs button').forEach(b => b.classList.toggle('on', b.dataset.t === wTab));
   $('wGrid').innerHTML = '';
   for (const c of COS[wTab]) {
@@ -3250,12 +3303,22 @@ function renderWardrobe(){
     b.className = (on ? 'eq ' : '') + (owned ? '' : 'lock');
     b.innerHTML = `<b></b><span></span><span class="dimtxt"></span>`;
     b.querySelector('b').textContent = c.ic; b.children[1].textContent = c.nm;
-    b.children[2].textContent = on ? 'Wearing' : owned ? 'Owned' : c.unlock ? `🔒 ${c.how}` : `💈 ${c.cost}`;
+    b.children[2].textContent = on ? 'Wearing' : owned ? 'Owned' : c.unlock ? `🔒 ${c.how}` : c.pay ? `${c.pay.n} ${PAYI[c.pay.k]}` : `💈 ${c.cost}`;
+    if (c.pay && !owned) b.classList.add('flex');
     b.onclick = () => {
       if (!owned) {
         if (c.unlock) return toast(`🔒 ${c.nm}: ${c.how} to unlock`);
-        if (S.hc < c.cost) return sfx('error'), toast(`You need 💈 ${c.cost} tokens`);
-        S.hc -= c.cost; S.cos.owned[wTab + ':' + c.id] = true; sfx('buy');
+        if (c.pay) {
+          const P = c.pay, have = P.k === 'rebirths' ? S.rebirths : S[P.k];
+          if (have < P.n) return sfx('error'), toast(`You need ${P.n} ${PAYI[P.k]} (you have ${have})`);
+          if (!confirm(`Flex: spend ${P.n} ${PAYI[P.k]} on ${c.ic} ${c.nm}?\n\nYour ${PAYI[P.k]} really go down (and so do their bonuses). That's the flex.`)) return;
+          S[P.k] -= P.n; if (P.k === 'rebirths') S.beaten = S.rebirths >= ascNeed() && S.beaten;
+          confetti(80); sfx('fanfare'); recalcResearch(); renderLayers();
+        } else {
+          if (S.hc < c.cost) return sfx('error'), toast(`You need 💈 ${c.cost} tokens`);
+          S.hc -= c.cost; sfx('buy');
+        }
+        S.cos.owned[wTab + ':' + c.id] = true;
       }
       S.cos[wTab] = on ? '' : c.id;
       save(); applyCos(); renderWardrobe(); refresh(); window.pushNow?.();
@@ -3419,7 +3482,7 @@ if (FIREBASE) {
     if (!user) return Promise.resolve();
     const saved = setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
-    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip.slice(0, 4), npets:Object.keys(S.pets).length, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
+    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip.slice(0, 4), npets:Object.keys(S.pets).length, card:S.cos.card, acc:S.cos.acc, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
       // older Firestore rules don't know the day/month fields yet: retry without them so the board keeps updating
       .catch(() => S.cheater ? 0 : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
     return saved;
@@ -3564,9 +3627,8 @@ if (FIREBASE) {
     $('pfCard').textContent = n; $('pfStats').textContent = 'Loading…';
     const r = await findPlayer(n).catch(() => null);
     if (r) {
-      nameHtml($('pfCard'), cleanName(r.display), n, r.title, r.color);
-      const hat = cosItem('hat', r.badge); if (hat) $('pfCard').prepend(hat.ic + ' ');
-      $('pfStats').textContent = `🪙 ${fmt(Number(r.score) || 0)} lifetime · 🔁 ${Number(r.rebirths) || 0} rebirths · ✨ ${Number(r.asc) || 0} ascensions` + (typeof r.guild === 'string' && r.guild ? ` · 🛡️ [${r.guild}]` : '');
+      $('pfCard').textContent = ''; $('pfCard').appendChild(playerCard(r));
+      $('pfStats').textContent = '';
     } else $('pfStats').textContent = 'Not on the leaderboard right now';
   }
   $('frBack').onclick = () => frRender();
@@ -3881,14 +3943,7 @@ if (FIREBASE) {
       body.appendChild(act);
       const r = await findPlayer(from).catch(() => null);
       if (!r) { info.textContent = 'Not on the leaderboard'; return; }
-      const N = x => Number(x) || 0, lay = [['🌠', r.tr], ['🔆', r.apo], ['🕳️', r.sing], ['🌌', r.omni]].filter(([, v]) => N(v)).map(([i, v]) => `${i} ${N(v)}`).join(' · ');
-      const pets = (Array.isArray(r.pets) ? r.pets : []).map(id => PETS.find(q => q.id === id)).filter(Boolean);
-      info.innerHTML = `<div>🪙 <b></b> lifetime · 🔁 <b></b> rebirths · ✨ <b></b> Ascensions</div><div class="dimtxt"></div><div class="ppets"></div>`;
-      const [a, b2, c] = info.querySelectorAll('b'); a.textContent = fmt(N(r.score)); b2.textContent = N(r.rebirths); c.textContent = N(r.asc);
-      info.querySelector('.dimtxt').textContent = [lay, N(r.npets) ? `${N(r.npets)}/${PETS.length} pets found` : '', typeof r.guild === 'string' && r.guild ? `🛡️ [${r.guild}]` : ''].filter(Boolean).join(' · ');
-      const pp = info.querySelector('.ppets');
-      for (const q of pets) pp.appendChild(Object.assign(document.createElement('span'), {textContent:q.ic, title:`${q.nm} (${q.r})`, style:`border-color:${RARC[q.r]}`}));
-      if (!pets.length) pp.remove();
+      info.textContent = ''; info.appendChild(playerCard(r));
     };
     return row;
   }
