@@ -58,6 +58,14 @@ h2.shut::after{transform:rotate(-90deg)}
 #rbNext{color:var(--dim);font-size:12px;margin-top:6px}
 #ascBtn{width:100%;margin-top:10px;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);border:0;color:#111;border-radius:10px;padding:10px;font:inherit;font-weight:800;cursor:pointer}
 #ascBtn[hidden],#ascLine[hidden]{display:none}
+.lay{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.lay:first-child{border-top:0;padding-top:0}
+.lay .li{font-size:30px;line-height:1}.lay .lt{flex:1;min-width:0}.lay .ln{font:600 16px 'Fredoka',sans-serif}
+.lay .ab{flex:none}.lay .ab:disabled{opacity:.4}
+.chal{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}.chal:first-of-type{border-top:0}
+.chal .ci{font-size:26px}.chal .ct2{flex:1;min-width:0}.chal .cn{font-weight:800}
+.chal.done .cn::after{content:' ✓';color:var(--good)}
+.cbar{height:10px;border-radius:5px;background:var(--panel2);overflow:hidden;margin:8px 0}.cbar i{display:block;height:100%;background:var(--good)}
+.idea{background:var(--panel2);border-radius:12px;padding:8px 10px;margin-top:6px;font-size:13px;overflow-wrap:anywhere}.idea b{color:var(--gold)}
 #ascLine{margin-top:8px;font-size:13px;color:#ffd166;font-weight:600}
 #skipScene{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:101;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
 #ending:not([hidden])+#skipScene{display:block}
@@ -65,7 +73,7 @@ h2.shut::after{transform:rotate(-90deg)}
 #ending[hidden]{display:none}
 #ending .end-btn{background:linear-gradient(90deg,#ffd166,#ff8a3d);border:0;color:#111;border-radius:999px;padding:12px 22px;font:inherit;font-weight:800;cursor:pointer;margin:6px}
 #ending .end-btn.alt{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
-#lbTabs{display:flex;gap:6px;margin-bottom:8px}
+#lbTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
 #lbTabs button{flex:1;padding:6px 0;border-radius:9px;border:1px solid var(--line);background:none;color:var(--dim);font:inherit;font-weight:700;cursor:pointer}
 #lbTabs button.on{background:var(--accent);color:#fff;border-color:transparent}
 #lbList{list-style:none;padding:0}
@@ -505,6 +513,7 @@ body.light .ab:hover{background:#e6e8f2}
     <div id="rbNext"></div>
     <button class="ab" id="shopBtn" style="width:100%;margin-top:10px">🛒 Rebirth Shop · <span id="hcBal">0</span> 💈 tokens</button>
   </div>
+  <div id="layerWrap" hidden><h2>Prestige Layers</h2><div class="card" id="layerCard"></div></div>
   </div>
   <div class="tabp" data-tab="pets">
   <h2>Pets</h2>
@@ -519,6 +528,8 @@ body.light .ab:hover{background:#e6e8f2}
   <div class="tabp" data-tab="goals">
   <h2>Daily Quests</h2>
   <div class="card" id="questCard"></div>
+  <h2>Challenges</h2>
+  <div class="card" id="chalCard"></div>
   <h2>Achievements · <span id="achCount"></span></h2>
   <div id="achGrid"></div>
   </div>
@@ -536,8 +547,8 @@ body.light .ab:hover{background:#e6e8f2}
   <div class="tabp" data-tab="social">
   <div id="socialRow"><button id="chatBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span>Chat</span></button><button id="friendBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Friends</span></button><button id="tradeBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg><span>Trades</span></button><button id="guildBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg><span>Guild</span></button></div>
   <div id="lb" hidden>
-    <h2>Leaderboard</h2>
-    <div id="lbTabs"><button data-k="score" class="on">🪙 Coins</button><button data-k="rebirths">🔁 Rebirths</button><button data-k="asc">✨ Ascensions</button><button data-k="week">📅 Week</button></div>
+    <h2>Leaderboard · Season 1</h2>
+    <div id="lbTabs"><button data-k="score" class="on">🪙 All time</button><button data-k="day">☀️ Today</button><button data-k="week">📅 Week</button><button data-k="month">🗓️ Month</button><button data-k="rebirths">🔁 Rebirths</button><button data-k="asc">✨ Ascensions</button></div>
     <ol id="lbList"><li>Loading…</li></ol>
     <div id="lbNote"></div>
   </div>
@@ -584,6 +595,11 @@ body.light .ab:hover{background:#e6e8f2}
   <input type="range" id="vol" min="0" max="1" step="0.05" style="margin-top:8px">
   <label>Numbers</label><button id="sciBtn" class="setb"></button>
   <label>Cutscenes</label><button id="animBtn" class="setb"></button>
+  <label>💡 Suggest an idea</label>
+  <textarea id="ideaIn" class="tin" maxlength="500" rows="3" placeholder="What should Click Jun add next?" style="width:100%;resize:vertical"></textarea>
+  <button class="ab" id="ideaSend" style="width:100%;margin-top:6px">Send idea</button>
+  <div id="ideaMsg" class="dimtxt" style="margin-top:4px"></div>
+  <div id="ideaInbox" hidden><label>📬 Ideas from players</label><div id="ideaList"></div></div>
   <button id="reset">Reset progress</button>
   <button id="adminBtn">⚙ Admin panel <span style="opacity:.5">(`)</span></button>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:16px">Done</button></form>
@@ -921,7 +937,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, skipAnim:false, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -987,7 +1003,7 @@ function evtSchedule(){
 let RM;   // research multipliers, rebuilt whenever research changes (umult runs too often to scan RES each time)
 function recalcResearch(){
   RM = {up:{}, c:1, k:1, a:1, c2:0, gold:1, combo:1};
-  for (const r of RES) if (S.research[r.id]) {
+  for (const r of RES) if (S.research[r.id] && S.chal?.id !== 'nores') {   // runs at startup, before inChal exists
     if (r.up) RM.up[r.up] = (RM.up[r.up] || 1) * r.x;
     for (const key of ['c', 'k', 'a', 'gold', 'combo']) if (r[key]) RM[key] *= r[key];
     if (r.c2) RM.c2 += r.c2;
@@ -1069,6 +1085,32 @@ const AUP = [
 ];
 const asu = id => !!S.aup[id];
 
+// prestige layers above Ascension. Each one resets everything below it (coins, upgrades, research, rebirths, tokens,
+// perks, Ascensions and lower layers) but multiplies everything forever. Every layer also adds rebirths to each climb,
+// and each needs more of the layer below every time, so nothing loops forever.
+const LAYERS = [
+  {k:'tr',   ic:'🌠', nm:'Transcend',   pl:'Transcendences', x:1e3,  below:'asc',  bl:'Ascensions',     need:() => 8 + S.tr},
+  {k:'apo',  ic:'🔆', nm:'Apotheosis',  pl:'Apotheoses',     x:1e5,  below:'tr',   bl:'Transcendences', need:() => 3 + S.apo},
+  {k:'sing', ic:'🕳️', nm:'Singularity', pl:'Singularities',  x:1e8,  below:'apo',  bl:'Apotheoses',     need:() => 2 + S.sing},
+  {k:'omni', ic:'🌌', nm:'Omniverse',   pl:'Omniverses',     x:1e12, below:'sing', bl:'Singularities',  need:() => 1 + S.omni},
+];
+const layerMult = () => Math.min(CAP, LAYERS.reduce((m, L) => m * L.x ** S[L.k], 1));
+// rebirths needed to Ascend: 300, plus 10 per Ascension and more for every higher layer
+const ascNeed = () => 300 + 10*S.asc + 5*S.tr + 10*S.apo + 15*S.sing + 20*S.omni;
+
+// challenge runs: restart this run (coins, upgrades, research) under a rule and reach the goal to earn a permanent ×2
+const CHALS = [
+  {id:'clicks', ic:'👆', nm:'Clicks Only',  ds:"Auto Clickers and Passive income can't be bought"},
+  {id:'idle',   ic:'😴', nm:'Hands Off',    ds:"Click Power can't be bought and your own taps earn nothing"},
+  {id:'broke',  ic:'💸', nm:'Inflation',    ds:'Every upgrade costs ×10'},
+  {id:'nopets', ic:'🚫', nm:'Pet Strike',   ds:'Your pets refuse to help'},
+  {id:'nores',  ic:'📵', nm:'No Science',   ds:'Research is switched off'},
+  {id:'speed',  ic:'⏱️', nm:'Speedrun',     ds:'Reach the goal within 10 minutes'},
+];
+const inChal = id => S.chal?.id === id;
+const chalMult = () => 2 ** CHALS.filter(c => S.chalDone[c.id]).length;
+const chalBlocked = u => (inChal('clicks') && u.t !== 'c') || (inChal('idle') && u.t === 'c');
+
 // bosses: beat them with your clicks only (per-click damage, no auto clickers or passive) inside 30 seconds.
 // HP grows ×30 per boss and the gap widens every boss (the 1.06^(i²) part). Each win adds a permanent click-power bonus.
 const BOSSES = [
@@ -1139,7 +1181,7 @@ const cleanChat = t => String(t).replace(/[\u0000-\u001f\u007f]/g, '')
   .replace(/(https?:\/\/|www\.)\S+/gi, '[link removed]').replace(/\b[\w-]+\.(com|net|org|io|gg|xyz|ru|ly|co|me|tv)\b\S*/gi, '[link removed]')
   .replace(BAD_RE, m => '*'.repeat(m.length));
 const nameColor = id => { const c = cosItem('color', id); return c ? c.a : ''; };
-const petLv = id => S.equip.includes(id) ? (S.pets[id] || 0) : 0;
+const petLv = id => S.equip.includes(id) && !inChal('nopets') ? (S.pets[id] || 0) : 0;
 
 const own = u => S.own[u.id] || 0;
 // every milestone owned doubles that upgrade's output; rebirths boost everything with diminishing returns:
@@ -1148,7 +1190,7 @@ const rbBoost = (r = S.rebirths) => 1 + .2 * r ** .85;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 1) * RM[u.t];
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
+const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * layerMult() * chalMult() * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.g;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
@@ -1159,7 +1201,7 @@ function maxN(u){
   while (n > 0 && cost(u, n) > S.coins) n--;
   return Math.max(0, n);
 }
-const cost = (u, n = buyN(u)) => { const g = growth(u); return fin(Math.ceil(u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap')) * (1 - .01*petLv('hedge')))); };
+const cost = (u, n = buyN(u)) => { const g = growth(u); return fin(Math.ceil((inChal('broke') ? 10 : 1) * u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap')) * (1 - .01*petLv('hedge')))); };
 // the base click is always exactly 1; boosts multiply what your Click Power upgrades add on top of it
 const perClick = () => fin(1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .1*lv('click')) * bossMult() * (1 + .05*petLv('cat')) * (1 + .08*petLv('eagle')) + perSec()*RM.c2);
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
@@ -1177,6 +1219,9 @@ const fin = x => Number.isFinite(x) ? Math.min(x, CAP) : (x > 0 || Number.isNaN(
 const weekId = (d = new Date()) => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7;
   t.setUTCDate(t.getUTCDate() + 4 - day); const y = t.getUTCFullYear(); return `${y}-W${Math.ceil(((t - Date.UTC(y, 0, 1))/864e5 + 1)/7)}`; };
 let CUR_WEEK = weekId();
+const dayId = (d = new Date()) => d.toISOString().slice(0, 10), monthId = (d = new Date()) => d.toISOString().slice(0, 7);   // UTC, like the week
+let CUR_DAY = dayId(), CUR_MONTH = monthId();
+const SEASON = 1;   // leaderboard season (Season 1 runs until we decide to start Season 2)
 // sound effects, synthesised with Web Audio (no files). On/off and volume in Settings.
 let AC = null;
 function tone(f, d, type = 'sine', v = 1, slide = 0){
@@ -1222,7 +1267,7 @@ const sfx = k => SFX[k] && SFX[k]();
 // like offline earnings, golden Juns, VC deals and minigame prizes are left out so they don't spike it.
 let liveBucket = 0, liveRate = 0;
 const earnLive = n => { if (n > 0) liveBucket += n*MULT; earn(n); };
-function earn(n){ n *= MULT; if (!(n > 0)) return; if (S.week !== CUR_WEEK) { S.week = CUR_WEEK; S.wcoins = 0; } S.wcoins = Math.min(CAP, S.wcoins + n); S.coins = Math.min(CAP, S.coins + n); S.total = Math.min(CAP, S.total + n); S.lifetime = Math.min(CAP, S.lifetime + n); }
+function earn(n){ n *= MULT; if (!(n > 0)) return; if (S.week !== CUR_WEEK) { S.week = CUR_WEEK; S.wcoins = 0; } if (S.day !== CUR_DAY) { S.day = CUR_DAY; S.dcoins = 0; } if (S.month !== CUR_MONTH) { S.month = CUR_MONTH; S.mcoins = 0; } S.dcoins = Math.min(CAP, S.dcoins + n*1); S.mcoins = Math.min(CAP, S.mcoins + n*1); S.wcoins = Math.min(CAP, S.wcoins + n); S.coins = Math.min(CAP, S.coins + n); S.total = Math.min(CAP, S.total + n); S.lifetime = Math.min(CAP, S.lifetime + n); }
 
 // shop
 function renderShop(){
@@ -1244,6 +1289,7 @@ function renderShop(){
         save(); renderShop(); refresh();
       };
       b.onclick = () => {
+        if (chalBlocked(u)) return toast(`${CHALS.find(c => c.id === S.chal.id).ic} Not allowed in this challenge`);
         const n = buyN(u), p = cost(u, n); if (S.coins < p) return;   // fix n before paying (MAX depends on coins)
         const before = umult(u); S.coins -= p; S.own[u.id] = own(u) + n; S.bought += n; sfx('buy');
         if (umult(u) > before) { toast(`${u.ic} ${u.nm} milestone! Output ×2`); confetti(30); }
@@ -1261,12 +1307,12 @@ let shopBtns = [], shopSig = -1;
 const setText = (el, t) => { if (el.textContent !== t) el.textContent = t; };
 function refresh(){
   const fz = frenzy() > 1 ? ` · 💎 FRENZY ${Math.ceil((frenzyUntil - performance.now())/1000)}s` : '';
-  $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}`;
+  $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}${S.chal ? ` · ⚔️ ${CHALS.find(c => c.id === S.chal.id).nm}` : ''}`;
   document.title = `${fmt(S.coins)} coins · Click Jun`;
   if (UPS.filter(u => own(u)).length !== shopSig) renderShop();   // a first purchase (any path, or a reset) changes which upgrades are revealed
   const pc = perClick();
   for (const b of shopBtns) {
-    const u = b._u, r = b._r, p = cost(u), can = S.coins >= p, next = MILES.find(m => own(u) < m);
+    const u = b._u, r = b._r, p = cost(u), can = S.coins >= p && !chalBlocked(u), next = MILES.find(m => own(u) < m);
     const n = buyN(u); setText(r.p, fmt(p)); setText(r.buyn, S.buy === 1 ? '' : `+${fmt(n)}`);   // how many this tap buys
     setText(r.v, fmt(u.t === 'k' ? u.v * umult(u) * AUTO * pc : u.v * umult(u) * prestige()));
     setText(r.cnt, String(own(u) || ''));
@@ -1279,15 +1325,15 @@ function refresh(){
   $('rbBp').textContent = S.rebirths; $('rbBoost').textContent = `+${fmt(Math.round((rbBoost() - 1)*100))}%`;
   const gainPct = fmt(Math.round((rbBoost(S.rebirths + n) - rbBoost())*100));
   for (const b of rbRowBtns) { const v = b.dataset.n === 'max' ? 'max' : +b.dataset.n, k = rbPick(v); b.disabled = !rbCan(k); b.classList.toggle('on', v === S.rbN && rbCan(k)); b.title = rbCan(k) ? `${k} rebirths: +${rbGainN(k)} points, ${tokenGain(rbGainN(k))} tokens` : `need ${fmt(rbCost(k))} coins this run`; }
-  const capped = S.rebirths >= MAXR;
+  const capped = S.rebirths >= ascNeed();
   $('ascBtn').hidden = !capped;
   $('ascLine').hidden = !S.asc && !capped;
-  $('ascLine').textContent = `✨ Ascensions: ${S.asc} · ×${fmt(3 ** S.asc)} everything · rebirths ${fmt(10 ** Math.min(S.asc, 6))}× cheaper`;
+  $('ascLine').textContent = `✨ Ascensions: ${S.asc} · ×${fmt(3 ** S.asc)} everything · next Ascension needs ${ascNeed()} rebirths`;
   $('ashopBtn').hidden = !S.asc && !S.ap; setText($('apBal'), String(S.ap));
-  $('rbBtn').disabled = g < 1 || capped;
-  $('rbBtn').textContent = capped ? '👑 You beat Click Jun! Ascend to climb again' : g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
+  $('rbBtn').disabled = g < 1 || capped || !!S.chal;
+  $('rbBtn').textContent = S.chal ? '⚔️ Finish or abandon your challenge to rebirth' : capped ? '👑 You beat Click Jun! Ascend to climb again' : g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
   setText($('hcBal'), String(S.hc));
-  $('rbNext').textContent = !(rbBase() < CAP) ? `You've reached the Ascension ceiling: rebirths now cost more coins than exist. Bosses, pets and the leaderboard are your climb now.` : capped ? `${MAXR}/${MAXR} rebirths` : g < 1 ? `Rebirth ${S.rebirths}/${MAXR} · each one needs more coins than the last` : `${fmt(rbBase() * 10 ** ((g + 1)/rbMult() - 1) - S.total)} more coins this run for +1 💈 token`;
+  $('rbNext').textContent = !(rbBase() < CAP) ? `You've reached the Ascension ceiling: rebirths now cost more coins than exist. Bosses, pets and the leaderboard are your climb now.` : capped ? `${S.rebirths}/${ascNeed()} rebirths` : g < 1 ? `Rebirth ${S.rebirths}/${ascNeed()} · each one needs more coins than the last` : `${fmt(rbBase() * 10 ** ((g + 1)/rbMult() - 1) - S.total)} more coins this run for +1 💈 token`;
 }
 
 // floating heads
@@ -1345,7 +1391,7 @@ $('jun').addEventListener('pointerdown', e => {
   const now = performance.now();
   combo = now - lastClick < 450 ? Math.min(3 + .5*lv('combo') + .2*petLv('fox'), combo + .04*RM.combo*(1 + .05*petLv('bunny'))) : Math.max(1, combo - .2); lastClick = now;
   S.clicks++; S.maxCombo = Math.max(S.maxCombo, combo); S.qcombo = Math.max(S.qcombo, combo);
-  const n = perClick() * combo * frenzy(); earnLive(n); pop('+'+fmt(n), e); sparks(e); sfx('click'); if (n > S.bigClick) S.bigClick = n;
+  const n = inChal('idle') ? 0 : perClick() * combo * frenzy(); earnLive(n); pop('+'+fmt(n), e); sparks(e); sfx('click'); if (n > S.bigClick) S.bigClick = n;
   // nudge him away from the cursor so he feels alive
   jun.vx = Math.sign(jun.vx) * Math.min(Math.abs(jun.vx)*1.08, BASE*2.3);
   refresh();
@@ -1399,9 +1445,9 @@ const rbGainN = n => {
   for (let i = 0; i < n; i++) g += Math.floor(k * rbMult(S.rebirths + i));
   return g;
 };
-const rbCan = n => S.rebirths + n <= MAXR && rbGainN(n) >= 1;
+const rbCan = n => !S.chal && S.rebirths + n <= ascNeed() && rbGainN(n) >= 1;
 // MAX: as many rebirths as this run's coins cover (up to the 300 cap)
-function rbMaxN(){ let n = 0, c = 0; while (S.rebirths + n < MAXR && c + rbReq(S.rebirths + n) <= S.total) c += rbReq(S.rebirths + n++); return n; }
+function rbMaxN(){ let n = 0, c = 0; const cap = ascNeed(); while (S.rebirths + n < cap && c + rbReq(S.rebirths + n) <= S.total) c += rbReq(S.rebirths + n++); return n; }
 const rbPick = v => v === 'max' ? rbMaxN() : v;          // resolve a selector value (1/2/5/10/'max') to a count
 const TOKEN_CAP = 1e15;
 const tokenGain = g => Math.min(TOKEN_CAP, Math.floor(fin(g * (1 + .1*lv('tokens')) * (1 + .1*petLv('whale')) * (1 + .5*S.asc) * (asu('tokens') ? 2 : 1) * (1 + .05*petLv('panda')))));
@@ -1415,20 +1461,84 @@ $('rbBtn').onclick = () => {
   const L = lv('headstart');
   Object.assign(S, {coins:Math.max(asu('keep') ? S.coins * .1 : 0, asu('rich') ? 1e6 : 0), total:0, own:L ? {buzz:10*L, blind:10*L, gel:10*L, gym:10*L} : {}, hc:Math.min(TOKEN_CAP, S.hc + tokenGain(g)), rebirths:S.rebirths + n, rebTotal:S.rebTotal + n, research:asu('lab') ? S.research : {}}); shown = S.coins; recalcResearch();
   sfx('rebirth'); rebirthFx(n); save(); refresh(); toast(`🔁 Reborn! Rebirth boost is now +${fmt(Math.round((rbBoost() - 1)*100))}%`);
-  if (S.rebirths >= MAXR && !S.beaten) { S.beaten = true; save(); playEnding(); }
+  if (S.rebirths >= ascNeed() && !S.beaten) { S.beaten = true; save(); playEnding(); }
 };
 // Ascension: reset everything (coins, upgrades, research, rebirths, tokens, perks) but keep lifetime coins, pets,
 // achievements and stars. Each one: ×3 to everything, rebirths 10× cheaper, +50% tokens. Leaderboard rebirths keep counting.
 function ascend(){
-  if (S.rebirths < MAXR) return;
-  if (!confirm(`✨ Ascend? You reset coins, upgrades, research, rebirths, tokens and perks.\n\nYou keep lifetime coins (your leaderboard spot), pets, achievements and stars, your ${MAXR} rebirths still count on the Rebirths leaderboard, and you gain:\n• ×3 to everything (stacks every Ascension)\n• Rebirths 10× cheaper (up to ×1,000,000)\n• +50% rebirth tokens\n• 1 ✨ for the Ascension Shop`)) return;
+  if (S.rebirths < ascNeed() || S.chal) return;
+  if (!confirm(`✨ Ascend? You reset coins, upgrades, research, rebirths, tokens and perks.\n\nYou keep lifetime coins (your leaderboard spot), pets, achievements and stars, your ${S.rebirths} rebirths still count on the Rebirths leaderboard, and you gain:\n• ×3 to everything (stacks every Ascension)\n• Rebirths 10× cheaper (up to ×1,000,000)\n• +50% rebirth tokens\n• 1 ✨ for the Ascension Shop`)) return;
   const carried = asu('carry') ? Object.fromEntries(Object.entries(S.perks).map(([k, v]) => [k, Math.floor(v/4)]).filter(([, v]) => v > 0)) : {};
   Object.assign(S, {coins:asu('rich') ? 1e6 : 0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1});
-  shown = 0; recalcResearch(); applyPerks(); save(); refresh(); window.pushNow?.();
+  shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
   playAscendScene();
   if (S.asc === 1) setTimeout(() => toast('🕊️ Angel Wings unlocked! Wear them in your 👕 Wardrobe'), 9000);
 }
 $('ascBtn').onclick = ascend;
+
+// ---------- prestige layers ----------
+function renderLayers(){
+  const show = S.asc > 0 || LAYERS.some(L => S[L.k] > 0);
+  $('layerWrap').hidden = !show; if (!show) return;
+  const C = $('layerCard'); C.innerHTML = '';
+  LAYERS.forEach((L, i) => {
+    if (i > 0 && !S[LAYERS[i - 1].k] && !S[L.k]) return;   // reveal one layer at a time
+    const have = S[L.below], need = L.need(), ok = have >= need && !S.chal;
+    const row = document.createElement('div'); row.className = 'lay';
+    row.innerHTML = `<div class="li">${L.ic}</div><div class="lt"><div class="ln">${L.nm} · ${S[L.k]}</div>
+      <div class="dimtxt">×${fmt(L.x)} everything each (now ×${fmt(L.x ** S[L.k])}) · needs ${need} ${L.bl} (you have ${have})</div></div><button class="ab">${L.nm}</button>`;
+    const b = row.querySelector('button'); b.disabled = !ok; b.onclick = () => doLayer(i);
+    C.appendChild(row);
+  });
+}
+function doLayer(i){
+  const L = LAYERS[i]; if (S[L.below] < L.need() || S.chal) return;
+  const lower = ['Ascensions', ...LAYERS.slice(0, i).map(x => x.pl)].join(', ');
+  if (!confirm(`${L.ic} ${L.nm}? This resets coins, upgrades, research, rebirths, tokens, perks and your ${lower}.\n\nYou keep lifetime coins, pets, achievements, cosmetics, bosses, challenges and the Ascension Shop, and gain ×${fmt(L.x)} to everything (stacks every time). Climbs will need more rebirths afterwards.`)) return;
+  const zero = Object.fromEntries(LAYERS.slice(0, i).map(x => [x.k, 0]));
+  Object.assign(S, zero, {[L.k]:S[L.k] + 1, coins:asu('rich') ? 1e6 : 0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:{}, beaten:false, asc:0});
+  shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
+  sfx('angel'); rebirthFx(1); confetti(120); toast(`${L.ic} ${L.nm} ${S[L.k]}! Everything ×${fmt(L.x ** S[L.k])} from this layer`);
+}
+
+// ---------- challenges ----------
+function renderChal(){
+  const C = $('chalCard');
+  if (S.chal) {
+    const c = CHALS.find(x => x.id === S.chal.id), pct = Math.min(100, S.total / S.chal.goal * 100);
+    const left = c.id === 'speed' ? ` · ⏱️ ${Math.max(0, Math.ceil((S.chal.start + 600e3 - Date.now())/1000))}s left` : '';
+    C.innerHTML = `<div class="dimtxt">Active challenge</div><div style="font:600 18px Fredoka,sans-serif">${c.ic} ${c.nm}</div><div class="dimtxt">${c.ds}</div>
+      <div class="cbar"><i style="width:${pct.toFixed(1)}%"></i></div><div class="dimtxt">${fmt(S.total)} / ${fmt(S.chal.goal)} coins this run${left}</div>
+      <button class="ab" id="chalQuit" style="width:100%;margin-top:8px">Abandon challenge</button>`;
+    $('chalQuit').onclick = () => { if (confirm('Abandon this challenge? You keep playing this run normally.')) { S.chal = null; save(); recalcResearch(); renderChal(); renderShop(); refresh(); } };
+    return;
+  }
+  C.innerHTML = `<div class="dimtxt">Restart this run under a special rule. Reach the goal to double everything forever. Now ×${chalMult()} from ${CHALS.filter(c => S.chalDone[c.id]).length}/${CHALS.length} challenges.</div>`;
+  for (const c of CHALS) {
+    const row = document.createElement('div'); row.className = 'chal' + (S.chalDone[c.id] ? ' done' : '');
+    row.innerHTML = `<div class="ci">${c.ic}</div><div class="ct2"><div class="cn">${c.nm}</div><div class="dimtxt">${c.ds}</div></div>${S.chalDone[c.id] ? '' : '<button class="ab">Start</button>'}`;
+    const b = row.querySelector('button'); if (b) b.onclick = () => startChal(c);
+    C.appendChild(row);
+  }
+}
+function startChal(c){
+  const goal = Math.max(1e6, rbReq(S.rebirths) * 3);
+  if (!confirm(`${c.ic} Start "${c.nm}"?\n\n${c.ds}.\nGoal: earn ${fmt(goal)} coins this run.\n\nYour coins, upgrades and research reset now (rebirths and everything else stay). Win for ×2 to everything, forever.`)) return;
+  Object.assign(S, {chal:{id:c.id, goal, start:Date.now()}, coins:0, total:0, own:{}, research:{}});
+  shown = 0; recalcResearch(); save(); renderShop(); renderChal(); refresh(); sfx('rebirth');
+}
+function chalTick(){
+  if (!S.chal) return;
+  const c = CHALS.find(x => x.id === S.chal.id);
+  if (S.total >= S.chal.goal) {
+    S.chalDone[c.id] = true; S.chal = null; recalcResearch(); save(); renderShop(); refresh();
+    sfx('fanfare'); confetti(120); toast(`${c.ic} Challenge complete: ${c.nm}! Everything ×2 forever (now ×${chalMult()})`);
+  } else if (c.id === 'speed' && Date.now() > S.chal.start + 600e3) {
+    S.chal = null; save(); renderShop(); refresh(); sfx('error'); toast('⏱️ Speedrun failed: out of time. Try again from the Goals tab');
+  }
+  if (tab === 'goals') renderChal();
+}
+renderLayers(); renderChal();
 
 // the ending: Jun sweats, a giant finger rises, one last poke sends him spinning into another dimension
 // TRUE ENDING at ∞ coins: Jun clones spiral in from every direction, merge into one golden Jun, then the credits roll
@@ -1509,7 +1619,7 @@ function playEnding(){
   const E = $('ending'); E.innerHTML = ''; E.hidden = false; E.style.background = '';
   const el = (tag, css, html = '') => { const d = document.createElement(tag); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
   const go = (node, frames, o) => node.animate(frames, {fill:'forwards', easing:'ease-in-out', ...o});
-  const title = el('div', 'top:10%;width:100%;text-align:center;font-weight:800;font-size:clamp(26px,6vw,44px);color:#ffd166;opacity:0', `REBIRTH ${MAXR}`);
+  const title = el('div', 'top:10%;width:100%;text-align:center;font-weight:800;font-size:clamp(26px,6vw,44px);color:#ffd166;opacity:0', `REBIRTH ${S.rebirths}`);
   const head = el('img', 'width:min(260px,55vw);left:50%;top:46%;transform:translate(-50%,-50%)');
   head.src = $('jun').src; head.style.clipPath = getComputedStyle($('jun')).clipPath;
   const finger = el('div', 'font-size:clamp(70px,16vw,120px);left:50%;top:110%;transform:translateX(-50%)', '👆');
@@ -1530,7 +1640,7 @@ function playEnding(){
     go(finger, [{opacity:1}, {opacity:0}], {duration:500});
     const box = el('div', 'left:0;right:0;top:38%;text-align:center;color:#fff;padding:0 20px;opacity:0',
       `<div style="font-size:clamp(30px,7vw,54px);font-weight:800;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent">👑 YOU BEAT CLICK JUN 👑</div>
-       <div style="margin:10px 0 22px;color:#c9cce0">Jun has been clicked into another dimension.<br>Ascend to bring him back, stronger. Your ${MAXR} rebirths stay on the leaderboard.</div>
+       <div style="margin:10px 0 22px;color:#c9cce0">Jun has been clicked into another dimension.<br>Ascend to bring him back, stronger. Your ${S.rebirths} rebirths stay on the leaderboard.</div>
        <button class="end-btn" id="endAsc">✨ Ascend now</button><button class="end-btn alt" id="endStay">Keep playing</button>`);
     go(box, [{opacity:0, transform:'translateY(20px)'}, {opacity:1, transform:'translateY(0)'}], {duration:700}); sfx('fanfare'); confetti(80);
     $('endStay').onclick = () => { E.hidden = true; };
@@ -1651,7 +1761,7 @@ function tick(now){
     const r = liveBucket / liveAcc; liveRate = liveRate ? liveRate*.83 + r*.17 : r; liveBucket = 0; liveAcc = 0;
     setText($('live'), `📈 +${fmt(liveRate)}/s right now`);
   }
-  if ((wkAcc += dt) > 60) { wkAcc = 0; CUR_WEEK = weekId(); }
+  if ((wkAcc += dt) > 60) { wkAcc = 0; CUR_WEEK = weekId(); CUR_DAY = dayId(); CUR_MONTH = monthId(); }
   if (S.coins >= CAP && !S.trueEnd) { S.trueEnd = true; save(); playTrueEnding(); }
   // ease speed back down after click nudges
   jun.vx += (Math.sign(jun.vx)*BASE - jun.vx) * dt * .5;
@@ -1661,7 +1771,7 @@ function tick(now){
   earnLive(perSec()*dt);
   autoClick(dt);
   if ((acc += dt) > .2) { acc = 0; refresh(); renderResearch(); }
-  if ((achAcc += dt) > 1) { achAcc = 0; if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if (asu('auto') && S.autoBuy) autoBuyer(); }
+  if ((achAcc += dt) > 1) { achAcc = 0; chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if (asu('auto') && S.autoBuy) autoBuyer(); }
   requestAnimationFrame(tick);
 }
 setInterval(save, 5000);
@@ -1754,6 +1864,10 @@ function applyState(d, keepCheat = true){
     muted:Array.isArray(d.muted) ? d.muted.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)).slice(-100) : [],
     eggs:Object.fromEntries(EGGS.map(e => [e.id, int(d.eggs?.[e.id] ?? (e.id === 'basic' ? d.hatches : 0))])),
     guild:typeof d.guild === 'string' && /^[A-Z0-9]{6}$/.test(d.guild) ? d.guild : '',
+    tr:int(d.tr), apo:int(d.apo), sing:int(d.sing), omni:int(d.omni),
+    chal:d.chal && CHALS.some(c => c.id === d.chal.id) && num(d.chal.goal) > 0 ? {id:d.chal.id, goal:num(d.chal.goal), start:num(d.chal.start) || Date.now()} : null,
+    chalDone:Object.fromEntries(CHALS.filter(c => d.chalDone && d.chalDone[c.id] === true).map(c => [c.id, true])),
+    day:typeof d.day === 'string' ? d.day.slice(0, 10) : '', dcoins:num(d.dcoins), month:typeof d.month === 'string' ? d.month.slice(0, 7) : '', mcoins:num(d.mcoins),
     boss:Math.min(BOSSES.length, int(d.boss)), spins:int(d.spins), casNet:Number.isFinite(d.casNet) ? d.casNet : 0,
     rebTotal:int(d.rebTotal) || int(d.asc)*300 + int(d.rebirths)};
   shown = S.coins; recalcResearch(); save(); applyXmas(); applyFx(); applyBuy(); applyPerks(); renderAch(); renderPets(); renderShop(); refresh();
@@ -2404,6 +2518,12 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'5.0', date:'Oct 7, 2026', title:'Season 1: Beyond Ascension', notes:[
+    '🌠 4 new prestige layers past Ascension: Transcend, Apotheosis, Singularity and Omniverse. Each resets the layers below for a giant permanent multiplier',
+    'Every Ascension and every higher layer adds rebirths to each climb (300, then +10 per Ascension and more per layer), so progress can\'t loop forever',
+    '⚔️ Challenge runs in 🏆 Goals: Clicks Only, Hands Off, Inflation, Pet Strike, No Science and Speedrun. Each win doubles everything forever',
+    '🏆 Leaderboards: All time, Today, This week, This month, Rebirths and Ascensions. Welcome to Season 1',
+    '💡 Suggestion box in ⚙️ Settings: send your ideas straight to the dev']},
   {v:'4.7', date:'Oct 7, 2026', title:'Friends & Fixes', notes:[
     '👋 Friend requests: send one by username, they accept or decline in 👥 Friends',
     '🖼️ Profile pictures in chat show your hat and name colour',
@@ -2608,10 +2728,10 @@ document.querySelectorAll('aside h2').forEach(h => {
 let resKey = '';
 function renderResearch(){
   const avail = RES.filter(r => !S.research[r.id] && r.need()).sort((a, b) => a.cost - b.cost);
-  const key = avail.map(r => r.id).join();
+  const key = avail.map(r => r.id).join() + (inChal('nores') ? '!' : '');
   if (key !== resKey) {
     resKey = key; $('resRow').innerHTML = '';
-    $('resWrap').hidden = !avail.length;
+    $('resWrap').hidden = !avail.length || inChal('nores');
     for (const r of avail) {
       const b = document.createElement('button'); b.className = 'res'; b._r = r;
       b.innerHTML = `<span class="ri">${r.ic}</span><span class="rn"></span><span class="rp">🪙 ${fmt(r.cost)}</span>`;
@@ -2834,7 +2954,7 @@ function renderSettings(){
   $('dispIn').value = S.display;
   $('animBtn').textContent = S.skipAnim ? '⏭ Cutscenes & big effects: skipped' : '🎬 Cutscenes & big effects: on';
 }
-$('setBtn').onclick = () => { renderSettings(); $('dispMsg').textContent = ''; $('settings').showModal(); };
+$('setBtn').onclick = () => { renderSettings(); window.loadIdeas?.(); $('ideaMsg').textContent = ''; $('dispMsg').textContent = ''; $('settings').showModal(); };
 document.querySelectorAll('#appRow button').forEach(b => b.onclick = () => { S.appearance = b.dataset.v; save(); applyAppearance(); });
 $('sndBtn').onclick = () => { S.sound = !S.sound; save(); renderSettings(); sfx('buy'); };
 $('vol').oninput = e => { S.vol = +e.target.value; save(); };
@@ -2851,7 +2971,7 @@ $('dispSave').onclick = () => {
 $('statBtn').onclick = () => {
   const rows = [['Lifetime coins', fmt(S.lifetime)], ['Coins this week', fmt(S.wcoins)], ['Coins this run', fmt(S.total)], ['Time played', dur(S.playtime)],
     ['Jun clicks', fmt(S.clicks)], ['Biggest single click', fmt(S.bigClick)], ['Best combo', S.maxCombo.toFixed(1) + '×'],
-    ['Rebirths (this climb)', S.rebirths], ['Rebirths (all-time)', S.rebTotal], ['Ascensions', S.asc], ['Golden Juns caught', S.golds], ['Bosses defeated', `${S.boss}/${BOSSES.length}`], ['Roulette spins', S.spins], ['Roulette profit', (S.casNet < 0 ? '−' : '') + fmt(Math.abs(S.casNet))],
+    ['Rebirths (this climb)', S.rebirths], ['Rebirths (all-time)', S.rebTotal], ['Ascensions', S.asc], ['Golden Juns caught', S.golds], ['Bosses defeated', `${S.boss}/${BOSSES.length}`], ['Challenges won', `${CHALS.filter(c => S.chalDone[c.id]).length}/${CHALS.length}`], ['Transcend · Apotheosis · Singularity · Omniverse', `${S.tr} · ${S.apo} · ${S.sing} · ${S.omni}`], ['Coins today', fmt(S.dcoins)], ['Coins this month', fmt(S.mcoins)], ['Roulette spins', S.spins], ['Roulette profit', (S.casNet < 0 ? '−' : '') + fmt(Math.abs(S.casNet))],
     ['Diamond Juns caught', S.diamonds], ['Pumpkins caught', S.candy], ['VC deals closed', S.vcDeals], ['Eggs hatched', S.hatches],
     ['Upgrades owned', fmt(Object.values(S.own).reduce((a, b) => a + b, 0))], ['Research owned', Object.keys(S.research).length],
     ['Achievements', `${achCount()}/${ACH.length}`], ['Flappy best', S.best], ['Jun-Man words', S.hwins], ['Tank wins', S.twins], ['Pac-Jun clears', S.pwins],
@@ -2997,7 +3117,7 @@ function autoBuyer(){
   let bought = 0;
   while (bought < 25) {
     let best = null, bc = Infinity;
-    for (const u of UPS) { const c = cost(u, 1); if (c < bc) { bc = c; best = u; } }
+    for (const u of UPS) { if (chalBlocked(u)) continue; const c = cost(u, 1); if (c < bc) { bc = c; best = u; } }
     if (!best || S.coins < bc) break;
     S.coins -= bc; S.own[best.id] = own(best) + 1; bought++; S.bought++;
   }
@@ -3062,7 +3182,7 @@ $('logoJun').src = $('jun').src; $('logoJun').style.clipPath = getComputedStyle(
 document.documentElement.style.setProperty('--jclip', getComputedStyle($('jun')).clipPath);   // chat avatars reuse Jun's head outline
 applyPerks(); renderAch(); renderPets();
 if (!S.rebTotal) S.rebTotal = S.asc*MAXR + S.rebirths;   // all-time rebirths (never resets) for the Rebirths leaderboard
-if (S.rebirths >= MAXR && !S.beaten) { S.beaten = true; save(); setTimeout(playEnding, 1200); }
+if (S.rebirths >= ascNeed() && !S.beaten) { S.beaten = true; save(); setTimeout(playEnding, 1200); }
 offline(S.lastSeen ? Date.now() - S.lastSeen : 0);
 renderShop(); refresh(); requestAnimationFrame(tick);
 </script>
@@ -3108,7 +3228,9 @@ if (FIREBASE) {
     if (!user) return Promise.resolve();
     const saved = setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
-    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
+    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
+      // older Firestore rules don't know the day/month fields yet: retry without them so the board keeps updating
+      .catch(() => S.cheater ? 0 : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
     return saved;
   };
   window.onCheat = () => { push(); loadBoard(); };
@@ -3121,9 +3243,10 @@ if (FIREBASE) {
     const list = $('lbList');
     try {
       // weekly: top weekly scores, keeping only this week's (old weeks' entries are ignored)
-      const weekly = lbKey === 'week';
-      const qs = await getDocs(query(collection(db, 'leaderboard'), orderBy(weekly ? 'wscore' : lbKey, 'desc'), limit(weekly ? 100 : 10)));
-      const docs = []; qs.forEach(d => { if (!weekly || d.data().week === CUR_WEEK) docs.push(d); });
+      // today / week / month: top scores for that period, keeping only entries from the current one (old periods are ignored)
+      const P = {day:['dscore', 'day', CUR_DAY], week:['wscore', 'week', CUR_WEEK], month:['mscore', 'month', CUR_MONTH]}[lbKey], weekly = !!P;
+      const qs = await getDocs(query(collection(db, 'leaderboard'), orderBy(P ? P[0] : lbKey, 'desc'), limit(P ? 100 : 10)));
+      const docs = []; qs.forEach(d => { if (!P || d.data()[P[1]] === P[2]) docs.push(d); });
       list.innerHTML = ''; let i = 0;
       docs.slice(0, 10).forEach(d => {
         const r = d.data(), li = document.createElement('li');
@@ -3133,7 +3256,7 @@ if (FIREBASE) {
         const nm = li.querySelector('.nmx'); nameHtml(nm, cleanName(r.display), String(r.name), r.title, r.color);
         const hat = cosItem('hat', r.badge); if (typeof r.guild === 'string' && /^[A-Z0-9]{1,4}$/.test(r.guild)) nm.prepend(`[${r.guild}] `); if (hat) nm.prepend(hat.ic + ' ');
         nm.firstElementChild.append((crowns ? ` 👑${crowns > 1 ? crowns : ''}` : '') + (lbKey === 'score' && reb ? ` 🔁${reb}` : ''));
-        li.querySelector('.sc').textContent = weekly ? fmt(Number(r.wscore) || 0) : lbKey === 'score' ? fmt(Number(r.score) || 0) : lbKey === 'asc' ? `${Number(r.asc) || 0} ✨` : `${reb} 🔁`;
+        li.querySelector('.sc').textContent = weekly ? fmt(Number(r[P[0]]) || 0) : lbKey === 'score' ? fmt(Number(r.score) || 0) : lbKey === 'asc' ? `${Number(r.asc) || 0} ✨` : `${reb} 🔁`;
         list.appendChild(li);
       });
       if (!i) list.innerHTML = '<li>No one yet. Be the first!</li>';
@@ -3141,6 +3264,36 @@ if (FIREBASE) {
     $('lbNote').textContent = !user ? 'Create an account below to get on the board.' : S.cheater ? 'You used the admin panel, so you’re off the board.' : '';
   }
   $('lb').hidden = false; loadBoard(); setInterval(loadBoard, 60000);
+  // ---------- suggestions: suggestions/{id} = {from, text, ts}. Anyone signed in can send; only the mod can read and delete ----------
+  $('ideaSend').onclick = async () => {
+    const t = $('ideaIn').value.trim(), msg = x => $('ideaMsg').textContent = x;
+    if (!user) return msg('Sign in to send ideas');
+    if (t.length < 5) return msg('Write a little more first');
+    let last = 0; try { last = +localStorage.getItem('clickjun-idea') || 0; } catch {}
+    if (Date.now() - last < 60e3) return msg('One idea a minute, please');
+    try {
+      await addDoc(collection(db, 'suggestions'), {from:me(), text:t.slice(0, 500), ts:serverTimestamp()});
+      try { localStorage.setItem('clickjun-idea', String(Date.now())); } catch {}
+      $('ideaIn').value = ''; msg('💡 Sent! Thanks for the idea'); sfx('coin');
+    } catch { msg("Couldn't send right now, try again later"); }
+  };
+  window.loadIdeas = async () => {
+    $('ideaInbox').hidden = me() !== 'nkthn'; if (me() !== 'nkthn') return;
+    const L = $('ideaList'); L.innerHTML = '<div class="dimtxt">Loading…</div>';
+    try {
+      const qs = await getDocs(query(collection(db, 'suggestions'), orderBy('ts', 'desc'), limit(50)));
+      L.innerHTML = qs.empty ? '<div class="dimtxt">No ideas yet.</div>' : '';
+      qs.forEach(d => {
+        const g = d.data(), row = document.createElement('div'); row.className = 'idea';
+        row.innerHTML = '<b></b> <span class="dimtxt"></span><div></div><button class="ab" style="margin-top:6px;padding:4px 10px;font-size:12px">🗑️ Done</button>';
+        row.querySelector('b').textContent = String(g.from);
+        row.querySelector('.dimtxt').textContent = g.ts?.toDate ? g.ts.toDate().toLocaleString() : '';
+        row.querySelector('div').textContent = String(g.text || '');
+        row.querySelector('button').onclick = () => deleteDoc(d.ref).then(() => row.remove()).catch(() => {});
+        L.appendChild(row);
+      });
+    } catch { L.innerHTML = '<div class="dimtxt">Couldn\'t load ideas</div>'; }
+  };
   // ---------- friends, gifts and trades ----------
   // gifts/{id} = {from, to, amount}; trades/{id} = {from, to, give:{tokens, pet}, want:{tokens, pet}, status:'open'|'accepted'|'declined'}.
   // The sender's side of a trade is held (escrowed) when the offer is made, so nobody can back out after the other side accepts.
