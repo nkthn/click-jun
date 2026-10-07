@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Click Jun</title>
 <link rel="manifest" href="manifest.json">
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -380,6 +381,8 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 #wGrid button.flex{box-shadow:inset 0 0 0 2px #b388ff}
 #admin .hx{flex-wrap:wrap}#admin .hx .ab{flex:1 1 30%;font-size:12px;padding:8px 4px}
 .fxSkip{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
+.awList{display:flex;flex-direction:column;gap:6px;margin:10px 0}.awRow{display:flex;gap:10px;align-items:center;background:var(--panel2);border-radius:12px;padding:8px 10px;font-size:14px}.awRow span:first-child{font-size:20px}
+#cpsChart{width:100%;height:150px;display:block;margin-top:8px;background:var(--panel2);border-radius:12px}
 .pcard{flex-direction:column;background:var(--panel2);border-radius:12px;padding:10px;margin-top:6px}
 .pstats{font-size:13px}.pstats b{color:var(--gold)}
 .ppets{display:flex;gap:6px;margin-top:6px}.ppets span{font-size:22px;border:2px solid;border-radius:10px;padding:2px 5px;background:var(--panel)}
@@ -644,6 +647,8 @@ body.light .ab:hover{background:#e6e8f2}
   <input type="range" id="vol" min="0" max="1" step="0.05" style="margin-top:8px">
   <label>Numbers</label><button id="sciBtn" class="setb"></button>
   <label>Cutscenes</label><button id="animBtn" class="setb"></button>
+  <label>Sound pack</label><div class="seg" id="packRow"><button data-p="classic">Classic</button><button data-p="8bit">8-bit</button><button data-p="cute">Cute</button><button data-p="meme">Meme</button></div>
+  <label>Notifications</label><button id="notiBtn" class="setb"></button>
   <label>🔇 Muted players</label><div id="setMuted"></div>
   <label>💡 Suggest an idea</label>
   <textarea id="ideaIn" class="tin" maxlength="500" rows="3" placeholder="What should Click Jun add next?" style="width:100%;resize:vertical"></textarea>
@@ -656,6 +661,9 @@ body.light .ab:hover{background:#e6e8f2}
 </dialog>
 <dialog id="stats">
   <h3>📊 Your <span>Stats</span></h3>
+  <label>Coins per second</label>
+  <div class="seg" id="cpsTabs"><button data-s="h" class="on">Last hour</button><button data-s="d">Last day</button></div>
+  <svg id="cpsChart" viewBox="0 0 320 150" preserveAspectRatio="none"></svg>
   <div id="statList"></div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:14px">Close</button></form>
 </dialog>
@@ -1040,7 +1048,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, logoEgg:false, koEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, pack:'classic', logoEgg:false, koEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -1100,7 +1108,15 @@ const liveMult = k => liveOn() && LIVE.kind === k ? LIVE.mult : 1;
 const LIVE_KIND = {coins:'everything', luck:'rare pet odds', gold:'Golden Jun spawns', diamond:'Diamond Jun spawns', goldrain:'Golden Juns raining in', diarain:'Diamond Juns raining in'};
 const hms = ms => { const t = Math.max(0, Math.floor(ms/1000)), h = Math.floor(t/3600), m = Math.floor(t/60) % 60, x = t % 60;
   return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
-let liveSec = -1;
+let liveSec = -1, notified = '';
+// system notification (works while the game is open or in the background; iPhone needs the home-screen app)
+async function notify(title, body){
+  try {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const reg = await navigator.serviceWorker?.getRegistration();
+    if (reg) reg.showNotification(title, {body, icon:'icon-192.png', badge:'icon-192.png'}); else new Notification(title, {body, icon:'icon-192.png'});
+  } catch {}
+}
 function liveTick(){
   const B = $('liveBar'), G = $('liveBig'), next = LIVES.filter(e => e.end > Date.now()).sort((a, b) => a.start - b.start)[0] || null;
   const key = e => e ? `${e.start}|${e.kind}|${e.name}` : '';
@@ -1109,6 +1125,9 @@ function liveTick(){
   if (!LIVE) { B.hidden = true; G.hidden = true; return; }   // event over: the bar goes away
   const on = liveOn(), left = LIVE.start - Date.now(), sec = Math.ceil(left / 1000), rain = LIVE.kind.endsWith('rain');
   const what = rain ? `${LIVE.mult} ${LIVE_KIND[LIVE.kind]}` : `×${LIVE.mult} ${LIVE_KIND[LIVE.kind]}`;
+  const nk = `${LIVE.start}|${LIVE.name}`;   // one alert ~1 minute before, one when it goes live
+  if (!on && left <= 60e3 && notified !== nk + 'soon') { notified = nk + 'soon'; notify(`⏳ ${LIVE.name} starts in 1 minute`, what); }
+  if (on && notified !== nk + 'live' && Date.now() - LIVE.start < 60e3) { notified = nk + 'live'; notify(`🎉 ${LIVE.name} is LIVE!`, what); }
   B.hidden = false; B.classList.toggle('on', on); B.classList.toggle('final', !on && sec <= 10);
   B.textContent = on ? `🎉 ${LIVE.name} · LIVE · ${what} · ends in ${hms(LIVE.end - Date.now())}` : `⏳ ${LIVE.name} starts in ${hms(left)} · ${what}`;
   // final 10 seconds: a giant number in the middle of the screen, one beat per second, red for the last 3
@@ -1417,8 +1436,11 @@ let CUR_DAY = dayId(), CUR_MONTH = monthId();
 const SEASON = 1;   // leaderboard season (Season 1 runs until we decide to start Season 2)
 // sound effects, synthesised with Web Audio (no files). On/off and volume in Settings.
 let AC = null;
+// sound packs: 8-bit = square chiptune, cute = higher + shorter + soft, meme = low, buzzy and wobbly
+const PACKS = {classic:null, '8bit':{type:'square', f:1, d:.8, v:.7}, cute:{type:'sine', f:1.9, d:.6, v:1.1}, meme:{type:'sawtooth', f:.55, d:1.5, v:.8, slide:.5}};
 function tone(f, d, type = 'sine', v = 1, slide = 0){
   if (!S.sound || !S.vol) return;
+  const P = PACKS[S.pack]; if (P) { type = P.type; f *= P.f; d *= P.d; v *= P.v; if (P.slide && !slide) slide = P.slide; }
   try {
     AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume();
     const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
@@ -1447,10 +1469,11 @@ const SFX = {
 // soft swelling note for the choir (slow attack, long fade)
 function pad(f, d, v = 1){
   if (!S.sound || !S.vol) return;
+  const P = PACKS[S.pack]; if (P) f *= P.f;
   try {
     AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume();
     const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
-    o.type = 'sine'; o.frequency.setValueAtTime(f, t);
+    o.type = P ? P.type : 'sine'; o.frequency.setValueAtTime(f, t);
     g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.12*S.vol*v, t + .6); g.gain.exponentialRampToValueAtTime(.0001, t + d);
     o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d);
   } catch {}
@@ -1459,6 +1482,26 @@ const sfx = k => SFX[k] && SFX[k]();
 // live meter: steady income only (clicks, auto clicks, passive), averaged over a few seconds. Lump sums
 // like offline earnings, golden Juns, VC deals and minigame prizes are left out so they don't spike it.
 let liveBucket = 0, liveRate = 0;
+// coins/sec history for the Stats graph: one point every 10s for the last hour, one a minute for the last day (this device only)
+let CPS = {h:[], d:[], th:0, td:0};
+try { const c = JSON.parse(localStorage.getItem('clickjun-cps')); if (c && Array.isArray(c.h) && Array.isArray(c.d)) CPS = c; } catch {}
+function cpsLog(r){
+  const now = Date.now();
+  if (now - CPS.th >= 10e3) { CPS.th = now; CPS.h.push([now, r]); CPS.h = CPS.h.filter(p => now - p[0] < 3600e3); }
+  if (now - CPS.td >= 60e3) { CPS.td = now; CPS.d.push([now, r]); CPS.d = CPS.d.filter(p => now - p[0] < 86400e3);
+    try { localStorage.setItem('clickjun-cps', JSON.stringify(CPS)); } catch {} }
+}
+// log-scale line chart (income grows by orders of magnitude), drawn as inline SVG
+function drawCps(span){
+  const pts = CPS[span].filter(p => p[1] > 0), W = 320, H = 150, el = $('cpsChart');
+  if (pts.length < 2) { el.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="currentColor" opacity=".6" font-size="12">Not enough data yet. Keep playing!</text>`; return; }
+  const t0 = pts[0][0], t1 = pts[pts.length - 1][0], ls = pts.map(p => Math.log10(p[1])), lo = Math.min(...ls), hi = Math.max(...ls) + 1e-9;
+  const X = t => 8 + (t - t0) / (t1 - t0 || 1) * (W - 16), Y = l => H - 20 - (l - lo) / (hi - lo || 1) * (H - 40);
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)} ${Y(ls[i]).toFixed(1)}`).join(' ');
+  el.innerHTML = `<path d="${line} L${X(t1)} ${H - 20} L${X(t0)} ${H - 20} Z" fill="rgba(124,92,255,.18)"/><path d="${line}" fill="none" stroke="#7c5cff" stroke-width="2.5" stroke-linejoin="round"/>
+    <text x="8" y="14" fill="currentColor" font-size="11" opacity=".75">peak ${fmt(10 ** hi)}/s</text><text x="${W - 8}" y="${H - 6}" text-anchor="end" fill="currentColor" font-size="11" opacity=".75">now ${fmt(pts[pts.length - 1][1])}/s</text>
+    <text x="8" y="${H - 6}" fill="currentColor" font-size="11" opacity=".6">${span === 'h' ? '1 hour ago' : '24 hours ago'}</text>`;
+}
 const earnLive = n => { if (n > 0) liveBucket += n*MULT; earn(n); };
 function earn(n){ n *= MULT; if (!(n > 0)) return; if (S.week !== CUR_WEEK) { S.week = CUR_WEEK; S.wcoins = 0; } if (S.day !== CUR_DAY) { S.day = CUR_DAY; S.dcoins = 0; } if (S.month !== CUR_MONTH) { S.month = CUR_MONTH; S.mcoins = 0; } S.dcoins = Math.min(CAP, S.dcoins + n*1); S.mcoins = Math.min(CAP, S.mcoins + n*1); S.wcoins = Math.min(CAP, S.wcoins + n); S.coins = Math.min(CAP, S.coins + n); S.total = Math.min(CAP, S.total + n); S.lifetime = Math.min(CAP, S.lifetime + n); }
 
@@ -2064,7 +2107,7 @@ function tick(now){
   fxStep(dt, now);
   S.playtime += dt;
   if ((liveAcc += dt) >= .5) {   // every half second, blend the newest rate into a ~3s rolling average
-    const r = liveBucket / liveAcc; liveRate = liveRate ? liveRate*.83 + r*.17 : r; liveBucket = 0; liveAcc = 0;
+    const r = liveBucket / liveAcc; liveRate = liveRate ? liveRate*.83 + r*.17 : r; liveBucket = 0; liveAcc = 0; cpsLog(liveRate);
     setText($('live'), `📈 +${fmt(liveRate)}/s right now`);
   }
   if ((wkAcc += dt) > 60) { wkAcc = 0; CUR_WEEK = weekId(); CUR_DAY = dayId(); CUR_MONTH = monthId(); }
@@ -2162,7 +2205,7 @@ function applyState(d, keepCheat = true){
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
-    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true, logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
+    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true, pack:['classic', '8bit', 'cute', 'meme'].includes(d.pack) ? d.pack : 'classic', logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
@@ -2854,9 +2897,25 @@ function offline(ms){
   if (sec < 60) return;
   const n = income() * sec * rate;
   if (n < 1) return;
-  earn(n); save(); refresh();
-  $('awayTxt').innerHTML = `You were gone <b>${dur(sec)}</b>. Jun kept grinding and earned <b style="color:var(--gold)">${fmt(n)}</b> coins` +
-    `.<br><span style="color:var(--dim);font-size:13px">Offline speed ${Math.round(rate*100)}% · up to ${hrs}h away${lv('offline') < 10 ? ' · level up 🌙 Night Shift in the Rebirth Shop for more' : ''}</span>`;
+  earn(n);
+  // the Auto Buyer keeps shopping while you're away (same rules: 1 or 5 every 2s, only upgrades ≤10% of your coins), capped so it stays quick
+  let bought = 0; const per = tsu('auto5') && S.autoBuy2 ? 5 : asu('auto') && S.autoBuy ? 1 : 0;
+  for (let k = 0; per && k < Math.min(sec/2, 400); k++) for (let j = 0; j < per; j++) {
+    let best = null, bc = Infinity;
+    for (const u of UPS) { if (chalBlocked(u)) continue; const c = cost(u, 1); if (c < bc) { bc = c; best = u; } }
+    if (!best || bc > S.coins * .1) { k = 1e9; break; }
+    S.coins -= bc; S.own[best.id] = own(best) + 1; S.bought++; bought++;
+  }
+  const golds = Math.floor(sec / (goldDelay() / 1000)), dias = Math.floor(sec / (diaDelay() / 1000)), vcs = Math.floor(sec / 420);
+  save(); refresh(); renderShop();
+  const row = (ic, t) => `<div class="awRow"><span>${ic}</span><span>${t}</span></div>`;
+  $('awayTxt').innerHTML = `<div style="font-size:15px">You were gone <b>${dur(sec)}</b>.</div><div class="awList">` +
+    row('🪙', `Earned <b style="color:var(--gold)">${fmt(n)}</b> coins`) +
+    (bought ? row('🤖', `Auto Buyer bought <b>${fmt(bought)}</b> upgrade${bought === 1 ? '' : 's'}`) : '') +
+    (golds ? row('✨', `Missed about <b>${golds}</b> Golden Jun${golds === 1 ? '' : 's'}`) : '') +
+    (dias ? row('💎', `Missed about <b>${dias}</b> Diamond Jun${dias === 1 ? '' : 's'}`) : '') +
+    (vcs ? row('💼', `Missed about <b>${vcs}</b> VC offer${vcs === 1 ? '' : 's'}`) : '') +
+    `</div><div style="color:var(--dim);font-size:13px">Offline speed ${Math.round(rate*100)}% · up to ${hrs}h away${lv('offline') < 10 ? ' · level up 🌙 Night Shift in the Rebirth Shop for more' : ''}</div>`;
   if (!$('away').open) $('away').showModal();
 }
 let hiddenAt = 0;
@@ -3333,6 +3392,9 @@ function renderSettings(){
     row.querySelector('button').onclick = () => { S.muted = S.muted.filter(x => x !== n); save(); renderSettings(); };
     M.appendChild(row);
   }
+  const np = 'Notification' in window ? Notification.permission : 'unsupported';
+  $('notiBtn').textContent = np === 'granted' ? '🔔 Live event alerts: on' : np === 'denied' ? '🔕 Alerts blocked (allow them in your phone/browser settings)' : np === 'unsupported' ? '🔕 Alerts need the home-screen app (iPhone: Share → Add to Home Screen)' : '🔔 Turn on live event alerts';
+  document.querySelectorAll('#packRow button').forEach(b => b.classList.toggle('on', b.dataset.p === (S.pack || 'classic')));
   $('animBtn').textContent = S.skipAnim ? '⏭ Cutscenes & big effects: skipped' : '🎬 Cutscenes & big effects: on';
 }
 $('setBtn').onclick = () => { renderSettings(); $('modBtn').hidden = !window.permaAdmin; $('ideaMsg').textContent = ''; $('dispMsg').textContent = ''; $('settings').showModal(); };
@@ -3344,6 +3406,8 @@ $('muteBtn').onclick = e => { e.stopPropagation(); setSound(!S.sound); };
 addEventListener('keydown', e => { if ((e.key === 'm' || e.key === 'M') && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && !e.metaKey && !e.ctrlKey && $('hang').style.display !== 'flex') setSound(!S.sound); });   // not while Jun-Man takes letters
 $('vol').oninput = e => { S.vol = +e.target.value; save(); };
 $('vol').onchange = () => sfx('coin');
+$('notiBtn').onclick = async () => { if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission(); renderSettings(); if (Notification?.permission === 'granted') notify('🔔 Alerts on', "You'll get a heads-up when a live event is about to start"); };
+document.querySelectorAll('#packRow button').forEach(b => b.onclick = () => { S.pack = b.dataset.p; save(); renderSettings(); sfx('gold'); });
 $('animBtn').onclick = () => { S.skipAnim = !S.skipAnim; save(); renderSettings(); };
 $('skipScene').onclick = () => { const E = $('ending'); E.hidden = true; E.innerHTML = ''; E.style.background = ''; };
 $('sciBtn').onclick = () => { S.sci = !S.sci; save(); renderSettings(); refresh(); renderShop(); };
@@ -3353,6 +3417,7 @@ $('dispSave').onclick = () => {
 };
 
 // --- stats ---
+$('cpsTabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; for (const x of $('cpsTabs').children) x.classList.toggle('on', x === b); drawCps(b.dataset.s); };
 $('statBtn').onclick = () => {
   const rows = [['Lifetime coins', fmt(S.lifetime)], ['Coins this week', fmt(S.wcoins)], ['Coins this run', fmt(S.total)], ['Time played', dur(S.playtime)],
     ['Jun clicks', fmt(S.clicks)], ['Biggest single click', fmt(S.bigClick)], ['Best combo', S.maxCombo.toFixed(1) + '×'],
@@ -3363,6 +3428,7 @@ $('statBtn').onclick = () => {
     ['Daily streak', `${S.daily.streak} day${S.daily.streak === 1 ? '' : 's'}`], ['Playing since', new Date(S.started).toLocaleDateString()]];
   $('statList').innerHTML = '';
   for (const [k, v] of rows) for (const t of [k, String(v)]) $('statList').appendChild(Object.assign(document.createElement('span'), {textContent:t}));
+  drawCps(document.querySelector('#cpsTabs .on').dataset.s);
   $('stats').showModal();
 };
 
@@ -3511,7 +3577,7 @@ setTimeout(() => { if (dailyState().can && !document.querySelector('dialog[open]
 // --- accounts: a local save belongs to the account it was synced with ---
 function resetLocal(){
   // daily is kept too, so signing out doesn't re-offer (or let you re-claim) today's reward
-  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx,  skipAnim:S.skipAnim, daily:{...S.daily}, quests:JSON.parse(JSON.stringify(S.quests))};
+  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx, pack:S.pack,  skipAnim:S.skipAnim, daily:{...S.daily}, quests:JSON.parse(JSON.stringify(S.quests))};
   S = {...DEF(), ...keep, started:Date.now()}; shown = 0;
   recalcResearch(); applyPerks(); applyCos(); applyXmas(); applyAppearance(); applyBuy(); renderAch(); renderPets(); renderShop(); renderDaily(); refresh(); save();
 }
