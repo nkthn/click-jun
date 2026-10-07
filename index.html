@@ -1007,6 +1007,7 @@ const ACH = [
   ['asc1', '✨', 'Ascended', 'Ascend once', () => S.asc >= 1],
   ['asc5', '🌟', 'Ascension Addict', 'Ascend 5 times', () => S.asc >= 5],
   ['egg', '🥚', 'Theme Hopper', 'Find a secret (hint: someone can\'t decide on a theme)', () => S.rainbow],
+  ['logoegg', '🙅', 'Don\'t Touch The Logo', 'Find a secret (hint: Jun is watching from the corner)', () => S.logoEgg],
   ['inf', '♾️', 'To Infinity', 'Reach ∞ coins and see the true ending', () => S.trueEnd],
   ['candy', '🎃', 'Trick or Treat', 'Catch a Halloween pumpkin', () => S.candy >= 1],
   ['night', '🦉', 'Past Your Bedtime', 'Play between 2 and 4 AM', () => [2, 3].includes(new Date().getHours())],
@@ -1037,7 +1038,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, logoEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -2159,7 +2160,7 @@ function applyState(d, keepCheat = true){
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
-    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true,
+    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true, logoEgg:d.logoEgg === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
@@ -3619,6 +3620,35 @@ function renderQuests(){
 }
 renderQuests();
 $('logoJun').src = $('jun').src; $('logoJun').style.clipPath = getComputedStyle($('jun')).clipPath;
+// easter egg: tap the little Jun in the logo and the big Jun shakes his head at you, then jumps
+let logoBusy = false;
+$('logoJun').style.cursor = 'pointer';
+$('logoJun').onclick = () => {
+  if (logoBusy) return; logoBusy = true;
+  $('logoJun').animate([{transform:'rotate(0)'}, {transform:'rotate(-25deg)'}, {transform:'rotate(25deg)'}, {transform:'rotate(0)'}], {duration:300});
+  const F = document.createElement('div'); F.className = 'fxLayer'; F.style.background = 'rgba(8,9,16,.7)'; document.body.appendChild(F);
+  const wrap = document.createElement('div'); wrap.style.cssText = 'position:relative;text-align:center';
+  const head = Object.assign(document.createElement('img'), {src:$('jun').src, alt:''}); head.style.cssText = `width:min(48vmin,260px);clip-path:${getComputedStyle($('jun')).clipPath};display:block;margin:0 auto`;
+  const say = document.createElement('div'); say.style.cssText = "font:700 clamp(20px,5vw,30px) 'Fredoka',sans-serif;color:#fff;margin-top:14px;opacity:0;text-shadow:0 3px 10px #000";
+  say.textContent = ['nuh uh. 🙅', "don't touch the logo.", 'that tickles. stop.', 'bro. the LOGO??'][Math.random()*4|0];
+  const shadow = document.createElement('div'); shadow.style.cssText = 'width:55%;height:16px;margin:6px auto 0;border-radius:50%;background:rgba(0,0,0,.45);filter:blur(4px)';
+  wrap.append(head, shadow, say); F.appendChild(wrap);
+  head.animate([{transform:'scale(0) rotate(-20deg)'}, {transform:'scale(1.1)'}, {transform:'scale(1)'}], {duration:450, easing:'ease-out'});
+  // the head shake: no, no, no
+  setTimeout(() => { sfx('error'); say.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'translateY(0)'}], {duration:300, fill:'forwards'});
+    head.animate([0, -18, 18, -16, 16, -12, 12, -6, 0].map(d => ({transform:`rotate(${d}deg) translateX(${d*.6}px)`})), {duration:1100, easing:'ease-in-out'}); }, 500);
+  // then the jump: squash, launch, land, little bounce
+  setTimeout(() => { sfx('buy');
+    head.animate([{transform:'translateY(0) scale(1,1)'}, {transform:'translateY(0) scale(1.15,.85)', offset:.15}, {transform:'translateY(-42vmin) scale(.92,1.1)', offset:.5},
+      {transform:'translateY(0) scale(1.18,.82)', offset:.8}, {transform:'translateY(-4vmin) scale(1)', offset:.9}, {transform:'translateY(0) scale(1)'}], {duration:1100, easing:'ease-in-out'});
+    shadow.animate([{transform:'scale(1)', opacity:1}, {transform:'scale(.4)', opacity:.3, offset:.5}, {transform:'scale(1)', opacity:1}], {duration:1100}); }, 1700);
+  const done = () => { F.remove(); logoBusy = false; };
+  setTimeout(() => {
+    if (!S.logoEgg) { S.logoEgg = true; save(); checkAch(); confetti(90); }
+    F.animate([{opacity:1}, {opacity:0}], {duration:350}).onfinish = done;
+  }, 3100);
+  F.onclick = () => {};   // let the scene play out (it's short)
+};
 document.documentElement.style.setProperty('--jclip', getComputedStyle($('jun')).clipPath);   // chat avatars reuse Jun's head outline
 applyPerks(); renderAch(); renderPets();
 if (!S.rebTotal) S.rebTotal = S.asc*MAXR + S.rebirths;   // all-time rebirths (never resets) for the Rebirths leaderboard
