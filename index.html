@@ -557,6 +557,7 @@ body.light .ab:hover{background:#e6e8f2}
     <button id="ascBtn" hidden>✨ Ascend</button>
     <div id="ascLine" hidden></div>
     <button class="ab" id="ashopBtn" hidden style="width:100%;margin-top:8px">✨ Ascension Shop · <span id="apBal">0</span> ✨</button>
+    <button class="ab" id="tshopBtn" hidden style="width:100%;margin-top:8px">🌠 Transcendence Shop · <span id="tpBal">0</span> 🌠</button>
     <div id="rbNext"></div>
     <button class="ab" id="shopBtn" style="width:100%;margin-top:10px">🛒 Rebirth Shop · <span id="hcBal">0</span> 💈 tokens</button>
   </div>
@@ -799,6 +800,13 @@ body.light .ab:hover{background:#e6e8f2}
   <div class="dimtxt" style="font-size:11px">Winnings go to your coins but don't count toward the leaderboard or rebirths.</div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:10px">Close</button></form>
 </dialog>
+<dialog id="tshop">
+  <h3>🌠 Transcendence <span>Shop</span></h3>
+  <div class="bal">You have <b id="tpBig">0</b> 🌠 Transcend points</div>
+  <div class="dimtxt" style="margin-top:4px">Permanent upgrades. You earn 1 🌠 every time you Transcend.</div>
+  <div id="tList" style="margin-top:12px"></div>
+  <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
+</dialog>
 <dialog id="ashop">
   <h3>✨ Ascension <span>Shop</span></h3>
   <div class="bal">You have <b id="apBig">0</b> ✨ Ascension points</div>
@@ -843,7 +851,7 @@ body.light .ab:hover{background:#e6e8f2}
   <label>🔓 God mode</label>
   <button class="ab" id="aAll" style="width:100%;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);color:#111;font-weight:800">🔓 UNLOCK EVERYTHING</button>
   <label>Currencies</label>
-  <div class="row hx"><button class="ab" data-cur="hc:100">+100 💈</button><button class="ab" data-cur="hc:10000">+10K 💈</button><button class="ab" data-cur="ap:10">+10 ✨</button><button class="ab" data-cur="rebirths:10">+10 🔁</button><button class="ab" data-cur="rebirths:300">+300 🔁</button>
+  <div class="row hx"><button class="ab" data-cur="hc:100">+100 💈</button><button class="ab" data-cur="hc:10000">+10K 💈</button><button class="ab" data-cur="ap:10">+10 ✨</button><button class="ab" data-cur="tp:5">+5 🌠 pts</button><button class="ab" data-cur="rebirths:10">+10 🔁</button><button class="ab" data-cur="rebirths:300">+300 🔁</button>
     <button class="ab" data-cur="asc:1">+1 Ascension</button><button class="ab" data-cur="asc:10">+10 Ascensions</button><button class="ab" data-cur="tr:1">+1 🌠</button><button class="ab" data-cur="apo:1">+1 🔆</button><button class="ab" data-cur="sing:1">+1 🕳️</button><button class="ab" data-cur="omni:1">+1 🌌</button></div>
   <label>Instant</label>
   <div class="row hx"><button class="ab" id="aUps100">+100 every upgrade</button><button class="ab" id="aRes">All research</button><button class="ab" id="aPerks">Max perks</button><button class="ab" id="aAsh">All Ascension Shop</button>
@@ -1029,7 +1037,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -1041,6 +1049,7 @@ if (saved) {
   if (!('ap' in saved)) S.ap = S.asc || 0;                            // ✨ points for players who ascended before the shop existed
   if (!('hc' in saved)) S.hc = S.bp;                                    // tokens for players who rebirthed before the shop existed
   if (S.perks && S.perks.maxbuy) { S.hc += 5; delete S.perks.maxbuy; }
+  if (saved.tp === undefined) S.tp = S.tr || 0;   // 🌠 points for Transcends done before the shop existed
   if (S.perks && S.perks.keep) { S.hc += keepRefund(S.perks.keep); delete S.perks.keep; }
   if (S.aup && (S.aup.rich || S.aup.keep)) { S.ap = (S.ap || 0) + (S.aup.rich ? 1 : 0) + (S.aup.keep ? 2 : 0); delete S.aup.rich; delete S.aup.keep; }  // MAX buy is free now: refund Bulk Buyer
   if (!('theme' in saved)) S.theme = saved.xmas === false ? 'none' : 'xmas';
@@ -1245,6 +1254,11 @@ const AUP = [
   {id:'auto',   ic:'🤖', nm:'Auto Buyer',    ds:'Buys the cheapest upgrade every 2 seconds, only if it costs 10% of your coins or less (switch it off here)', cost:10},
 ];
 const asu = id => !!S.aup[id];
+// Transcendence Shop: bought with 🌠 (1 per Transcend)
+const TUP = [
+  {id:'auto5', ic:'🤖', nm:'Auto Buyer+', ds:'5× Auto Buyer: buys 5 upgrades every 2 seconds, each only if it costs 10% of your coins or less (switch it off here)', cost:2},
+];
+const tsu = id => !!S.tup[id];
 const aupRefund = a => (a?.rich ? 1 : 0) + (a?.keep ? 2 : 0);   // Trust Fund and Rainy Day Fund were removed
 
 // prestige layers above Ascension. Each one resets everything below it (coins, upgrades, research, rebirths, tokens,
@@ -1507,6 +1521,7 @@ function refresh(){
   $('ascLine').hidden = !S.asc && !capped;
   $('ascLine').textContent = `✨ Ascensions: ${S.asc} · ×${fmt(3 ** S.asc)} everything · next Ascension needs ${ascNeed()} rebirths`;
   $('ashopBtn').hidden = !S.asc && !S.ap; setText($('apBal'), String(S.ap));
+  $('tshopBtn').hidden = !S.tr && !S.tp; setText($('tpBal'), String(S.tp));
   $('rbBtn').disabled = g < 1 || capped || !!S.chal;
   $('rbBtn').textContent = S.chal ? '⚔️ Finish or abandon your challenge to rebirth' : capped ? '👑 You beat Click Jun! Ascend to climb again' : g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
   setText($('hcBal'), String(S.hc));
@@ -1694,6 +1709,7 @@ function doLayer(i){
   const lower = ['Ascensions', ...LAYERS.slice(0, i).map(x => x.pl)].join(', ');
   if (!confirm(`${L.ic} ${L.nm}? This resets coins, upgrades, research, rebirths, tokens, perks and your ${lower}.\n\nYou keep lifetime coins, pets, achievements, cosmetics, bosses, challenges and the Ascension Shop, and gain ×${fmt(L.x)} to everything (stacks every time). Rebirth costs scale with it, so climbs stay the same length.`)) return;
   const zero = Object.fromEntries(LAYERS.slice(0, i).map(x => [x.k, 0]));
+  if (L.k === 'tr') S.tp += 1;
   Object.assign(S, zero, {[L.k]:S[L.k] + 1, coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:{}, beaten:false, asc:0});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
   playLayerScene(i);
@@ -2058,7 +2074,7 @@ function tick(now){
   earnLive(perSec()*dt);
   autoClick(dt);
   if ((acc += dt) > .2) { acc = 0; refresh(); renderResearch(); }
-  if ((achAcc += dt) > 1) { achAcc = 0; chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if (asu('auto') && S.autoBuy) autoBuyer(); }
+  if ((achAcc += dt) > 1) { achAcc = 0; chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if ((asu('auto') && S.autoBuy) || (tsu('auto5') && S.autoBuy2)) autoBuyer(); }
   requestAnimationFrame(tick);
 }
 setInterval(save, 5000);
@@ -2151,7 +2167,8 @@ function applyState(d, keepCheat = true){
     muted:Array.isArray(d.muted) ? d.muted.filter(n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n)).slice(-100) : [],
     eggs:Object.fromEntries(EGGS.map(e => [e.id, int(d.eggs?.[e.id] ?? (e.id === 'basic' ? d.hatches : 0))])),
     guild:typeof d.guild === 'string' && /^[A-Z0-9]{6}$/.test(d.guild) ? d.guild : '',
-    tr:int(d.tr), apo:int(d.apo), sing:int(d.sing), omni:int(d.omni),
+    tr:int(d.tr), apo:int(d.apo), sing:int(d.sing), omni:int(d.omni), tp:d.tp === undefined ? int(d.tr) : int(d.tp),
+    tup:Object.fromEntries(TUP.filter(a => d.tup && d.tup[a.id] === true).map(a => [a.id, true])), autoBuy2:d.autoBuy2 !== false,
     chal:d.chal && CHALS.some(c => c.id === d.chal.id) && num(d.chal.goal) > 0 ? {id:d.chal.id, goal:num(d.chal.goal), start:num(d.chal.start) || Date.now(), main:d.chal.main ? {coins:num(d.chal.main.coins), total:num(d.chal.main.total),
       own:Object.fromEntries(UPS.filter(u => d.chal.main.own?.[u.id]).map(u => [u.id, int(d.chal.main.own[u.id])])), research:Object.fromEntries(RES.filter(r => d.chal.main.research?.[r.id] === true).map(r => [r.id, true]))} : null} : null,
     chalDone:Object.fromEntries(CHALS.filter(c => d.chalDone && d.chalDone[c.id] === true).map(c => [c.id, true])),
@@ -2196,7 +2213,7 @@ const hax = {
   ups:() => UPS.forEach(u => S.own[u.id] = own(u) + 100),
   res:() => RES.forEach(r => S.research[r.id] = true),
   perks:() => PERKS.forEach(k => S.perks[k.id] = k.max || 50),
-  ash:() => { if (!S.aup.auto) S.autoBuy = false; AUP.forEach(a => S.aup[a.id] = true); },   // a granted Auto Buyer starts switched off
+  ash:() => { if (!S.aup.auto) S.autoBuy = false; AUP.forEach(a => S.aup[a.id] = true); if (!S.tup.auto5) S.autoBuy2 = false; TUP.forEach(a => S.tup[a.id] = true); },   // a granted Auto Buyer starts switched off
   pets:() => { PETS.forEach(q => S.pets[q.id] = PET_MAX); S.equip = ['blackhole', 'orca', 'dodo', 'tiger'].slice(0, PET_SLOTS); },
   cos:() => { for (const t in COS) for (const c of COS[t]) S.cos.owned[t + ':' + c.id] = true; S.allCos = true; },
   boss:() => S.boss = BOSSES.length,
@@ -3040,7 +3057,7 @@ function vcShow(msg){
 function vcEnd(msg){ $('vc').close(); toast(msg); vcSchedule(); }
 $('vcPing').onclick = () => {
   $('vcPing').hidden = true;
-  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(income()*600, perClick()*1000, rbReq(S.rebirths)*.02, 1000) * frenzy() * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});   // scales with progress: ≥2% of your next rebirth
+  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(income()*300, perClick()*500, Math.min(rbReq(S.rebirths)*.02, S.total*.05), 1000) * frenzy() * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});   // scales with progress: up to 2% of your next rebirth, but never more than 5% of what you've earned this run
   $('vcName').textContent = '💼 ' + VC.name;
   vcShow('We love what you\'re doing with the forehead. Here\'s our offer:');
   $('vc').showModal();
@@ -3514,14 +3531,37 @@ function renderAshop(){
   }
 }
 $('ashopBtn').onclick = () => { renderAshop(); $('ashop').showModal(); };
+function renderTshop(){
+  $('tpBig').textContent = fmt(S.tp); $('tList').innerHTML = '';
+  for (const a of TUP) {
+    const has = tsu(a.id), b = document.createElement('button');
+    b.className = 'up perk' + (has ? ' owned' : '');
+    b.innerHTML = `<div class="ic">${a.ic}</div><div style="flex:1;min-width:0"><div class="nm"></div><div class="ds"></div><div class="ct"></div></div>`;
+    b.querySelector('.nm').textContent = a.nm; b.querySelector('.ds').textContent = a.ds;
+    b.querySelector('.ct').textContent = has ? (S.autoBuy2 ? 'Owned ✓ · ON (tap to turn off)' : 'Owned ✓ · OFF (tap to turn on)') : `🌠 ${a.cost}`;
+    b.disabled = !has && S.tp < a.cost;
+    b.onclick = () => {
+      if (has) { S.autoBuy2 = !S.autoBuy2; save(); return renderTshop(); }
+      if (S.tp < a.cost) return;
+      S.tp -= a.cost; S.tup[a.id] = true; S.autoBuy2 = true; sfx('buy'); toast(`${a.ic} ${a.nm} unlocked forever!`); save(); renderTshop(); refresh();
+    };
+    $('tList').appendChild(b);
+  }
+}
+$('tshopBtn').onclick = () => { renderTshop(); $('tshop').showModal(); };
 // Auto Buyer: every 2 seconds, buys the single cheapest upgrade, but only if it costs ≤10% of your coins (never drains the bank)
 let abTick = 0;
 function autoBuyer(){
   if (++abTick % 2) return;
-  let best = null, bc = Infinity;
-  for (const u of UPS) { if (chalBlocked(u)) continue; const c = cost(u, 1); if (c < bc) { bc = c; best = u; } }
-  if (!best || bc > S.coins * .1) return;
-  S.coins -= bc; S.own[best.id] = own(best) + 1; S.bought++; refresh();
+  const n = tsu('auto5') && S.autoBuy2 ? 5 : asu('auto') && S.autoBuy ? 1 : 0;   // Auto Buyer+ (Transcendence Shop) = 5 at a time
+  let bought = 0;
+  while (bought < n) {
+    let best = null, bc = Infinity;
+    for (const u of UPS) { if (chalBlocked(u)) continue; const c = cost(u, 1); if (c < bc) { bc = c; best = u; } }
+    if (!best || bc > S.coins * .1) break;
+    S.coins -= bc; S.own[best.id] = own(best) + 1; S.bought++; bought++;
+  }
+  if (bought) refresh();
 }
 // --- daily quests ---
 // everyone gets the same 3 quests on a given day (seeded by the date); targets for coin quests scale with your income
