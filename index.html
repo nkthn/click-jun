@@ -128,22 +128,43 @@ h2.shut::after{transform:rotate(-90deg)}
 body.xmas #pac{background:#07110c}
 #pc{width:100%;height:100%;display:block;touch-action:none}
 #pclose{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;cursor:pointer}
-#ghouse{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:#0b0d12}
+#ghouse{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:#0b0d12;user-select:none;-webkit-user-select:none}
 #ghouse[hidden]{display:none}
-#ghTop{display:flex;gap:10px;align-items:center;padding:10px 14px;background:rgba(0,0,0,.4)}#ghTop b{font:600 18px 'Fredoka',sans-serif}#ghTop span{flex:1}
-#ghScene{position:relative;flex:1;overflow:hidden;cursor:pointer;background:radial-gradient(ellipse at 50% 35%,#3f8f4f,#1f5a2e 70%,#143d20);touch-action:manipulation}
-#ghScene.stone{background:repeating-conic-gradient(#6b6f7a 0 25%,#5c606a 0 50%) 0 0/48px 48px}
-#ghScene.gold{background:radial-gradient(ellipse at 50% 35%,#ffe08a,#c8961a 70%,#7a5200)}
-#ghScene.rainbow{background:linear-gradient(135deg,#ff5c7a,#ffcf4a,#57cc99,#4cc9f0,#c77dff)}
-.ghd{position:absolute;transform:translate(-50%,-100%);line-height:1;pointer-events:none;filter:drop-shadow(0 6px 6px rgba(0,0,0,.35))}
-.gav{position:absolute;transform:translate(-50%,-100%);transition:left 1.2s linear,top 1.2s linear;text-align:center;pointer-events:none;z-index:2}
-.gav .gf{position:relative;width:52px;height:52px;margin:0 auto}.gav .gf img{width:52px;height:52px;clip-path:var(--jclip)}
-.gav .gf b{position:absolute;left:50%;top:-20px;transform:translateX(-50%);font-size:28px}
+#ghTop{display:flex;gap:8px;align-items:center;padding:10px 14px;background:rgba(0,0,0,.45);z-index:3}#ghTop b{font:600 18px 'Fredoka',sans-serif}#ghTop span{flex:1}
+/* the yard: textured grass, brick back wall, wooden fence, stone path to the hall */
+#ghScene{position:relative;flex:1;overflow:hidden;cursor:crosshair;touch-action:none;
+  background:radial-gradient(circle at 25% 35%,rgba(255,255,255,.07) 0 1.5px,transparent 2.5px) 0 0/18px 18px,
+    radial-gradient(circle at 70% 70%,rgba(0,40,0,.14) 0 2px,transparent 3px) 0 0/26px 26px,
+    radial-gradient(ellipse at 50% 40%,#69b860,#3f8a3d 75%,#2e6e2f)}
+#ghScene.stone{background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/24px 24px,repeating-conic-gradient(#757a86 0 25%,#686c77 0 50%) 0 0/56px 56px}
+#ghScene.gold{background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.25) 0 1.5px,transparent 2.5px) 0 0/16px 16px,radial-gradient(ellipse at 50% 40%,#ffe596,#d7a326 70%,#8a5d00)}
+#ghScene.rainbow{background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.2) 0 2px,transparent 3px) 0 0/20px 20px,linear-gradient(135deg,#ff7a8f,#ffd56b,#6fd8a5,#6fd2f2,#cf95ff)}
+#ghWall{position:absolute;left:0;right:0;top:0;height:11%;z-index:1;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 2px,transparent 2px 22px),repeating-linear-gradient(90deg,#9b4a32 0 44px,#8a3f2a 44px 46px),#9b4a32;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+#ghWall::after{content:'';position:absolute;left:0;right:0;bottom:-6px;height:6px;background:#5a2a1c}
+#ghFence{position:absolute;inset:11% 0 0 0;pointer-events:none;z-index:1;border:12px solid transparent;border-top:0;
+  border-image:repeating-linear-gradient(90deg,#8a5a2f 0 14px,#6d4422 14px 16px) 12;box-shadow:inset 0 0 0 2px rgba(0,0,0,.2)}
+#ghPath{position:absolute;left:50%;top:22%;bottom:0;width:13%;transform:translateX(-50%);border-radius:20px 20px 0 0;
+  background:radial-gradient(ellipse at 50% 50%,rgba(255,255,255,.12) 0 30%,transparent 32%) 0 0/34px 26px,repeating-linear-gradient(0deg,#b8ad97 0 24px,#a69a82 24px 26px);opacity:.9;box-shadow:inset 0 0 12px rgba(0,0,0,.25)}
+.ghd{position:absolute;transform:translate(-50%,-100%);line-height:1;pointer-events:none;filter:drop-shadow(0 4px 2px rgba(0,0,0,.35))}
+.ghd::after,.gav::after{content:'';position:absolute;left:50%;bottom:-6px;width:70%;height:10px;transform:translateX(-50%);border-radius:50%;background:rgba(0,0,0,.28);z-index:-1}
+.gav{position:absolute;transform:translate(-50%,-100%);transition:left .95s linear,top .95s linear;text-align:center;pointer-events:none}
+.gav.me{transition:none}
+.gav .gf{position:relative;width:50px;height:50px;margin:0 auto}.gav .gf img{width:50px;height:50px;clip-path:var(--jclip)}
+.gav .gf b{position:absolute;left:50%;top:-19px;transform:translateX(-50%);font-size:26px}
 .gav .gn{font:800 12px 'Nunito',sans-serif;color:#fff;text-shadow:0 1px 3px #000;white-space:nowrap;margin-top:2px}
 .gav.me .gn::after{content:' (you)';opacity:.7}
-.gav .bub{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-26px);background:#fff;color:#111;border-radius:12px;padding:6px 10px;font:700 13px 'Nunito',sans-serif;max-width:200px;width:max-content;box-shadow:0 4px 10px rgba(0,0,0,.3)}
-#ghBar{display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.4)}#ghBar input{flex:1}
-#ghPanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);max-height:80vh;overflow-y:auto;background:var(--panel);border-radius:22px;padding:18px;z-index:5;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.gav.walk .gf{animation:ghbob .32s ease-in-out infinite}
+@keyframes ghbob{50%{transform:translateY(-4px) rotate(3deg)}}
+.gav .bub{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-24px);background:#fff;color:#111;border-radius:12px;padding:6px 10px;font:700 13px 'Nunito',sans-serif;max-width:200px;width:max-content;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.gav .emo{position:absolute;left:100%;top:-6px;font-size:26px}
+#ghJoy{position:absolute;left:18px;bottom:18px;width:118px;height:118px;border-radius:50%;background:rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.35);z-index:4;touch-action:none}
+#ghJoy i{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 3px 8px rgba(0,0,0,.35)}
+#ghEmotes{position:absolute;right:12px;bottom:14px;display:flex;flex-direction:column;gap:6px;z-index:4}
+#ghEmotes button{width:46px;height:46px;border-radius:50%;border:0;background:rgba(0,0,0,.4);font-size:22px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+#ghEmotes button:active{transform:translateY(2px)}
+#ghHint{position:absolute;left:50%;bottom:150px;transform:translateX(-50%);z-index:4;background:rgba(0,0,0,.45);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;pointer-events:none}
+#ghBar{display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.45)}#ghBar input{flex:1}
+#ghPanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);max-height:80vh;overflow-y:auto;background:var(--panel);border-radius:22px;padding:18px;z-index:6;box-shadow:0 24px 70px rgba(0,0,0,.6)}
 #ghPanel[hidden]{display:none}
 .hall{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}.hall .hi{font-size:28px}.hall .ht{flex:1;min-width:0}.hall .hn{font-weight:800}
 #boss{position:absolute;inset:0;z-index:10;display:none;flex-direction:column;align-items:center;padding:60px 20px 20px;background:radial-gradient(circle at 50% 45%,#3a1020,#0b0d12 70%);user-select:none;-webkit-user-select:none;touch-action:manipulation}
@@ -547,7 +568,11 @@ body.light .ab:hover{background:#e6e8f2}
     <div id="dpad"><span></span><button data-d="0,-1">▲</button><span></span><button data-d="-1,0">◀</button><span></span><button data-d="1,0">▶</button><span></span><button data-d="0,1">▼</button></div><button id="pclose">✕ Back to clicking</button></div>
   <div id="ghouse" hidden>
   <div id="ghTop"><b id="ghName"></b><span id="ghOnline" class="dimtxt"></span><button class="ab" id="ghHall">🏛️ Town Hall</button><button class="ab" id="ghClose">✕</button></div>
-  <div id="ghScene"><div id="ghDeco"></div><div id="ghPeople"></div></div>
+  <div id="ghScene"><div id="ghWall"></div><div id="ghPath"></div><div id="ghFence"></div><div id="ghDeco"></div><div id="ghPeople"></div>
+    <div id="ghHint">Move with the joystick, WASD / arrow keys, or tap where to go</div>
+    <div id="ghJoy"><i></i></div>
+    <div id="ghEmotes"><button data-e="dance" title="Dance">💃</button><button data-e="spin" title="Spin">🕺</button><button data-e="flip" title="Flip">🤸</button><button data-e="wave" title="Wave">👋</button><button data-e="laugh" title="Laugh">😂</button></div>
+  </div>
   <div id="ghBar"><input id="ghSay" class="tin" maxlength="200" placeholder="Say something to your guild…" autocomplete="off"><button class="ab" id="ghSend">Say</button></div>
   <div id="ghPanel" hidden><h3>🏛️ Town <span>Hall</span></h3><div class="dimtxt">Upgrades are shared by the whole guild. Whoever buys one pays with their own coins, rebirths or Ascensions.</div><div id="ghList"></div><button class="ab" id="ghPanelClose" style="width:100%;margin-top:10px">Close</button></div>
 </div>
@@ -4367,22 +4392,43 @@ if (FIREBASE) {
   $('gJoin').onclick = () => joinGuild($('gCode').value);
   $('gCopy').onclick = () => { navigator.clipboard?.writeText(S.guild).then(() => toast('Invite code copied!'), () => {}); };
   $('gChat').onclick = () => { $('guild').close(); window.openChat?.('guild'); };
-  // ---------- Guild House: guilds/{gid}/presence/{name} = {x, y, ts, hat, acc, color, display}. Tap to walk; one write per move ----------
-  let ghUnsub = [], ghMe = null, ghBeat = 0, ghPeople = {}, ghGid = '';
+  // ---------- Guild House: guilds/{gid}/presence/{name} = {x, y, ts, hat, color, display, emote, emoteAt}
+  // You move locally at 60fps (joystick / keys / tap-to-walk) with collisions; your position is shared ~once a second and
+  // others glide between updates. Dances are shared the same way.
+  let ghUnsub = [], ghMe = null, ghBeat = 0, ghPeople = {}, ghGid = '', ghCol = [], ghRaf = 0, ghLastW = 0, ghDirty = false, ghTarget = null, ghEmoSeen = {};
+  const ghKeys = new Set(), ghJoyV = {x:0, y:0}, ghKey = () => me() || 'you';   // 'you' only in the signed-out preview
   const ghPres = () => doc(db, 'guilds', ghGid, 'presence', me());
-  const ghWrite = () => setDoc(ghPres(), {...ghMe, ts:Date.now(), hat:S.cos.hat, acc:S.cos.acc, color:S.cos.color, display:S.display}).catch(() => {});
+  const ghWrite = extra => { ghLastW = Date.now(); ghDirty = false; if (!ghGid || !user) return;
+    return setDoc(ghPres(), {x:+ghMe.x.toFixed(2), y:+ghMe.y.toFixed(2), ts:Date.now(), hat:S.cos.hat, color:S.cos.color, display:S.display, ...(extra || {})}, {merge:true}).catch(() => {}); };
   function ghAvatar(n, p){
     if (!n) return null;
     let a = ghPeople[n];
     if (!a) {
-      a = document.createElement('div'); a.className = 'gav' + (n === me() ? ' me' : '');
+      a = document.createElement('div'); a.className = 'gav' + (n === ghKey() ? ' me' : '');
       a.innerHTML = '<div class="gf"><img alt=""></div><div class="gn"></div>'; a.querySelector('img').src = $('jun').src;
       $('ghPeople').appendChild(a); ghPeople[n] = a;
     }
     const hat = cosItem('hat', p.hat), f = a.querySelector('.gf'); f.querySelector('b')?.remove(); if (hat) f.appendChild(Object.assign(document.createElement('b'), {textContent:hat.ic}));
     const nm = a.querySelector('.gn'); nm.textContent = cleanName(p.display) || n; const c = nameColor(p.color); nm.style.color = c && c !== 'rainbow' ? c : '#fff';
-    a.style.left = Math.min(96, Math.max(4, +p.x || 50)) + '%'; a.style.top = Math.min(96, Math.max(12, +p.y || 70)) + '%';
+    if (n !== ghKey() || !ghMe) ghPlace(a, +p.x || 50, +p.y || 70);
+    if (n !== me() && p.emote && +p.emoteAt > (ghEmoSeen[n] || 0)) { ghEmoSeen[n] = +p.emoteAt; if (Date.now() - p.emoteAt < 10e3) ghEmote(n, p.emote); }
     return a;
+  }
+  function ghPlace(a, x, y){
+    const ox = parseFloat(a.style.left), oy = parseFloat(a.style.top);
+    a.style.left = x + '%'; a.style.top = y + '%'; a.style.zIndex = 10 + Math.round(y * 10);
+    if (!a.classList.contains('me')) { a.classList.add('walk'); clearTimeout(a._w); a._w = setTimeout(() => a.classList.remove('walk'), Math.hypot(x - ox, y - oy) > .2 ? 950 : 0); }
+  }
+  function ghEmote(n, e){
+    const a = ghPeople[n]; if (!a) return; const f = a.querySelector('.gf');
+    const A = {dance:[[0, 0, 0], [-8, -6, -14], [8, 0, 14], [-8, -6, -14], [8, 0, 14], [0, 0, 0]], spin:null, flip:null}[e];
+    if (e === 'dance') f.animate(A.concat(A).map(([x, y, r]) => ({transform:`translate(${x}px,${y}px) rotate(${r}deg)`})), {duration:2200});
+    else if (e === 'spin') f.animate([{transform:'rotate(0)'}, {transform:'rotate(720deg)'}], {duration:900, easing:'ease-in-out'});
+    else if (e === 'flip') f.animate([{transform:'translateY(0) rotate(0)'}, {transform:'translateY(-48px) rotate(-180deg)', offset:.5}, {transform:'translateY(0) rotate(-360deg)'}], {duration:800, easing:'ease-out'});
+    else { const m = Object.assign(document.createElement('div'), {className:'emo', textContent:e === 'wave' ? '👋' : '😂'}); a.appendChild(m);
+      m.animate(e === 'wave' ? [{transform:'rotate(-20deg)'}, {transform:'rotate(25deg)'}, {transform:'rotate(-20deg)'}, {transform:'rotate(25deg)'}, {transform:'rotate(0)'}]
+        : [{transform:'translateY(0) scale(.6)', opacity:1}, {transform:'translateY(-40px) scale(1.3)', opacity:0}], {duration:1400}).onfinish = () => m.remove();
+      if (e === 'laugh') f.animate([0, -4, 4, -4, 4, 0].map(x => ({transform:`translateX(${x}px)`})), {duration:600}); }
   }
   function ghBubble(n, text){
     const a = ghPeople[n]; if (!a) return;
@@ -4393,24 +4439,24 @@ if (FIREBASE) {
     const hall = g.hall || {}, lv = Math.min(HALL_LV.length, Math.max(1, +hall.lvl || 1)), items = hall.items || {};
     $('ghName').textContent = `[${g.tag}] ${g.name}`;
     const floor = HALL.filter(h => h.floor && items[h.id]).pop(); $('ghScene').className = floor ? floor.floor : '';
-    const D = $('ghDeco'); D.innerHTML = '';
-    const put = (ic, x, y, sz, img) => { const d = document.createElement('div'); d.className = 'ghd'; d.style.cssText = `left:${x}%;top:${y}%;font-size:${sz}px`;
-      if (img) { const im = Object.assign(document.createElement('img'), {src:$('jun').src}); im.style.cssText = `width:${sz}px;clip-path:var(--jclip);filter:sepia(1) saturate(3) brightness(1.1)`; d.appendChild(im); } else d.textContent = ic; D.appendChild(d); };
+    const D = $('ghDeco'); D.innerHTML = ''; ghCol = [];
+    const put = (ic, x, y, sz, img) => { const d = document.createElement('div'); d.className = 'ghd'; d.style.cssText = `left:${x}%;top:${y}%;font-size:${sz}px;z-index:${10 + Math.round(y*10)}`;
+      if (img) { const im = Object.assign(document.createElement('img'), {src:$('jun').src}); im.style.cssText = `width:${sz}px;clip-path:var(--jclip);filter:sepia(1) saturate(3) brightness(1.1)`; d.appendChild(im); } else d.textContent = ic;
+      D.appendChild(d); ghCol.push({x, y, r:sz * .42}); };   // collider: a circle around the object's base
     put(HALL_LV[lv - 1][0], 50, 24, 60 + lv*14);
     for (const h of HALL) if (items[h.id] && h.at) for (const [x, y] of h.at) put(h.ic, x, y, h.sz, h.jun);
-    // town hall shop
     const L = $('ghList'); L.innerHTML = '';
     const row = (ic, nm, sub, cost, owned, buy) => {
       const r = document.createElement('div'); r.className = 'hall';
       r.innerHTML = `<div class="hi">${ic}</div><div class="ht"><div class="hn"></div><div class="dimtxt"></div></div>`; r.querySelector('.hn').textContent = nm; r.querySelector('.dimtxt').textContent = sub;
       if (owned) r.appendChild(Object.assign(document.createElement('span'), {className:'dimtxt', textContent:'Built ✓'}));
-      else { const c = parseCost(cost), b = document.createElement('button'); b.className = 'ab'; b.textContent = `${c.k === 'coins' ? fmt(c.n) : c.n} ${PAYC[c.k]}`; b.onclick = () => buy(c); r.appendChild(b); }
+      else { const c = parseCost(cost), b = document.createElement('button'); b.className = 'ab'; b.textContent = `${c.k === 'coins' ? fmt(c.n) : c.n} ${PAYC[c.k]}`; b.onclick = () => ghBuy(c, buy.patch, buy.msg); r.appendChild(b); }
       L.appendChild(r);
     };
     const next = HALL_LV[lv];
-    row(HALL_LV[lv - 1][0], `Town Hall · Lv ${lv} ${HALL_LV[lv - 1][1]}`, next ? `Next: ${next[0]} ${next[1]}` : 'Max level!', next?.[2], !next, c => ghBuy(c, {'hall.lvl':lv + 1}, `${next[0]} Town Hall upgraded to ${next[1]}!`));
+    row(HALL_LV[lv - 1][0], `Town Hall · Lv ${lv} ${HALL_LV[lv - 1][1]}`, next ? `Next: ${next[0]} ${next[1]}` : 'Max level!', next?.[2], !next, {patch:{'hall.lvl':lv + 1}, msg:next ? `${next[0]} Town Hall upgraded to ${next[1]}!` : ''});
     for (const h of HALL) row(h.ic, h.nm, h.floor ? 'Changes the whole floor' : `Adds ${h.at.length > 1 ? h.at.length + ' ' : ''}${h.nm.toLowerCase()} to the house`, h.cost, !!items[h.id],
-      c => ghBuy(c, {['hall.items.' + h.id]:true}, `${h.ic} ${h.nm} built in the Guild House!`));
+      {patch:{['hall.items.' + h.id]:true}, msg:`${h.ic} ${h.nm} built in the Guild House!`});
   }
   async function ghBuy(c, patch, msg){
     const have = c.k === 'coins' ? S.coins : S[c.k];
@@ -4421,13 +4467,57 @@ if (FIREBASE) {
     recalcResearch(); save(); refresh(); sfx('fanfare'); confetti(90); toast(msg);
     window.postGuildLine?.(`🏗️ ${msg}`);
   }
+  // movement: input vector from keys + joystick (or a tap target), speed in px/s, collide against circles and the walls
+  function ghStep(t){
+    const dt = Math.min(.05, (t - (ghStep.t || t)) / 1000); ghStep.t = t;
+    const R = $('ghScene').getBoundingClientRect(), W = R.width || 1, H = R.height || 1;
+    let vx = ghJoyV.x + (ghKeys.has('right') ? 1 : 0) - (ghKeys.has('left') ? 1 : 0), vy = ghJoyV.y + (ghKeys.has('down') ? 1 : 0) - (ghKeys.has('up') ? 1 : 0);
+    if (!vx && !vy && ghTarget) { const dx = (ghTarget.x - ghMe.x) * W/100, dy = (ghTarget.y - ghMe.y) * H/100, d = Math.hypot(dx, dy); if (d < 4) ghTarget = null; else { vx = dx/d; vy = dy/d; } }
+    else if (vx || vy) ghTarget = null;
+    const len = Math.hypot(vx, vy);
+    if (len > 0) {
+      const sp = 200 * Math.min(1, len) / len;
+      let x = ghMe.x * W/100 + vx * sp * dt, y = ghMe.y * H/100 + vy * sp * dt;
+      for (const c of ghCol) {   // push out of any object we walked into
+        const cx = c.x * W/100, cy = c.y * H/100 - c.r * .3, dx = x - cx, dy = y - cy, d = Math.hypot(dx, dy), min = c.r + 14;
+        if (d < min) { const k = (min - d) / (d || 1); x += dx * k; y += dy * k; }
+      }
+      ghMe.x = Math.min(96, Math.max(4, x / W * 100)); ghMe.y = Math.min(96, Math.max(17, y / H * 100));
+      const a = ghPeople[ghKey()]; if (a) { ghPlace(a, ghMe.x, ghMe.y); a.classList.add('walk'); }
+      ghDirty = true; if (Date.now() - ghLastW > 1000) ghWrite();
+    } else {
+      ghPeople[ghKey()]?.classList.remove('walk');
+      if (ghDirty) ghWrite();   // send the final spot when we stop
+    }
+    ghRaf = requestAnimationFrame(ghStep);
+  }
+  const KEYMAP = {ArrowUp:'up', w:'up', W:'up', ArrowDown:'down', s:'down', S:'down', ArrowLeft:'left', a:'left', A:'left', ArrowRight:'right', d:'right', D:'right'};
+  addEventListener('keydown', e => { if ($('ghouse').hidden || e.target.tagName === 'INPUT' || !KEYMAP[e.key]) return; ghKeys.add(KEYMAP[e.key]); e.preventDefault(); });
+  addEventListener('keyup', e => { if (KEYMAP[e.key]) ghKeys.delete(KEYMAP[e.key]); });
+  // joystick
+  $('ghJoy').addEventListener('pointerdown', e => {
+    e.stopPropagation(); const J = $('ghJoy'), knob = J.firstElementChild; J.setPointerCapture(e.pointerId);
+    const mv = ev => { const r = J.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2, max = r.width/2 - 12;
+      let dx = ev.clientX - cx, dy = ev.clientY - cy; const d = Math.hypot(dx, dy); if (d > max) { dx *= max/d; dy *= max/d; }
+      knob.style.transform = `translate(${dx}px,${dy}px)`; ghJoyV.x = dx/max; ghJoyV.y = dy/max; };
+    const up = () => { knob.style.transform = ''; ghJoyV.x = ghJoyV.y = 0; J.removeEventListener('pointermove', mv); J.removeEventListener('pointerup', up); J.removeEventListener('pointercancel', up); };
+    mv(e); J.addEventListener('pointermove', mv); J.addEventListener('pointerup', up); J.addEventListener('pointercancel', up);
+  });
+  $('ghEmotes').addEventListener('pointerdown', e => e.stopPropagation());
+  $('ghEmotes').onclick = e => { const b = e.target.closest('button'); if (!b) return; ghEmote(ghKey(), b.dataset.e); ghWrite({emote:b.dataset.e, emoteAt:Date.now()}); };
+  // tap to walk there
+  $('ghScene').addEventListener('pointerdown', e => {
+    if (e.target.closest('#ghJoy,#ghEmotes')) return;
+    const r = $('ghScene').getBoundingClientRect(); ghTarget = {x:(e.clientX - r.left) / r.width * 100, y:(e.clientY - r.top) / r.height * 100 + 3};
+  });
   function ghOpen(){
     if (!guildDoc || !S.guild) return;
-    ghGid = S.guild; ghPeople = {}; $('ghPeople').innerHTML = ''; $('guild').close(); $('ghouse').hidden = false;
-    ghMe = {x:20 + Math.random()*60, y:65 + Math.random()*25}; ghWrite();
+    ghGid = S.guild; ghPeople = {}; ghEmoSeen = {}; $('ghPeople').innerHTML = ''; $('guild').close(); $('ghouse').hidden = false;
+    ghMe = {x:30 + Math.random()*40, y:82 + Math.random()*10};
+    ghAvatar(me(), {...ghMe, hat:S.cos.hat, color:S.cos.color, display:S.display}); ghPlace(ghPeople[me()], ghMe.x, ghMe.y); ghWrite();
     ghUnsub.push(onSnapshot(doc(db, 'guilds', ghGid), d => d.exists() && ghRender(d.data()), () => {}));
     ghUnsub.push(onSnapshot(collection(db, 'guilds', ghGid, 'presence'), qs => {
-      const now = Date.now(), live = new Set();
+      const now = Date.now(), live = new Set([me()]);
       qs.forEach(d => { const p = d.data(); if (now - (+p.ts || 0) < 150e3) { live.add(d.id); ghAvatar(d.id, p); } });
       for (const n in ghPeople) if (!live.has(n)) { ghPeople[n].remove(); delete ghPeople[n]; }
       $('ghOnline').textContent = `${live.size} here now`;
@@ -4438,20 +4528,19 @@ if (FIREBASE) {
         if (t > since - 2000) ghBubble(String(m.from), cleanChat(String(m.text || ''))); });
       since = Date.now();
     }, () => {}));
-    ghBeat = setInterval(ghWrite, 45e3);
+    ghBeat = setInterval(() => ghWrite(), 45e3);
+    cancelAnimationFrame(ghRaf); ghStep.t = 0; ghRaf = requestAnimationFrame(ghStep);
+    setTimeout(() => $('ghHint').hidden = true, 6000);
   }
   function ghClose(){
-    ghUnsub.forEach(u => u()); ghUnsub = []; clearInterval(ghBeat); $('ghouse').hidden = true; $('ghPanel').hidden = true;
+    ghUnsub.forEach(u => u()); ghUnsub = []; clearInterval(ghBeat); cancelAnimationFrame(ghRaf); ghKeys.clear();
+    $('ghouse').hidden = true; $('ghPanel').hidden = true; $('ghHint').hidden = false;
     if (ghGid) deleteDoc(ghPres()).catch(() => {});
   }
   $('gHouse').onclick = ghOpen; $('ghClose').onclick = ghClose;
-  window.ghPreview = g => { $('ghouse').hidden = false; ghRender(g); for (const [n, p] of Object.entries(g.people || {})) ghAvatar(n, p); };   // render-only preview (no Firestore)
+  window.ghPreview = g => { $('ghouse').hidden = false; ghMe = {x:50, y:85}; ghRender(g); for (const [n, p] of Object.entries(g.people || {})) ghAvatar(n, p);
+    ghAvatar(ghKey(), {...ghMe, hat:S.cos.hat}); ghPlace(ghPeople[ghKey()], ghMe.x, ghMe.y); cancelAnimationFrame(ghRaf); ghRaf = requestAnimationFrame(ghStep); };   // render-only preview (no Firestore)
   $('ghHall').onclick = () => { $('ghPanel').hidden = false; }; $('ghPanelClose').onclick = () => { $('ghPanel').hidden = true; };
-  $('ghScene').addEventListener('pointerdown', e => {
-    const r = $('ghScene').getBoundingClientRect();
-    ghMe = {x:(e.clientX - r.left) / r.width * 100, y:(e.clientY - r.top) / r.height * 100 + 4};
-    ghAvatar(me(), {...ghMe, hat:S.cos.hat, color:S.cos.color, display:S.display}); ghWrite();
-  });
   const ghSend = async () => {
     const t = cleanChat($('ghSay').value.trim()).slice(0, 200); if (!t) return;
     if (await window.postGuildLine?.(t)) $('ghSay').value = ''; else toast('Slow down! One message every 3 seconds');
