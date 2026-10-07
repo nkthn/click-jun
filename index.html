@@ -153,6 +153,7 @@ body.xmas #pac{background:#07110c}
 .gav .gf b{position:absolute;left:50%;top:-19px;transform:translateX(-50%);font-size:26px}
 .gav .gn{font:800 12px 'Nunito',sans-serif;color:#fff;text-shadow:0 1px 3px #000;white-space:nowrap;margin-top:2px}
 .gav.me .gn::after{content:' (you)';opacity:.7}
+.gav .gt{font:800 10px 'Nunito',sans-serif;color:#ffd166;text-shadow:0 1px 3px #000;white-space:nowrap}.gav .gt:empty{display:none}
 .gav.walk .gf{animation:ghbob .32s ease-in-out infinite}
 @keyframes ghbob{50%{transform:translateY(-4px) rotate(3deg)}}
 .gav .bub{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-24px);background:#fff;color:#111;border-radius:12px;padding:6px 10px;font:700 13px 'Nunito',sans-serif;max-width:200px;width:max-content;box-shadow:0 4px 10px rgba(0,0,0,.3)}
@@ -4399,17 +4400,20 @@ if (FIREBASE) {
   const ghKeys = new Set(), ghJoyV = {x:0, y:0}, ghKey = () => me() || 'you';   // 'you' only in the signed-out preview
   const ghPres = () => doc(db, 'guilds', ghGid, 'presence', me());
   const ghWrite = extra => { ghLastW = Date.now(); ghDirty = false; if (!ghGid || !user) return;
-    return setDoc(ghPres(), {x:+ghMe.x.toFixed(2), y:+ghMe.y.toFixed(2), ts:Date.now(), hat:S.cos.hat, color:S.cos.color, display:S.display, ...(extra || {})}, {merge:true}).catch(() => {}); };
+    return setDoc(ghPres(), {x:+ghMe.x.toFixed(2), y:+ghMe.y.toFixed(2), ts:Date.now(), hat:S.cos.hat, acc:S.cos.acc, title:S.cos.title, color:S.cos.color, display:S.display, ...(extra || {})}, {merge:true}).catch(() => {}); };
   function ghAvatar(n, p){
     if (!n) return null;
     let a = ghPeople[n];
     if (!a) {
       a = document.createElement('div'); a.className = 'gav' + (n === ghKey() ? ' me' : '');
-      a.innerHTML = '<div class="gf"><img alt=""></div><div class="gn"></div>'; a.querySelector('img').src = $('jun').src;
+      a.innerHTML = '<div class="gf"><img alt=""></div><div class="gn"></div><div class="gt"></div>'; a.querySelector('img').src = $('jun').src;
       $('ghPeople').appendChild(a); ghPeople[n] = a;
     }
     const hat = cosItem('hat', p.hat), f = a.querySelector('.gf'); f.querySelector('b')?.remove(); if (hat) f.appendChild(Object.assign(document.createElement('b'), {textContent:hat.ic}));
-    const nm = a.querySelector('.gn'); nm.textContent = cleanName(p.display) || n; const c = nameColor(p.color); nm.style.color = c && c !== 'rainbow' ? c : '#fff';
+    const ac = cosItem('acc', p.acc); f.querySelector('i')?.remove();
+    if (ac) { const w = 37.5*ac.b, i = document.createElement('i'); i.textContent = ac.ic; i.style.cssText = `position:absolute;font-style:normal;line-height:1;font-size:${w*.86}px;left:${50*(ac.cx ?? .5) - w/2}px;top:${50*ac.a - w/2}px`; f.appendChild(i); }
+    const nm = a.querySelector('.gn'); nm.textContent = cleanName(p.display) || n; const c = nameColor(p.color); nm.style.color = c && c !== 'rainbow' ? c : '#fff'; nm.classList.toggle('nc-rainbow', c === 'rainbow');
+    const t = cosItem('title', p.title); a.querySelector('.gt').textContent = t ? `${t.ic} ${t.nm}` : '';
     if (n !== ghKey() || !ghMe) ghPlace(a, +p.x || 50, +p.y || 70);
     if (n !== me() && p.emote && +p.emoteAt > (ghEmoSeen[n] || 0)) { ghEmoSeen[n] = +p.emoteAt; if (Date.now() - p.emoteAt < 10e3) ghEmote(n, p.emote); }
     return a;
@@ -4514,7 +4518,7 @@ if (FIREBASE) {
     if (!guildDoc || !S.guild) return;
     ghGid = S.guild; ghPeople = {}; ghEmoSeen = {}; $('ghPeople').innerHTML = ''; $('guild').close(); $('ghouse').hidden = false;
     ghMe = {x:30 + Math.random()*40, y:82 + Math.random()*10};
-    ghAvatar(me(), {...ghMe, hat:S.cos.hat, color:S.cos.color, display:S.display}); ghPlace(ghPeople[me()], ghMe.x, ghMe.y); ghWrite();
+    ghAvatar(me(), {...ghMe, hat:S.cos.hat, acc:S.cos.acc, title:S.cos.title, color:S.cos.color, display:S.display}); ghPlace(ghPeople[me()], ghMe.x, ghMe.y); ghWrite();
     ghUnsub.push(onSnapshot(doc(db, 'guilds', ghGid), d => d.exists() && ghRender(d.data()), () => {}));
     ghUnsub.push(onSnapshot(collection(db, 'guilds', ghGid, 'presence'), qs => {
       const now = Date.now(), live = new Set([me()]);
@@ -4539,7 +4543,7 @@ if (FIREBASE) {
   }
   $('gHouse').onclick = ghOpen; $('ghClose').onclick = ghClose;
   window.ghPreview = g => { $('ghouse').hidden = false; ghMe = {x:50, y:85}; ghRender(g); for (const [n, p] of Object.entries(g.people || {})) ghAvatar(n, p);
-    ghAvatar(ghKey(), {...ghMe, hat:S.cos.hat}); ghPlace(ghPeople[ghKey()], ghMe.x, ghMe.y); cancelAnimationFrame(ghRaf); ghRaf = requestAnimationFrame(ghStep); };   // render-only preview (no Firestore)
+    ghAvatar(ghKey(), {...ghMe, hat:S.cos.hat, acc:S.cos.acc, title:S.cos.title, color:S.cos.color, display:S.display}); ghPlace(ghPeople[ghKey()], ghMe.x, ghMe.y); cancelAnimationFrame(ghRaf); ghRaf = requestAnimationFrame(ghStep); };   // render-only preview (no Firestore)
   $('ghHall').onclick = () => { $('ghPanel').hidden = false; }; $('ghPanelClose').onclick = () => { $('ghPanel').hidden = true; };
   const ghSend = async () => {
     const t = cleanChat($('ghSay').value.trim()).slice(0, 200); if (!t) return;
