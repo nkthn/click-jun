@@ -1242,7 +1242,7 @@ const AUP = [
   {id:'lab',    ic:'🔬', nm:'Lab Notes',     ds:'Keep your research when you rebirth', cost:2},
   {id:'head',   ic:'🏁', nm:'Fast Start',    ds:'Start every climb with 10 rebirths already done', cost:2},
   {id:'carry',  ic:'🧳', nm:'Carry-On',      ds:'Keep 25% of your Rebirth Shop perk levels when you Ascend', cost:2},
-  {id:'auto',   ic:'🤖', nm:'Auto Buyer',    ds:'Buys the cheapest upgrade for you every second (can be switched off here)', cost:3},
+  {id:'auto',   ic:'🤖', nm:'Auto Buyer',    ds:'Buys the cheapest upgrade every 2 seconds, only if it costs 10% of your coins or less (switch it off here)', cost:10},
 ];
 const asu = id => !!S.aup[id];
 const aupRefund = a => (a?.rich ? 1 : 0) + (a?.keep ? 2 : 0);   // Trust Fund and Rainy Day Fund were removed
@@ -3514,16 +3514,14 @@ function renderAshop(){
   }
 }
 $('ashopBtn').onclick = () => { renderAshop(); $('ashop').showModal(); };
-// Auto Buyer: once a second, keep buying the single cheapest upgrade while you can afford it (up to 25 per tick)
+// Auto Buyer: every 2 seconds, buys the single cheapest upgrade, but only if it costs ≤10% of your coins (never drains the bank)
+let abTick = 0;
 function autoBuyer(){
-  let bought = 0;
-  while (bought < 25) {
-    let best = null, bc = Infinity;
-    for (const u of UPS) { if (chalBlocked(u)) continue; const c = cost(u, 1); if (c < bc) { bc = c; best = u; } }
-    if (!best || S.coins < bc) break;
-    S.coins -= bc; S.own[best.id] = own(best) + 1; bought++; S.bought++;
-  }
-  if (bought) refresh();
+  if (++abTick % 2) return;
+  let best = null, bc = Infinity;
+  for (const u of UPS) { if (chalBlocked(u)) continue; const c = cost(u, 1); if (c < bc) { bc = c; best = u; } }
+  if (!best || bc > S.coins * .1) return;
+  S.coins -= bc; S.own[best.id] = own(best) + 1; S.bought++; refresh();
 }
 // --- daily quests ---
 // everyone gets the same 3 quests on a given day (seeded by the date); targets for coin quests scale with your income
