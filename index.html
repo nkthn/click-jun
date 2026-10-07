@@ -69,6 +69,9 @@ h2.shut::after{transform:rotate(-90deg)}
 #ascLine{margin-top:8px;font-size:13px;color:#ffd166;font-weight:600}
 #skipScene{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:101;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
 #ending:not([hidden])+#skipScene{display:block}
+#annBar{position:absolute;top:58px;left:50%;transform:translateX(-50%);z-index:8;width:min(560px,calc(100% - 24px));display:flex;gap:10px;align-items:center;background:rgba(124,92,255,.92);color:#fff;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#annBar[hidden]{display:none}#annBar span{flex:1;overflow-wrap:anywhere}#annBar button{background:none;border:0;color:#fff;font-size:16px;cursor:pointer}
+#modBtn[hidden]{display:none}
 #muteBtn{position:absolute;top:12px;right:12px;z-index:7;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:18px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.3)}
 #muteBtn:active{transform:translateY(2px)}
 #ending{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 45%,#3a2160,#05030a 70%);overflow:hidden;font-family:'Space Grotesk',sans-serif}
@@ -245,6 +248,7 @@ body.rainbow .flake{font-size:14px!important}
 #petDetail .bar2 i{display:block;height:100%;background:var(--gold)}
 #petGrid button.sel{outline:2px solid var(--gold)}
 #petGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.pgh{grid-column:1/-1;font:700 12px 'Nunito',sans-serif;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
 #petGrid button{border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;padding:8px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 #petGrid button .pi{font-size:26px}
 #petGrid button .pl{font-size:11px;color:var(--dim)}
@@ -443,6 +447,7 @@ body.light .ab:hover{background:#e6e8f2}
 <body>
 <main id="stage">
   <button id="muteBtn" title="Mute / unmute (M)"></button>
+  <div id="annBar" hidden><b>📢</b><span></span><button aria-label="Dismiss">✕</button></div>
   <div id="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <img id="jhat" class="hat" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M8 58 Q30 0 70 8 Q92 14 90 40 L80 42 Q78 24 64 22 Q50 30 92 58Z' fill='%23d62839'/%3E%3Crect x='2' y='52' width='96' height='16' rx='8' fill='%23fff'/%3E%3Ccircle cx='86' cy='42' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="">
   <img id="ghat" class="hat" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M8 58 Q30 0 70 8 Q92 14 90 40 L80 42 Q78 24 64 22 Q50 30 92 58Z' fill='%23d62839'/%3E%3Crect x='2' y='52' width='96' height='16' rx='8' fill='%23fff'/%3E%3Ccircle cx='86' cy='42' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="">
@@ -551,7 +556,7 @@ body.light .ab:hover{background:#e6e8f2}
   <div id="socialRow"><button id="chatBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span>Chat</span></button><button id="friendBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Friends</span></button><button id="tradeBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg><span>Trades</span></button><button id="guildBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg><span>Guild</span></button></div>
   <div id="lb" hidden>
     <h2>Leaderboard · Season 1</h2>
-    <div id="lbTabs"><button data-k="score" class="on">🪙 All time</button><button data-k="day">☀️ Today</button><button data-k="week">📅 Week</button><button data-k="month">🗓️ Month</button><button data-k="rebirths">🔁 Rebirths</button><button data-k="asc">✨ Ascensions</button></div>
+    <div id="lbTabs"><button data-k="score" class="on">🪙 All time</button><button data-k="day">☀️ Today</button><button data-k="week">📅 Week</button><button data-k="month">🗓️ Month</button><button data-k="rebirths">🔁 Rebirths</button><button data-k="asc">✨ Ascensions</button><button data-k="prest">🌌 Prestige</button></div>
     <ol id="lbList"><li>Loading…</li></ol>
     <div id="lbNote"></div>
   </div>
@@ -602,9 +607,9 @@ body.light .ab:hover{background:#e6e8f2}
   <textarea id="ideaIn" class="tin" maxlength="500" rows="3" placeholder="What should Click Jun add next?" style="width:100%;resize:vertical"></textarea>
   <button class="ab" id="ideaSend" style="width:100%;margin-top:6px">Send idea</button>
   <div id="ideaMsg" class="dimtxt" style="margin-top:4px"></div>
-  <div id="ideaInbox" hidden><label>📬 Ideas from players</label><div id="ideaList"></div></div>
+
   <button id="reset">Reset progress</button>
-  <button id="adminBtn">⚙ Admin panel <span style="opacity:.5">(`)</span></button>
+  <button id="modBtn" hidden>🛡️ Admin panel</button><button id="adminBtn">🧪 Hax panel <span style="opacity:.5">(`)</span></button>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:16px">Done</button></form>
 </dialog>
 <dialog id="stats">
@@ -697,6 +702,7 @@ body.light .ab:hover{background:#e6e8f2}
   <div id="chatNote" class="dimtxt" style="margin-top:4px;min-height:16px"></div>
   <div class="row" id="chatForm" style="margin-top:4px"><input id="chatIn" class="tin" maxlength="200" placeholder="Say something nice…" autocomplete="off"><button class="ab" id="chatSend">Send</button></div>
   <div class="dimtxt" style="margin-top:6px;font-size:11px">Be kind. Tap a name to mute someone. Links and bad words are filtered.</div>
+  <div id="muteBox" hidden><label>🔇 Muted players</label><div id="muteList"></div></div>
   <div id="modBox" hidden><label>🔨 Banned from chat</label><div id="banList"></div></div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:10px">Close</button></form>
 </dialog>
@@ -708,6 +714,19 @@ body.light .ab:hover{background:#e6e8f2}
   <div class="row"><button id="wUp">Create account</button><button id="wIn" class="alt">I have one</button></div>
   <div id="wMsg" style="font-size:13px;color:#ff5c7a;margin-top:8px;min-height:18px"></div>
   <button id="wGuest">Play as guest for now</button>
+</dialog>
+<dialog id="modPanel">
+  <h3>🛡️ <span>Admin</span></h3>
+  <div class="dimtxt">Only nkthn can see this.</div>
+  <label>📢 Announcement to everyone</label>
+  <textarea id="annIn" class="tin" maxlength="300" rows="3" placeholder="Shows as a banner for every player" style="width:100%;resize:vertical"></textarea>
+  <button class="ab" id="annPost" style="width:100%;margin-top:6px">Post announcement</button>
+  <div id="annMsg" class="dimtxt" style="margin-top:4px"></div>
+  <div id="annList"></div>
+  <label>📬 Ideas from players</label><div id="ideaList"></div>
+  <label>Tools</label>
+  <div class="row"><button class="ab" id="modChat">💬 Chat moderation</button><button class="ab" id="modHax">🧪 Hax panel</button></div>
+  <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
 </dialog>
 <dialog id="casino">
   <h3>🎰 <span>Jun's Roulette</span></h3>
@@ -763,7 +782,7 @@ body.light .ab:hover{background:#e6e8f2}
   <label>Jun speed: <span id="aSpdV">180</span></label>
   <input type="range" id="aSpd" min="0" max="900" step="10" value="180">
   <label>Cheats</label>
-  <div class="row"><button class="ab" id="aUps">+10 every upgrade</button><button class="ab" id="aGold">Spawn Golden Jun</button><button class="ab" id="aDia">Spawn Diamond Jun</button><button class="ab" id="aVc">Spawn VC offer</button><button class="ab" id="aEvt">Start 4× frenzy</button><button class="ab" id="aEnd">Play ending</button><button class="ab" id="aTrue">Play true ending</button><button class="ab" id="aAscS">Play ascension</button><button class="ab" id="aBest">Reset Flappy best</button></div>
+  <div class="row"><button class="ab" id="aUps">+10 every upgrade</button><button class="ab" id="aGold">Spawn Golden Jun</button><button class="ab" id="aDia">Spawn Diamond Jun</button><button class="ab" id="aVc">Spawn VC offer</button><button class="ab" id="aEvt">Start 4× frenzy</button><button class="ab" id="aEnd">Play ending</button><button class="ab" id="aTrue">Play true ending</button><button class="ab" id="aAscS">Play ascension</button><button class="ab" id="aLayer">Play layer cutscene</button><button class="ab" id="aBH">Play black hole cutscene</button><button class="ab" id="aBest">Reset Flappy best</button></div>
   <div class="row" style="margin-top:18px"><button class="ab" id="aClose" style="flex:1">Close</button></div>
 </dialog>
 <script>
@@ -1037,6 +1056,35 @@ const PETS = [
   {id:'eagle',  ic:'🦅', nm:'Talon',         r:'Epic',      w:8,  fx:L => `+${8*L}% click power and +${4*L}% passive income`},
   {id:'ember',  ic:'🐲', nm:'Ember',         r:'Legendary', w:2,  fx:L => `Diamond Juns pay +${15*L}%`},
   {id:'prism',  ic:'🦚', nm:'Prism',         r:'Mythic',    w:1,  fx:L => `+${8*L}% to everything`},
+  {id:'bee',    ic:'🐝', nm:'Buzzby',        r:'Common',    w:20, fx:L => `+${3*L}% click power and passive income`},
+  {id:'crab',   ic:'🦀', nm:'Pinchy',        r:'Common',    w:20, fx:L => `Boss damage +${5*L}%`},
+  {id:'chick',  ic:'🐥', nm:'Peep',          r:'Common',    w:20, fx:L => `Coin eggs cost ${2*L}% less`},
+  {id:'frog',   ic:'🐸', nm:'Lucky Ribbit',  r:'Rare',      w:10, fx:L => `Roulette wins pay +${2*L}%`},
+  {id:'sloth',  ic:'🦥', nm:'Sir Slowpoke',  r:'Rare',      w:10, fx:L => `Boss fights last ${(L/2).toFixed(1)}s longer`},
+  {id:'shark',  ic:'🦈', nm:'Chomper',       r:'Epic',      w:8,  fx:L => `+${12*L}% click power`},
+  {id:'lion',   ic:'🦁', nm:'King Leo',      r:'Epic',      w:8,  fx:L => `+${12*L}% passive income`},
+  {id:'ghost',  ic:'👻', nm:'Boo',           r:'Legendary', w:2,  fx:L => `Offline earnings +${15*L}% and ${L}h longer`},
+  {id:'mammoth',ic:'🦣', nm:'Big Tusk',      r:'Legendary', w:2,  fx:L => `+${20*L}% to everything`},
+  {id:'kingjun',ic:'🤴', nm:'Prince Jun',    r:'Mythic',    w:1,  fx:L => `+${10*L}% to everything and +${10*L}% boss damage`},
+  {id:'tiger',  ic:'🐅', nm:'Rajah',         r:'Divine',    w:1,  fx:L => `+${35*L}% to everything`},
+  {id:'swan',   ic:'🦢', nm:'Serena',        r:'Divine',    w:1,  fx:L => `+${60*L}% click power and passive income`},
+  {id:'dodo',   ic:'🦤', nm:'The Last Dodo', r:'Celestial', w:1,  fx:L => `+${80*L}% to everything`},
+  {id:'orca',   ic:'🐳', nm:'Celestia',      r:'Celestial', w:1,  fx:L => `+${100*L}% to everything`},
+  {id:'blackhole', ic:'🕳️', nm:'Event Horizon', r:'Secret', w:0, fx:() => '+20000% to everything (1 in a billion)'},
+];
+// what each pet boosts, for the grouped pet list
+const PET_GROUPS = [
+  ['all', '🌟 Everything', ['dragon', 'unicorn', 'prism', 'mammoth', 'kingjun', 'tiger', 'dodo', 'orca', 'blackhole']],
+  ['click', '👆 Click power', ['cat', 'eagle', 'bee', 'shark', 'swan']],
+  ['passive', '💤 Passive income', ['pug', 'lion']],
+  ['auto', '🖱️ Auto clicks', ['ham', 'octo']],
+  ['gold', '✨ Golden & Diamond Juns', ['parrot', 'fly', 'baby', 'ember']],
+  ['boss', '⚔️ Bosses', ['crab', 'sloth']],
+  ['offline', '🌙 Offline', ['owl', 'turtle', 'ghost']],
+  ['tokens', '💈 Tokens', ['whale', 'panda']],
+  ['combo', '🔥 Combo', ['fox', 'bunny']],
+  ['shop', '🛒 Shop & eggs', ['hedge', 'chick']],
+  ['luck', '🎲 Luck & events', ['wolf', 'frog']],
 ];
 const PET_MAX = 25, PET_SLOTS = 4;
 
@@ -1070,9 +1118,12 @@ const EGGS = [
   {id:'basic',  ic:'🥚', nm:'Basic Egg',  odds:{Common:60, Rare:28, Epic:9, Legendary:2.5, Mythic:.5}},
   {id:'golden', ic:'🌟', nm:'Golden Egg', odds:{Common:0, Rare:50, Epic:32, Legendary:14, Mythic:4}},
   {id:'cosmic', ic:'🌌', nm:'Cosmic Egg', odds:{Common:0, Rare:0, Epic:55, Legendary:35, Mythic:10}},
-  {id:'royal',  ic:'👑', nm:'Royal Egg',  odds:{Common:0, Rare:0, Epic:0, Legendary:75, Mythic:25}},
+  {id:'royal',  ic:'👑', nm:'Royal Egg',  odds:{Common:0, Rare:0, Epic:0, Legendary:72, Mythic:25, Divine:3}},
+  {id:'jungle', ic:'🌴', nm:'Jungle Egg', odds:{Common:0, Rare:30, Epic:40, Legendary:22, Mythic:8}},
+  {id:'lucky',  ic:'🍀', nm:'Lucky Egg',  odds:{Common:0, Rare:0, Epic:49, Legendary:35, Mythic:15, Divine:1}},
+  {id:'void',   ic:'🕳️', nm:'Void Egg',   odds:{Common:0, Rare:0, Epic:0, Legendary:35, Mythic:55, Divine:8, Celestial:2}},
 ];
-const RARC = {Common:'#9aa3b5', Rare:'#4cc9f0', Epic:'#c77dff', Legendary:'#ffc94d', Mythic:'#ff5c7a'};
+const RARC = {Common:'#9aa3b5', Rare:'#4cc9f0', Epic:'#c77dff', Legendary:'#ffc94d', Mythic:'#ff5c7a', Divine:'#57e6b0', Celestial:'#ff9de2', Secret:'#b388ff'};
 
 // Ascension Shop: cheap, one-time, permanent upgrades bought with ✨ (1 per Ascension)
 const AUP = [
@@ -1193,7 +1244,7 @@ const rbBoost = (r = S.rebirths) => 1 + .2 * r ** .85;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 1) * RM[u.t];
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * layerMult() * chalMult() * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn'));
+const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * layerMult() * chalMult() * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn')) * (1 + .2*petLv('mammoth')) * (1 + .1*petLv('kingjun')) * (1 + .35*petLv('tiger')) * (1 + .8*petLv('dodo')) * (1 + petLv('orca')) * (petLv('blackhole') ? 201 : 1);
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.g;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
@@ -1206,11 +1257,11 @@ function maxN(u){
 }
 const cost = (u, n = buyN(u)) => { const g = growth(u); return fin(Math.ceil((inChal('broke') ? 10 : 1) * u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap')) * (1 - .01*petLv('hedge')))); };
 // the base click is always exactly 1; boosts multiply what your Click Power upgrades add on top of it
-const perClick = () => fin(1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .1*lv('click')) * bossMult() * (1 + .05*petLv('cat')) * (1 + .08*petLv('eagle')) + perSec()*RM.c2);
+const perClick = () => fin(1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .1*lv('click')) * bossMult() * (1 + .05*petLv('cat')) * (1 + .08*petLv('eagle')) * (1 + .03*petLv('bee')) * (1 + .12*petLv('shark')) * (1 + .6*petLv('swan')) + perSec()*RM.c2);
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
 const income = () => fin(perSec() + autoCps()*AUTO*perClick());   // steady coins/sec: passive + auto clickers
 const autoCps = () => fin(UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * (1 + .05*petLv('ham')) * (1 + .08*petLv('octo')));
-const perSec = () => fin(UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .05*petLv('pug')) * (1 + .04*petLv('eagle')));
+const perSec = () => fin(UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .05*petLv('pug')) * (1 + .04*petLv('eagle')) * (1 + .03*petLv('bee')) * (1 + .12*petLv('lion')) * (1 + .6*petLv('swan')));
 const fmt = n => n >= 1e300 ? '∞' : n < 1e3 ? String(Math.round(n*10)/10) : S.sci ? n.toExponential(2).replace('+', '')   // one decimal under 1K, rounded (13.26 → 13.3); K/M/B above
   : n >= 1e36 ? n.toExponential(2).replace('+', '')   // beyond decillions: 1.23e40
   : (()=>{const u=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
@@ -1504,8 +1555,91 @@ function doLayer(i){
   const zero = Object.fromEntries(LAYERS.slice(0, i).map(x => [x.k, 0]));
   Object.assign(S, zero, {[L.k]:S[L.k] + 1, coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:{}, beaten:false, asc:0});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
-  sfx('angel'); rebirthFx(1); confetti(120); toast(`${L.ic} ${L.nm} ${S[L.k]}! Everything ×${fmt(L.x ** S[L.k])} from this layer`);
+  playLayerScene(i);
 }
+
+// 🕳️ Event Horizon: the screen shakes, the whole game cracks and gets swallowed, a white-out, then the pet rises from the void
+function playBlackHole(){
+  sfx('fanfare'); toast('🕳️ EVENT HORIZON! 1 in a billion!');
+  if (S.skipAnim) return;
+  const E = $('ending'); E.innerHTML = ''; E.hidden = false; E.style.background = '#000';
+  document.body.animate([{transform:'translate(0,0)'}, {transform:'translate(-8px,6px)'}, {transform:'translate(7px,-5px)'}, {transform:'translate(0,0)'}], {duration:120, iterations:25});
+  const el = (css, html = '') => { const d = document.createElement('div'); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
+  const R = Math.random;
+  el('left:0;right:0;top:12%;text-align:center;font:700 16px Nunito,sans-serif;color:#b388ff;letter-spacing:.3em;opacity:.8', 'WARNING · GRAVITATIONAL ANOMALY');
+  const ring = el('left:50%;top:50%;width:60vmin;height:60vmin;margin:-30vmin 0 0 -30vmin;border-radius:50%;background:conic-gradient(#b388ff,#ff5c7a,#ffcf4a,#4cc9f0,#b388ff);filter:blur(16px)');
+  ring.animate([{transform:'rotate(0) scale(.2)'}, {transform:'rotate(1440deg) scale(1.4)'}], {duration:6000, fill:'forwards', easing:'ease-in'});
+  const core = el('left:50%;top:50%;width:34vmin;height:34vmin;margin:-17vmin 0 0 -17vmin;border-radius:50%;background:#000;box-shadow:0 0 80px 40px #000');
+  core.animate([{transform:'scale(.1)'}, {transform:'scale(3.2)'}], {duration:6000, fill:'forwards', easing:'ease-in'});
+  const junk = ['🪙', '💈', '✨', '🥚', '🐱', '🐉', '🦄', '🌍', '🪐', '⭐', '🎰', '👑'];
+  for (let k = 0; k < 120; k++) { const a = R()*360, d = el(`left:50%;top:50%;font-size:${16 + R()*30}px;margin:-15px`, junk[k % junk.length]);
+    d.animate([{transform:`rotate(${a}deg) translateX(${60 + R()*40}vmax)`, opacity:1}, {transform:`rotate(${a + 720}deg) translateX(0) scale(0)`, opacity:0}], {duration:2000 + R()*3000, delay:R()*2500, fill:'forwards', easing:'ease-in'}); }
+  const flash = el('inset:0;background:#fff;opacity:0'); flash.animate([{opacity:0}, {opacity:1, offset:.3}, {opacity:0}], {duration:1800, delay:5600, fill:'forwards'});
+  setTimeout(() => {
+    confetti(200); sfx('angel'); setTimeout(() => sfx('fanfare'), 900);
+    const pet = el('left:50%;top:42%;font-size:150px;transform:translate(-50%,-50%) scale(0);filter:drop-shadow(0 0 40px #b388ff)', '🕳️');
+    pet.animate([{transform:'translate(-50%,-50%) scale(0) rotate(-180deg)'}, {transform:'translate(-50%,-50%) scale(1.2) rotate(10deg)'}, {transform:'translate(-50%,-50%) scale(1) rotate(0)'}], {duration:1400, fill:'forwards', easing:'ease-out'});
+    const box = el('left:0;right:0;top:60%;text-align:center;padding:0 20px;color:#fff;opacity:0',
+      `<div style="color:#b388ff;font-weight:800;letter-spacing:.3em">SECRET · 1 IN 1,000,000,000</div>
+       <div style="font:700 clamp(34px,8vw,64px) Fredoka,sans-serif;background:linear-gradient(90deg,#b388ff,#ff5c7a,#ffcf4a,#4cc9f0);-webkit-background-clip:text;background-clip:text;color:transparent">EVENT HORIZON</div>
+       <div style="margin:8px 0 18px;font-weight:700">+20000% to everything. The whole server just found out.</div><button class="end-btn" id="bhDone">Unbelievable</button>`);
+    box.animate([{opacity:0}, {opacity:1}], {duration:900, delay:900, fill:'forwards'});
+    $('bhDone').onclick = () => { E.hidden = true; E.innerHTML = ''; E.style.background = ''; };
+  }, 6800);
+}
+$('aBH').onclick = () => { A.close(); playBlackHole(); };
+// cutscenes for the layers: Transcend = warp through the stars, Apotheosis = Jun crowned in a golden sunburst,
+// Singularity = everything spirals into a black hole, Omniverse = zoom out through endless universes full of Juns
+function playLayerScene(i){
+  const L = LAYERS[i], n = S[L.k], line = `${L.nm} ${n} · everything ×${fmt(L.x ** n)} from this layer`;
+  if (S.skipAnim) return toast(`${L.ic} ${line}`);
+  const E = $('ending'); E.innerHTML = ''; E.hidden = false;
+  const el = (css, html = '') => { const d = document.createElement('div'); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
+  const head = (css) => { const im = document.createElement('img'); im.src = $('jun').src; im.style.cssText = `position:absolute;clip-path:${getComputedStyle($('jun')).clipPath};` + css; E.appendChild(im); return im; };
+  const R = Math.random, ease = {fill:'forwards', easing:'ease-in-out'};
+  let title, sub, col;
+  if (L.k === 'tr') {
+    E.style.background = 'radial-gradient(circle,#1b1340,#000 70%)'; sfx('angel'); title = '🌠 JUN HAS TRANSCENDED'; col = 'linear-gradient(90deg,#9ad0ff,#c77dff)';
+    for (let k = 0; k < 90; k++) { const a = R()*Math.PI*2, s = el(`left:50%;top:50%;width:2px;height:${20 + R()*60}px;background:#fff;border-radius:2px;opacity:0;transform-origin:50% 0`);
+      s.animate([{transform:`rotate(${a}rad) translateY(0)`, opacity:0}, {opacity:1, offset:.2}, {transform:`rotate(${a}rad) translateY(70vmax)`, opacity:0}], {duration:900 + R()*700, delay:R()*3500, iterations:3}); }
+    const j = head('left:50%;top:50%;width:200px;margin:-100px 0 0 -100px');
+    j.animate([{transform:'scale(1)', filter:'brightness(1)'}, {transform:'scale(.05)', filter:'brightness(4)'}], {duration:4200, delay:600, ...ease});
+  } else if (L.k === 'apo') {
+    E.style.background = 'radial-gradient(circle,#fff3c4,#c8891a 45%,#3a2000 90%)'; sfx('angel'); setTimeout(() => sfx('fanfare'), 2600); title = '🔆 APOTHEOSIS'; col = 'linear-gradient(90deg,#fff,#ffd166)';
+    const rays = el('left:50%;top:50%;width:200vmax;height:200vmax;margin:-100vmax 0 0 -100vmax;background:repeating-conic-gradient(rgba(255,255,255,.35) 0 6deg,transparent 6deg 18deg);opacity:0');
+    rays.animate([{transform:'rotate(0)', opacity:0}, {opacity:1, offset:.2}, {transform:'rotate(120deg)', opacity:1}], {duration:7000, ...ease});
+    const j = head('left:50%;top:70%;width:180px;margin:-90px 0 0 -90px');
+    const crown = el('left:50%;top:70%;font-size:80px;margin:-190px 0 0 -40px;opacity:0', '👑');
+    j.animate([{top:'70%'}, {top:'48%'}], {duration:3000, delay:400, ...ease}); crown.animate([{top:'40%', opacity:0}, {top:'48%', opacity:1}], {duration:1200, delay:2600, ...ease});
+    setTimeout(() => confetti(120), 3000);
+  } else if (L.k === 'sing') {
+    E.style.background = '#000'; sfx('crack'); title = '🕳️ SINGULARITY'; col = 'linear-gradient(90deg,#ff8a3d,#c77dff)';
+    const disk = el('left:50%;top:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border-radius:50%;background:conic-gradient(#ff8a3d,#c77dff,#4cc9f0,#ff5c7a,#ff8a3d);filter:blur(10px);opacity:.85');
+    disk.animate([{transform:'rotate(0)'}, {transform:'rotate(360deg)'}], {duration:1600, iterations:Infinity});
+    el('left:50%;top:50%;width:170px;height:170px;margin:-85px 0 0 -85px;border-radius:50%;background:#000;box-shadow:0 0 60px 20px #000');
+    const stuff = ['🪙', '🌍', '⭐', '💈', '🥚', '🦄', '🪐'];
+    for (let k = 0; k < 40; k++) { const a = R()*360, r = 40 + R()*30, d = el(`left:50%;top:50%;font-size:${18 + R()*20}px;margin:-14px 0 0 -14px`, stuff[k % stuff.length]);
+      d.animate([{transform:`rotate(${a}deg) translateX(${r}vmax) rotate(0)`, opacity:1}, {transform:`rotate(${a + 540}deg) translateX(0) rotate(720deg)`, opacity:0}], {duration:2500 + R()*2000, delay:R()*1500, fill:'forwards', easing:'ease-in'}); }
+    const j = head('left:50%;top:50%;width:150px;margin:-75px 0 0 -75px');
+    j.animate([{transform:'rotate(0) scale(1)'}, {transform:'rotate(1080deg) scale(0)'}], {duration:3500, delay:1500, fill:'forwards', easing:'ease-in'});
+    const flash = el('inset:0;background:#fff;opacity:0'); flash.animate([{opacity:0}, {opacity:1}, {opacity:0}], {duration:900, delay:4900, fill:'forwards'});
+  } else {
+    E.style.background = 'radial-gradient(circle,#0b1e3a,#000 75%)'; sfx('angel'); setTimeout(() => sfx('fanfare'), 3000); title = '🌌 OMNIVERSE'; col = 'linear-gradient(90deg,#4cc9f0,#57cc99,#ffd166,#ff5c7a,#c77dff)';
+    const field = el('left:50%;top:50%;width:0;height:0');
+    for (let k = 0; k < 60; k++) { const u = document.createElement('div'), a = k*2.4, r = 40 + k*14, sz = 40 + R()*50;
+      u.style.cssText = `position:absolute;left:${Math.cos(a)*r - sz/2}px;top:${Math.sin(a)*r - sz/2}px;width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle,hsl(${R()*360} 80% 60% / .55),transparent 70%);display:flex;align-items:center;justify-content:center`;
+      const im = document.createElement('img'); im.src = $('jun').src; im.style.cssText = `width:55%;clip-path:${getComputedStyle($('jun')).clipPath}`; u.appendChild(im); field.appendChild(u); }
+    field.animate([{transform:'scale(4)'}, {transform:'scale(.35) rotate(40deg)'}], {duration:6000, ...ease});
+  }
+  setTimeout(() => {
+    const box = el('left:0;right:0;top:36%;text-align:center;padding:0 20px;opacity:0;color:#fff',
+      `<div style="font:700 clamp(28px,6.5vw,52px) Fredoka,sans-serif;background:${col};-webkit-background-clip:text;background-clip:text;color:transparent">${title}</div>
+       <div style="margin:10px 0 20px;font-weight:700;text-shadow:0 2px 8px #000">${line}</div><button class="end-btn" id="layDone">Keep climbing</button>`);
+    box.animate([{opacity:0, transform:'translateY(16px)'}, {opacity:1, transform:'translateY(0)'}], {duration:900, fill:'forwards'});
+    $('layDone').onclick = () => { E.hidden = true; E.innerHTML = ''; E.style.background = ''; };
+  }, 5600);
+}
+$('aLayer').onclick = () => { A.close(); playLayerScene(Math.floor(Math.random()*4)); };
 
 // ---------- challenges ----------
 function renderChal(){
@@ -1886,6 +2020,7 @@ const ADMIN_HASH = '371ca238d183a07b416fb16bace016f76d1d964efc554f3124291c61c690
 let adminOk = false;
 async function toggleAdmin(){
   if (A.open) return A.close();
+  if (!adminOk && window.permaAdmin) { adminOk = true; S.cheater = true; save(); window.onCheat?.(); }
   if (!adminOk) { $('passIn').value = ''; $('passMsg').textContent = ''; return $('pass').showModal(); }
   A.showModal();
 }
@@ -2247,7 +2382,7 @@ function renderBoss(){
 let fight = null;
 function bossStart(){
   const i = S.boss; if (i >= BOSSES.length) return;
-  fight = {i, hp:bossHp(i), max:bossHp(i), end:performance.now() + 30000, done:false};
+  fight = {i, hp:bossHp(i), max:bossHp(i), end:performance.now() + 30000 + 500*petLv('sloth'), done:false};
   $('bName').textContent = `${BOSSES[i][1]}`; $('bMob').textContent = BOSSES[i][0]; $('bEnd').hidden = true;
   $('boss').style.display = 'flex'; bossDraw();
   clearInterval(fight.t); fight.t = setInterval(() => { if (!fight || fight.done) return; bossDraw(); if (performance.now() > fight.end) bossOver(false); }, 100);
@@ -2260,7 +2395,7 @@ function bossDraw(){
 }
 $('bMob').addEventListener('pointerdown', e => {
   const f = fight; if (!f || f.done) return;
-  const dmg = perClick(); f.hp -= dmg; sfx('click');
+  const dmg = perClick() * (1 + .05*petLv('crab')) * (1 + .1*petLv('kingjun')); f.hp -= dmg; sfx('click');
   const M = $('bMob'); M.classList.add('hit'); setTimeout(() => M.classList.remove('hit'), 60);
   const r = $('boss').getBoundingClientRect(), d = document.createElement('div'); d.className = 'bdmg'; d.textContent = '-' + fmt(dmg);
   d.style.left = (e.clientX - r.left - 20 + (Math.random() - .5)*30) + 'px'; d.style.top = (e.clientY - r.top - 30) + 'px';
@@ -2317,7 +2452,7 @@ $('colRow').onclick = e => {
   $('casMsg').textContent = `Spinning… 🪙 ${fmt(bet)} on ${pick}`;
   $('wheel').style.transform = `rotate(${wheelRot}deg)`;
   setTimeout(() => {
-    const prize = win ? bet * CAS[pick].x : 0;
+    const prize = win ? bet * CAS[pick].x * (1 + .02*petLv('frog')) : 0;
     if (win) S.coins = Math.min(CAP, S.coins + prize);   // straight to coins: no lifetime/leaderboard credit
     S.casNet += prize - bet; spinning = false; save(); refresh(); casUI();
     for (const x of $('colRow').children) x.disabled = false;
@@ -2506,7 +2641,7 @@ news();
 // offline earnings: passive + auto clicks at 75% for up to 24h, boosted by Night Shift, Never Sleeps, Hoot and Shelly
 const dur = s => s >= 3600 ? `${Math.floor(s/3600)}h ${Math.floor(s%3600/60)}m` : `${Math.floor(s/60)}m`;
 function offline(ms){
-  const hrs = 24 + (asu('night') ? 72 : 0) + 6*lv('offline') + 2*petLv('turtle'), rate = (.75 + .05*lv('offline') + .1*petLv('owl')) * (asu('night') ? 2 : 1);
+  const hrs = 24 + (asu('night') ? 72 : 0) + 6*lv('offline') + 2*petLv('turtle') + petLv('ghost'), rate = (.75 + .05*lv('offline') + .1*petLv('owl') + .15*petLv('ghost')) * (asu('night') ? 2 : 1);
   const sec = Math.min(ms/1000, hrs * 3600);
   if (sec < 60) return;
   const n = income() * sec * rate;
@@ -2524,6 +2659,15 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'5.1', date:'Oct 7, 2026', title:'Pets, Eggs & Cutscenes', notes:[
+    '🐾 10 new pets: Buzzby, Pinchy, Peep, Lucky Ribbit, Sir Slowpoke, Chomper, King Leo, Boo, Big Tusk and the Mythic Prince Jun. Some boost bosses, roulette, eggs and offline earnings',
+    '🥚 3 new eggs: 🌴 Jungle (coins), 🍀 Lucky (tokens) and 🕳️ Void (✨, 60% Mythic)',
+    '🎬 Cutscenes for Transcend, Apotheosis, Singularity and Omniverse',
+    '🔇 Muted players now show in Chat with an Unmute button',
+    '📢 Announcements from the dev show as a banner at the top',
+    '🌈 New rarities: Divine and Celestial (from Royal, Lucky and Void eggs), plus a Secret 1-in-a-billion pet with its own cutscene and a server-wide shout',
+    '🗂️ Pets are grouped by what they boost',
+    '🌌 Leaderboards show Transcend, Apotheosis, Singularity and Omniverse, with a new Prestige board']},
   {v:'5.0', date:'Oct 7, 2026', title:'Season 1: Beyond Ascension', notes:[
     '🌠 4 new prestige layers past Ascension: Transcend, Apotheosis, Singularity and Omniverse. Each resets the layers below for a giant permanent multiplier',
     'Rebirth costs now grow with your Ascensions, layers and challenges, so every climb to 300 rebirths takes about as long as your first: no more endless shortcut loops, and no impossible walls',
@@ -2774,13 +2918,18 @@ $('resAll').onclick = () => {
 
 // pets
 // egg prices: Basic and Golden cost coins and get pricier the more you hatch (Golden is always ≥25× Basic); Cosmic costs tokens, Royal costs ✨
-const eggCost = (t = 'basic') => t === 'basic' ? Math.ceil(25000 * 1.8 ** (S.eggs.basic || 0))
-  : t === 'golden' ? Math.ceil(eggCost('basic') * 25 * 1.3 ** (S.eggs.golden || 0)) : t === 'cosmic' ? 25 : 1;   // golden always ≥25× a basic egg
-const eggCur = t => t === 'cosmic' ? '💈' : t === 'royal' ? '✨' : '🪙';
-const eggAfford = t => t === 'cosmic' ? S.hc >= 25 : t === 'royal' ? S.ap >= 1 : S.coins >= eggCost(t);
+// Jungle costs coins (≥20× a Golden egg); Lucky costs tokens; Void costs ✨. Peep the chick makes coin eggs cheaper
+const coinEgg = t => ['basic', 'golden', 'jungle'].includes(t);
+const eggCost = (t = 'basic') => coinEgg(t) ? Math.ceil((t === 'basic' ? 25000 * 1.8 ** (S.eggs.basic || 0)
+  : t === 'golden' ? eggCost('basic') * 25 * 1.3 ** (S.eggs.golden || 0)
+  : eggCost('golden') * 20 * 1.3 ** (S.eggs.jungle || 0)) * (1 - .02*petLv('chick')))
+  : {cosmic:25, lucky:60, royal:1, void:3}[t];
+const eggCur = t => ['cosmic', 'lucky'].includes(t) ? '💈' : ['royal', 'void'].includes(t) ? '✨' : '🪙';
+const eggHave = t => eggCur(t) === '💈' ? S.hc : eggCur(t) === '✨' ? S.ap : S.coins;
+const eggAfford = t => eggHave(t) >= eggCost(t);
 let petSel = '', eggN = 1;
 function eggBulk(t, want){
-  const have = t === 'cosmic' ? S.hc : t === 'royal' ? S.ap : S.coins, saved = {...S.eggs};
+  const have = eggHave(t), saved = {...S.eggs};
   let n = 0, tot = 0;
   for (; n < want; n++) { const c = eggCost(t); if (tot + c > have) break; tot += c; S.eggs[t] = (S.eggs[t] || 0) + 1; }
   S.eggs = saved; return {n, tot};
@@ -2797,13 +2946,17 @@ function renderPets(){
     $('eggRow').appendChild(b);
   }
   $('petGrid').innerHTML = '';
-  for (const q of PETS) {
+  for (const [, label, ids] of PET_GROUPS) {
+  $('petGrid').insertAdjacentHTML('beforeend', `<div class="pgh">${label}</div>`);
+  for (const q of ids.map(id => PETS.find(x => x.id === id))) {
+    if (q.r === 'Secret' && !S.pets[q.id]) continue;
     const L = S.pets[q.id] || 0, b = document.createElement('button');
     b.innerHTML = `<span class="pi">${L ? q.ic : '❓'}</span><span class="pl">${L ? 'Lv ' + L : q.r}</span>`;
     b.className = (!L ? 'none' : S.equip.includes(q.id) ? 'eq' : '') + (petSel === q.id ? ' sel' : '');
     if (L) b.style.borderColor = RARC[q.r];
     b.onclick = () => { petSel = petSel === q.id ? '' : q.id; renderPets(); };
     $('petGrid').appendChild(b);
+  }
   }
   // detail panel for the tapped pet
   const q = PETS.find(x => x.id === petSel), D = $('petDetail');
@@ -2829,13 +2982,14 @@ function hatchEgg(free, tier = 'basic', want = 1){
   if (!free) {
     const {n, tot} = eggBulk(egg.id, want);
     if (!n) return sfx('error'), toast(`You need ${eggCur(egg.id)} ${fmt(eggCost(egg.id))} for a ${egg.nm}`);
-    if (egg.id === 'cosmic') S.hc -= tot; else if (egg.id === 'royal') S.ap -= tot; else S.coins -= tot;
+    const c = eggCur(egg.id); if (c === '💈') S.hc -= tot; else if (c === '✨') S.ap -= tot; else S.coins -= tot;
     want = n;
   }
   const got = [];
   for (let i = 0; i < want; i++) got.push(rollEgg(egg));
   petSel = got[got.length - 1].q.id; save(); renderPets(); refresh();
-  if (got.length === 1) hatchFx(egg.ic, got[0].q, got[0].note); else hatchManyFx(egg, got);
+  if (got.some(g => g.q.id === 'blackhole' && g.note === 'New pet!')) { playBlackHole(); window.shoutPet?.('blackhole'); }
+  else if (got.length === 1) hatchFx(egg.ic, got[0].q, got[0].note); else hatchManyFx(egg, got);
 }
 function rollEgg(egg){
   S.eggs[egg.id] = (S.eggs[egg.id] || 0) + 1; S.hatches++;
@@ -2843,6 +2997,7 @@ function rollEgg(egg){
   const odds = Object.fromEntries(Object.entries(egg.odds).map(([k, v]) => [k, v * (asu('luck') && k !== 'Common' ? 2 : 1)]));
   let pick = Math.random() * Object.values(odds).reduce((a, b) => a + b, 0), rar = 'Common';
   for (const [k, v] of Object.entries(odds)) if ((pick -= v) <= 0) { rar = k; break; }
+  if (Math.random() < 1e-9) rar = 'Secret';   // 🕳️ Event Horizon: 0.0000001% from any egg
   const pool = PETS.filter(x => x.r === rar), q = pool[Math.random()*pool.length|0];
   const L = S.pets[q.id] || 0;
   let note;
@@ -2851,7 +3006,7 @@ function rollEgg(egg){
   return {q, note};
 }
 // bulk hatch: one wobble, then every pet pops in on a grid. One sound and one confetti for the best pull
-const RAR_ORD = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+const RAR_ORD = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic', 'Divine', 'Celestial', 'Secret'];
 function hatchManyFx(egg, got){
   if (S.skipAnim) return toast(`${egg.ic} Hatched ${got.length}: ${got.map(g => g.q.ic).join('')}`);
   const F = document.createElement('div'); F.className = 'fxLayer'; F.style.background = 'rgba(8,9,16,.86)'; document.body.appendChild(F);
@@ -2961,7 +3116,7 @@ function renderSettings(){
   $('dispIn').value = S.display;
   $('animBtn').textContent = S.skipAnim ? '⏭ Cutscenes & big effects: skipped' : '🎬 Cutscenes & big effects: on';
 }
-$('setBtn').onclick = () => { renderSettings(); window.loadIdeas?.(); $('ideaMsg').textContent = ''; $('dispMsg').textContent = ''; $('settings').showModal(); };
+$('setBtn').onclick = () => { renderSettings(); $('modBtn').hidden = !window.permaAdmin; $('ideaMsg').textContent = ''; $('dispMsg').textContent = ''; $('settings').showModal(); };
 document.querySelectorAll('#appRow button').forEach(b => b.onclick = () => { S.appearance = b.dataset.v; save(); applyAppearance(); });
 // quick mute: speaker button on the stage, the M key, and the Settings toggle all flip the same switch
 function setSound(on){ S.sound = on; save(); renderSettings(); if (on) sfx('buy'); toast(on ? '🔊 Sound on' : '🔇 Muted'); }
@@ -3239,7 +3394,7 @@ if (FIREBASE) {
     if (!user) return Promise.resolve();
     const saved = setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
-    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
+    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
       // older Firestore rules don't know the day/month fields yet: retry without them so the board keeps updating
       .catch(() => S.cheater ? 0 : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
     return saved;
@@ -3256,8 +3411,12 @@ if (FIREBASE) {
       // weekly: top weekly scores, keeping only this week's (old weeks' entries are ignored)
       // today / week / month: top scores for that period, keeping only entries from the current one (old periods are ignored)
       const P = {day:['dscore', 'day', CUR_DAY], week:['wscore', 'week', CUR_WEEK], month:['mscore', 'month', CUR_MONTH]}[lbKey], weekly = !!P;
-      const qs = await getDocs(query(collection(db, 'leaderboard'), orderBy(P ? P[0] : lbKey, 'desc'), limit(P ? 100 : 10)));
+      // Prestige: highest layer first (Omniverse > Singularity > Apotheosis > Transcend > Ascensions > rebirths)
+      // ponytail: reads the whole board and sorts here; fine for a few hundred players, add a combined score field if it grows
+      const prest = lbKey === 'prest', N = x => Number(x) || 0, rank = r => [N(r.omni), N(r.sing), N(r.apo), N(r.tr), N(r.asc), N(r.rebirths)];
+      const qs = await getDocs(prest ? query(collection(db, 'leaderboard'), limit(500)) : query(collection(db, 'leaderboard'), orderBy(P ? P[0] : lbKey, 'desc'), limit(P ? 100 : 10)));
       const docs = []; qs.forEach(d => { if (!P || d.data()[P[1]] === P[2]) docs.push(d); });
+      if (prest) docs.sort((a, b) => { const x = rank(a.data()), y = rank(b.data()); for (let k = 0; k < x.length; k++) if (x[k] !== y[k]) return y[k] - x[k]; return 0; });
       list.innerHTML = ''; let i = 0;
       docs.slice(0, 10).forEach(d => {
         const r = d.data(), li = document.createElement('li');
@@ -3266,8 +3425,9 @@ if (FIREBASE) {
         const reb = Number(r.rebirths) || 0, crowns = Math.floor(reb / MAXR);
         const nm = li.querySelector('.nmx'); nameHtml(nm, cleanName(r.display), String(r.name), r.title, r.color);
         const hat = cosItem('hat', r.badge); if (typeof r.guild === 'string' && /^[A-Z0-9]{1,4}$/.test(r.guild)) nm.prepend(`[${r.guild}] `); if (hat) nm.prepend(hat.ic + ' ');
-        nm.firstElementChild.append((crowns ? ` 👑${crowns > 1 ? crowns : ''}` : '') + (lbKey === 'score' && reb ? ` 🔁${reb}` : ''));
-        li.querySelector('.sc').textContent = weekly ? fmt(Number(r[P[0]]) || 0) : lbKey === 'score' ? fmt(Number(r.score) || 0) : lbKey === 'asc' ? `${Number(r.asc) || 0} ✨` : `${reb} 🔁`;
+        const lay = [['🌌', r.omni], ['🕳️', r.sing], ['🔆', r.apo], ['🌠', r.tr]].filter(([, v]) => Number(v) > 0).map(([i, v]) => `${i}${Number(v)}`).join(' ');
+        nm.firstElementChild.append((crowns ? ` 👑${crowns > 1 ? crowns : ''}` : '') + (lbKey === 'score' && reb ? ` 🔁${reb}` : '') + (lay && lbKey !== 'prest' ? ` ${lay}` : ''));
+        li.querySelector('.sc').textContent = lbKey === 'prest' ? ([lay, `✨${Number(r.asc) || 0}`, `🔁${reb}`].filter(Boolean).join(' ')) : weekly ? fmt(Number(r[P[0]]) || 0) : lbKey === 'score' ? fmt(Number(r.score) || 0) : lbKey === 'asc' ? `${Number(r.asc) || 0} ✨` : `${reb} 🔁`;
         list.appendChild(li);
       });
       if (!i) list.innerHTML = '<li>No one yet. Be the first!</li>';
@@ -3275,6 +3435,52 @@ if (FIREBASE) {
     $('lbNote').textContent = !user ? 'Create an account below to get on the board.' : S.cheater ? 'You used the admin panel, so you’re off the board.' : '';
   }
   $('lb').hidden = false; loadBoard(); setInterval(loadBoard, 60000);
+  // ---------- announcements: announce/{id} = {text, by, ts}. Everyone reads; only the mod (nkthn) posts and deletes ----------
+  async function loadAnnounce(){
+    try {
+      const qs = await getDocs(query(collection(db, 'announce'), orderBy('ts', 'desc'), limit(1)));
+      const d = qs.docs[0]; let seen = ''; try { seen = localStorage.getItem('clickjun-ann') || ''; } catch {}
+      if (!d || d.id === seen) return $('annBar').hidden = true;
+      $('annBar').querySelector('span').textContent = String(d.data().text || '').slice(0, 300); $('annBar').hidden = false;
+      $('annBar').querySelector('button').onclick = () => { $('annBar').hidden = true; try { localStorage.setItem('clickjun-ann', d.id); } catch {} };
+    } catch {}
+  }
+  loadAnnounce(); setInterval(loadAnnounce, 120000);
+  // shouts/{id} = {from, pet, ts}: everyone online sees a banner when someone unlocks the 1-in-a-billion pet
+  window.shoutPet = pet => user && addDoc(collection(db, 'shouts'), {from:me(), pet, ts:serverTimestamp()}).catch(() => {});
+  let shoutSeen = Date.now();
+  onSnapshot(query(collection(db, 'shouts'), orderBy('ts', 'desc'), limit(1)), qs => {
+    const d = qs.docs[0]; if (!d) return;
+    const g = d.data({serverTimestamps:'estimate'}), t = g.ts?.toMillis ? g.ts.toMillis() : 0;
+    if (t <= shoutSeen - 5000 || String(g.from) === me()) return;
+    shoutSeen = Date.now();
+    const q = PETS.find(x => x.id === g.pet); if (!q) return;
+    $('annBar').querySelector('span').textContent = `🚨 ${String(g.from)} just unlocked ${q.ic} ${q.nm} (${q.r})! That's 1 in a billion!`;
+    $('annBar').hidden = false; $('annBar').querySelector('button').onclick = () => { $('annBar').hidden = true; };
+    sfx('fanfare'); confetti(120);
+  }, () => {});
+  async function loadAnnList(){
+    const L = $('annList'); L.innerHTML = '';
+    try {
+      const qs = await getDocs(query(collection(db, 'announce'), orderBy('ts', 'desc'), limit(10)));
+      qs.forEach(d => {
+        const row = document.createElement('div'); row.className = 'idea';
+        row.innerHTML = '<span class="dimtxt"></span><div></div><button class="ab" style="margin-top:6px;padding:4px 10px;font-size:12px">🗑️ Remove</button>';
+        row.querySelector('.dimtxt').textContent = d.data().ts?.toDate ? d.data().ts.toDate().toLocaleString() : '';
+        row.querySelector('div').textContent = String(d.data().text || '');
+        row.querySelector('button').onclick = () => deleteDoc(d.ref).then(() => { row.remove(); loadAnnounce(); }).catch(() => {});
+        L.appendChild(row);
+      });
+    } catch { L.innerHTML = '<div class="dimtxt">Couldn\'t load announcements</div>'; }
+  }
+  $('annPost').onclick = async () => {
+    const t = $('annIn').value.trim(); if (!t) return;
+    try { await addDoc(collection(db, 'announce'), {text:t.slice(0, 300), by:me(), ts:serverTimestamp()}); $('annIn').value = ''; $('annMsg').textContent = '📢 Posted!'; loadAnnList(); loadAnnounce(); }
+    catch { $('annMsg').textContent = "Couldn't post (are you signed in as nkthn?)"; }
+  };
+  $('modBtn').onclick = () => { $('settings').close(); $('annMsg').textContent = ''; $('modPanel').showModal(); loadAnnList(); window.loadIdeas?.(); };
+  $('modChat').onclick = () => { $('modPanel').close(); window.openChat?.('global'); };
+  $('modHax').onclick = () => { $('modPanel').close(); toggleAdmin(); };
   // ---------- suggestions: suggestions/{id} = {from, text, ts}. Anyone signed in can send; only the mod can read and delete ----------
   $('ideaSend').onclick = async () => {
     const t = $('ideaIn').value.trim(), msg = x => $('ideaMsg').textContent = x;
@@ -3289,7 +3495,7 @@ if (FIREBASE) {
     } catch { msg("Couldn't send right now, try again later"); }
   };
   window.loadIdeas = async () => {
-    $('ideaInbox').hidden = me() !== 'nkthn'; if (me() !== 'nkthn') return;
+    if (me() !== 'nkthn') return;
     const L = $('ideaList'); L.innerHTML = '<div class="dimtxt">Loading…</div>';
     try {
       const qs = await getDocs(query(collection(db, 'suggestions'), orderBy('ts', 'desc'), limit(50)));
@@ -3311,6 +3517,7 @@ if (FIREBASE) {
   // UI: friend list; tap a friend for their profile (message, gift, trade, remove). Trades live in their own 🤝 Trades window.
   const me = () => user ? user.email.split('@')[0] : '';
   window.myName = me;
+  Object.defineProperty(window, 'permaAdmin', {get:() => me() === 'nkthn'});   // nkthn is the permanent admin while signed in
   let pf = '';   // friend whose profile is open
   const frMsg = t => $('frMsg').textContent = t, pfMsg = t => $('pfMsg').textContent = t, trMsg = t => $('trMsg').textContent = t;
   const tok = v => Math.max(0, Math.min(1e6, Math.floor(Number(v) || 0)));
@@ -3612,7 +3819,17 @@ if (FIREBASE) {
     };
     return row;
   }
+  function renderMuted(){
+    $('muteBox').hidden = !S.muted.length; const L = $('muteList'); L.innerHTML = '';
+    for (const n of S.muted) {
+      const row = document.createElement('div'); row.className = 'frRow';
+      row.innerHTML = '<b></b><span></span><button class="ab">🔊 Unmute</button>'; row.querySelector('b').textContent = n;
+      row.querySelector('button').onclick = () => { S.muted = S.muted.filter(x => x !== n); save(); listen(); };
+      L.appendChild(row);
+    }
+  }
   function listen(){
+    renderMuted();
     if (unsub) { unsub(); unsub = null; }
     const box = $('chatBox'); box.innerHTML = '';
     if (room === 'dm' && !chatFriend) return chatNote('Pick a friend to chat with');
