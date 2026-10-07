@@ -2196,7 +2196,7 @@ const hax = {
   ups:() => UPS.forEach(u => S.own[u.id] = own(u) + 100),
   res:() => RES.forEach(r => S.research[r.id] = true),
   perks:() => PERKS.forEach(k => S.perks[k.id] = k.max || 50),
-  ash:() => AUP.forEach(a => S.aup[a.id] = true),
+  ash:() => { if (!S.aup.auto) S.autoBuy = false; AUP.forEach(a => S.aup[a.id] = true); },   // a granted Auto Buyer starts switched off
   pets:() => { PETS.forEach(q => S.pets[q.id] = PET_MAX); S.equip = ['blackhole', 'orca', 'dodo', 'tiger'].slice(0, PET_SLOTS); },
   cos:() => { for (const t in COS) for (const c of COS[t]) S.cos.owned[t + ':' + c.id] = true; S.allCos = true; },
   boss:() => S.boss = BOSSES.length,
