@@ -370,6 +370,7 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .pcStats{font-size:12px;font-weight:700;margin-top:2px;opacity:.95}
 .pc .ppets em{font-style:normal;font-size:11px;align-self:center;opacity:.85}
 #wGrid button.flex{box-shadow:inset 0 0 0 2px #b388ff}
+#admin .hx{flex-wrap:wrap}#admin .hx .ab{flex:1 1 30%;font-size:12px;padding:8px 4px}
 .pcard{flex-direction:column;background:var(--panel2);border-radius:12px;padding:10px;margin-top:6px}
 .pstats{font-size:13px}.pstats b{color:var(--gold)}
 .ppets{display:flex;gap:6px;margin-top:6px}.ppets span{font-size:22px;border:2px solid;border-radius:10px;padding:2px 5px;background:var(--panel)}
@@ -759,6 +760,7 @@ body.light .ab:hover{background:#e6e8f2}
   <label>📬 Ideas from players</label><div id="ideaList"></div>
   <label>Tools</label>
   <div class="row"><button class="ab" id="modChat">💬 Chat moderation</button><button class="ab" id="modHax">🧪 Hax panel</button></div>
+  <button class="ab" id="modAll" style="width:100%;margin-top:8px">🔓 Unlock everything</button>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
 </dialog>
 <dialog id="casino">
@@ -809,11 +811,20 @@ body.light .ab:hover{background:#e6e8f2}
   <div style="color:var(--dim);font-size:13px">With great power comes great Jun.</div>
   <label>Coins</label>
   <div class="row"><input type="number" id="aAmt" value="1000000" min="0"><button class="ab" id="aAdd">Add</button><button class="ab" id="aSet">Set</button></div>
-  <div class="row" style="margin-top:6px"><button class="ab" data-add="1e3">+1K</button><button class="ab" data-add="1e6">+1M</button><button class="ab" data-add="1e9">+1B</button><button class="ab" data-add="1e12">+1T</button></div>
+  <div class="row" style="margin-top:6px"><button class="ab" data-add="1e6">+1M</button><button class="ab" data-add="1e12">+1T</button><button class="ab" data-add="1e30">+1e30</button><button class="ab" data-add="1e100">+1e100</button><button class="ab" id="aInf">∞ Max coins</button></div>
   <label>Coin multiplier: <span id="aMultV">1</span>×</label>
-  <input type="range" id="aMult" min="1" max="100" value="1">
+  <input type="range" id="aMult" min="0" max="12" step="1" value="0">
   <label>Jun speed: <span id="aSpdV">180</span></label>
   <input type="range" id="aSpd" min="0" max="900" step="10" value="180">
+  <label>🔓 God mode</label>
+  <button class="ab" id="aAll" style="width:100%;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);color:#111;font-weight:800">🔓 UNLOCK EVERYTHING</button>
+  <label>Currencies</label>
+  <div class="row hx"><button class="ab" data-cur="hc:100">+100 💈</button><button class="ab" data-cur="hc:10000">+10K 💈</button><button class="ab" data-cur="ap:10">+10 ✨</button><button class="ab" data-cur="rebirths:10">+10 🔁</button><button class="ab" data-cur="rebirths:300">+300 🔁</button>
+    <button class="ab" data-cur="asc:1">+1 Ascension</button><button class="ab" data-cur="asc:10">+10 Ascensions</button><button class="ab" data-cur="tr:1">+1 🌠</button><button class="ab" data-cur="apo:1">+1 🔆</button><button class="ab" data-cur="sing:1">+1 🕳️</button><button class="ab" data-cur="omni:1">+1 🌌</button></div>
+  <label>Instant</label>
+  <div class="row hx"><button class="ab" id="aUps100">+100 every upgrade</button><button class="ab" id="aRes">All research</button><button class="ab" id="aPerks">Max perks</button><button class="ab" id="aAsh">All Ascension Shop</button>
+    <button class="ab" id="aPets">All pets max</button><button class="ab" id="aBH2">Get Event Horizon</button><button class="ab" id="aVoid">Hatch 25 Void eggs</button><button class="ab" id="aCos">All cosmetics</button>
+    <button class="ab" id="aBoss">Beat all bosses</button><button class="ab" id="aChal">Win all challenges</button><button class="ab" id="aAch">All achievements</button><button class="ab" id="aDaily">Reset daily + quests</button></div>
   <label>Cheats</label>
   <div class="row"><button class="ab" id="aUps">+10 every upgrade</button><button class="ab" id="aGold">Spawn Golden Jun</button><button class="ab" id="aDia">Spawn Diamond Jun</button><button class="ab" id="aVc">Spawn VC offer</button><button class="ab" id="aEvt">Start 4× frenzy</button><button class="ab" id="aEnd">Play ending</button><button class="ab" id="aTrue">Play true ending</button><button class="ab" id="aAscS">Play ascension</button><button class="ab" id="aLayer">Play layer cutscene</button><button class="ab" id="aBH">Play black hole cutscene</button><button class="ab" id="aBest">Reset Flappy best</button></div>
   <div class="row" style="margin-top:18px"><button class="ab" id="aClose" style="flex:1">Close</button></div>
@@ -1265,7 +1276,7 @@ const COS = {
 const PAYI = {rebirths:'🔁 rebirths', asc:'✨ Ascensions', tr:'🌠 Transcend', apo:'🔆 Apotheosis', sing:'🕳️ Singularity', omni:'🌌 Omniverse'};
 for (const t in COS) COS[t] = COS[t].map(([id, ic, nm, cost, unlock, how, a, b, cx]) => ({id, ic, nm, cost, unlock, how, a, b, cx, pay:typeof cost === 'string' ? {k:cost.split(':')[0], n:+cost.split(':')[1]} : null}));
 const cosItem = (t, id) => COS[t].find(c => c.id === id);
-const cosOwned = (t, c) => c.unlock ? c.unlock() : !!S.cos.owned[t + ':' + c.id];
+const cosOwned = (t, c) => S.allCos || (c.unlock ? c.unlock() : !!S.cos.owned[t + ':' + c.id]);
 // display names: up to 16 characters, no control characters or angle brackets, trimmed
 const cleanName = v => typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f<>]/g, '').trim().slice(0, 16) : '';
 function cleanCos(c){
@@ -2055,6 +2066,7 @@ function applyState(d, keepCheat = true){
     chal:d.chal && CHALS.some(c => c.id === d.chal.id) && num(d.chal.goal) > 0 ? {id:d.chal.id, goal:num(d.chal.goal), start:num(d.chal.start) || Date.now()} : null,
     chalDone:Object.fromEntries(CHALS.filter(c => d.chalDone && d.chalDone[c.id] === true).map(c => [c.id, true])),
     day:typeof d.day === 'string' ? d.day.slice(0, 10) : '', dcoins:num(d.dcoins), month:typeof d.month === 'string' ? d.month.slice(0, 7) : '', mcoins:num(d.mcoins),
+    allCos:d.allCos === true, allUnlocked:d.allUnlocked === true,
     boss:Math.min(BOSSES.length, int(d.boss)), spins:int(d.spins), casNet:Number.isFinite(d.casNet) ? d.casNet : 0,
     rebTotal:int(d.rebTotal) || int(d.asc)*300 + int(d.rebirths)};
   shown = S.coins; recalcResearch(); save(); applyXmas(); applyFx(); applyBuy(); applyPerks(); renderAch(); renderPets(); renderShop(); refresh();
@@ -2083,7 +2095,44 @@ addEventListener('keydown', e => { if (e.key === '`' && e.target.tagName !== 'IN
 $('aAdd').onclick = () => give(+$('aAmt').value || 0);
 $('aSet').onclick = () => { S.coins = Math.max(0, +$('aAmt').value || 0); save(); refresh(); };
 A.querySelectorAll('[data-add]').forEach(b => b.onclick = () => give(+b.dataset.add));
-$('aMult').oninput = e => { MULT = +e.target.value; $('aMultV').textContent = MULT; };
+$('aMult').oninput = e => { MULT = 10 ** +e.target.value; $('aMultV').textContent = fmt(MULT); };   // 1× up to 1e12×
+$('aInf').onclick = () => { S.coins = CAP; save(); refresh(); };
+A.querySelectorAll('[data-cur]').forEach(b => b.onclick = () => {
+  const [k, n] = b.dataset.cur.split(':'); S[k] = (S[k] || 0) + +n;
+  if (k === 'rebirths') S.rebTotal += +n;
+  recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); toast(`${b.textContent} added`);
+});
+const hax = {
+  ups:() => UPS.forEach(u => S.own[u.id] = own(u) + 100),
+  res:() => RES.forEach(r => S.research[r.id] = true),
+  perks:() => PERKS.forEach(k => S.perks[k.id] = k.max || 50),
+  ash:() => AUP.forEach(a => S.aup[a.id] = true),
+  pets:() => { PETS.forEach(q => S.pets[q.id] = PET_MAX); S.equip = ['blackhole', 'orca', 'dodo', 'tiger'].slice(0, PET_SLOTS); },
+  cos:() => { for (const t in COS) for (const c of COS[t]) S.cos.owned[t + ':' + c.id] = true; S.allCos = true; },
+  boss:() => S.boss = BOSSES.length,
+  chal:() => CHALS.forEach(c => S.chalDone[c.id] = true),
+  ach:() => ACH.forEach(a => S.ach[a.id] = true),
+};
+const haxDone = msg => { recalcResearch(); applyPerks(); applyCos(); renderPets(); renderShop(); renderAch(); renderBoss(); renderChal(); renderLayers(); save(); refresh(); window.pushNow?.(); toast(msg); };
+$('aUps100').onclick = () => { hax.ups(); haxDone('+100 of every upgrade'); };
+$('aRes').onclick = () => { hax.res(); haxDone('All research unlocked'); };
+$('aPerks').onclick = () => { hax.perks(); haxDone('Every perk maxed'); };
+$('aAsh').onclick = () => { hax.ash(); haxDone('Whole Ascension Shop unlocked'); };
+$('aPets').onclick = () => { hax.pets(); haxDone('Every pet at max level'); };
+$('aBH2').onclick = () => { S.pets.blackhole = Math.max(1, S.pets.blackhole || 0); if (!S.equip.includes('blackhole')) S.equip = ['blackhole', ...S.equip].slice(0, PET_SLOTS); haxDone('🕳️ Event Horizon added'); A.close(); playBlackHole(); };
+$('aVoid').onclick = () => { A.close(); S.ap += 75; hatchEgg(false, 'void', 25); };
+$('aCos').onclick = () => { hax.cos(); haxDone('Every cosmetic unlocked'); };
+$('aBoss').onclick = () => { hax.boss(); haxDone(`All ${BOSSES.length} bosses beaten`); };
+$('aChal').onclick = () => { hax.chal(); haxDone('All challenges won'); };
+$('aAch').onclick = () => { hax.ach(); haxDone('All achievements unlocked'); };
+$('aDaily').onclick = () => { S.daily.last = ''; S.quests = {day:'', list:[], bonus:false, reroll:false}; ensureQuests(); renderQuests(); haxDone('Daily reward and quests reset'); };
+// everything at once (nkthn gets this automatically the first time they sign in)
+function unlockAll(){
+  Object.values(hax).forEach(f => f()); S.allUnlocked = true; S.cheater = true; window.onCheat?.();
+  haxDone('🔓 Everything unlocked'); confetti(150); sfx('fanfare');
+}
+window.unlockAll = unlockAll;
+$('aAll').onclick = () => { if (confirm('Unlock every cosmetic, pet, perk, research card, boss, challenge, achievement and the whole Ascension Shop?')) unlockAll(); };
 $('aSpd').oninput = e => { BASE = +e.target.value; $('aSpdV').textContent = BASE;
   const sx = Math.sign(jun.vx) || 1, sy = Math.sign(jun.vy) || 1; jun.vx = sx*BASE; jun.vy = sy*BASE*.8; };
 $('aUps').onclick = () => { UPS.forEach(u => S.own[u.id] = own(u) + 10); save(); refresh(); };
@@ -3556,6 +3605,7 @@ if (FIREBASE) {
   $('modBtn').onclick = () => { $('settings').close(); $('annMsg').textContent = ''; $('modPanel').showModal(); loadAnnList(); window.loadIdeas?.(); };
   $('modChat').onclick = () => { $('modPanel').close(); window.openChat?.('global'); };
   $('modHax').onclick = () => { $('modPanel').close(); toggleAdmin(); };
+  $('modAll').onclick = () => { $('modPanel').close(); window.unlockAll(); };
   // ---------- suggestions: suggestions/{id} = {from, text, ts}. Anyone signed in can send; only the mod can read and delete ----------
   $('ideaSend').onclick = async () => {
     const t = $('ideaIn').value.trim(), msg = x => $('ideaMsg').textContent = x;
@@ -4066,6 +4116,7 @@ if (FIREBASE) {
     if (S.owner && !mine) resetLocal();
     if (cloud && Math.max(cloud.lifetime || 0, cloud.total || 0) >= S.lifetime) { applyState(cloud, mine); toast('Cloud save loaded!'); }
     S.owner = u.uid; save();
+    if (me() === 'nkthn' && !S.allUnlocked) window.unlockAll?.();
     await syncGuild(); push(); loadBoard(); frPoll();
   });
   setInterval(push, 15000);
