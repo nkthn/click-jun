@@ -309,6 +309,20 @@ body.light #live{background:rgba(30,150,100,.12);color:#1e9664}
 .frRow{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .frRow span{flex:1;font-size:12px;color:var(--dim)}
 .trRow{padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.tzones{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.tz{background:var(--panel2);border:2px dashed var(--line);border-radius:14px;padding:8px;min-height:120px;display:flex;flex-direction:column;transition:border-color .15s,background .15s}
+.tz.hot{border-color:var(--accent);background:rgba(124,92,255,.15)}
+.tzh{font:700 12px 'Nunito',sans-serif;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+.tzp{flex:1;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:6px 0;align-content:start}
+.tzp button,.tinv button{position:relative;border:2px solid;border-radius:12px;background:var(--panel);color:var(--text);font-size:24px;line-height:1;padding:6px 0 4px;cursor:grab;display:flex;flex-direction:column;align-items:center;touch-action:none;user-select:none;-webkit-user-select:none}
+.tzp button small,.tinv button small{font:700 9px 'Nunito',sans-serif;color:var(--dim);margin-top:2px}
+.tzp:empty::after{content:'Drop pets here';grid-column:1/-1;color:var(--dim);font-size:12px;text-align:center;padding:16px 0}
+.tzt{display:flex;align-items:center;gap:6px;font-size:13px}.tzt input{width:100%;min-width:0}
+.tinvh{font-size:12px;color:var(--dim);margin:10px 0 4px}
+.tinv{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.tinv button:disabled{opacity:.3;cursor:not-allowed}
+.tghost{position:fixed;z-index:1000;pointer-events:none;font-size:36px;transform:translate(-50%,-60%) scale(1.2);filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+.tchips span{display:inline-block;font-size:18px;border:2px solid;border-radius:8px;padding:0 3px;margin:2px 2px 0 0;background:var(--panel)}
 .trRow .row{margin-top:6px}
 #jaura{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none;z-index:0;display:none;will-change:transform;animation:aurap 1.4s ease-in-out infinite alternate}
 #jaura.rb,#wAura.rb{animation:aurap 1.4s ease-in-out infinite alternate,hue 3s linear infinite}
@@ -345,6 +359,11 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .modtag{background:#ff5c7a;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;margin-left:5px;vertical-align:middle}
 .mact{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
 .mact .ab{padding:4px 8px;font-size:12px}
+.msg.announce{background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(255,92,122,.3));border:2px solid #b388ff;border-radius:14px;padding:12px;font-size:17px;font-weight:800;box-shadow:0 0 18px rgba(179,136,255,.35)}
+.msg.announce .txt{font-size:18px;line-height:1.3;margin-top:2px}
+.pcard{flex-direction:column;background:var(--panel2);border-radius:12px;padding:10px;margin-top:6px}
+.pstats{font-size:13px}.pstats b{color:var(--gold)}
+.ppets{display:flex;gap:6px;margin-top:6px}.ppets span{font-size:22px;border:2px solid;border-radius:10px;padding:2px 5px;background:var(--panel)}
 .frCard{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;color:var(--text);font:inherit;cursor:pointer}
 .frCard span{flex:1;font-size:12px;color:var(--dim)}
 .frCard i{font-style:normal;color:var(--dim);font-size:20px}
@@ -658,14 +677,18 @@ body.light .ab:hover{background:#e6e8f2}
 </dialog>
 <dialog id="trades">
   <h3>🤝 <span>Trades</span></h3>
-  <div id="trOut" class="dimtxt" style="margin-top:8px">Sign in to trade with friends.</div>
+  <div id="trOut" class="dimtxt" style="margin-top:8px">Sign in to trade.</div>
   <div id="trIn" hidden>
     <label>📥 Offers for you</label><div id="tradeInbox"></div>
     <label>📤 Your offers</label><div id="tradeOut"></div>
     <label>✍️ New offer</label>
     <div class="row"><select id="tradeTo" class="tin"></select></div>
-    <div class="row" style="margin-top:6px;align-items:center"><span class="dimtxt" style="width:40px">Give</span><input id="tgTok" class="tin" type="number" min="0" value="0" style="width:70px;flex:none">💈<select id="tgPet" class="tin"></select></div>
-    <div class="row" style="margin-top:6px;align-items:center"><span class="dimtxt" style="width:40px">Want</span><input id="twTok" class="tin" type="number" min="0" value="0" style="width:70px;flex:none">💈<select id="twPet" class="tin"></select></div>
+    <div class="tzones">
+      <div class="tz" id="tzGive"><div class="tzh">You give</div><div class="tzp"></div><div class="tzt">💈 <input id="tgTok" class="tin" type="number" min="0" value="0"></div></div>
+      <div class="tz" id="tzWant"><div class="tzh">You want</div><div class="tzp"></div><div class="tzt">💈 <input id="twTok" class="tin" type="number" min="0" value="0"></div></div>
+    </div>
+    <div class="tinvh">Your pets · drag into <b>You give</b> or tap</div><div class="tinv" id="invMine"></div>
+    <div class="tinvh">Ask for · drag into <b>You want</b> or tap</div><div class="tinv" id="invAll"></div>
     <button class="ab" id="tradeSend" style="width:100%;margin-top:8px">Send offer</button>
     <div class="dimtxt" style="margin-top:6px">What you give is held until they accept or decline, so trades are always fair.</div>
     <div id="trMsg" class="dimtxt" style="margin-top:6px"></div>
@@ -2665,9 +2688,11 @@ const UPDATES = [
     '🎬 Cutscenes for Transcend, Apotheosis, Singularity and Omniverse',
     '🔇 Muted players now show in Chat with an Unmute button',
     '📢 Announcements from the dev show as a banner at the top',
-    '🌈 New rarities: Divine and Celestial (from Royal, Lucky and Void eggs), plus a Secret 1-in-a-billion pet with its own cutscene and a server-wide shout',
+    '🌈 New rarities: Divine and Celestial (from Royal, Lucky and Void eggs), plus a Secret 1-in-a-billion pet with its own cutscene and a big shout in global chat',
     '🗂️ Pets are grouped by what they boost',
-    '🌌 Leaderboards show Transcend, Apotheosis, Singularity and Omniverse, with a new Prestige board']},
+    '🌌 Leaderboards show Transcend, Apotheosis, Singularity and Omniverse, with a new Prestige board',
+    '💬 Tap anyone in chat for their profile: coins, rebirths, Ascensions, layers and pets, plus Add friend and Offer trade',
+    '🤝 New trade window: up to 4 pets per side, drag pets into You give / You want (or tap)']},
   {v:'5.0', date:'Oct 7, 2026', title:'Season 1: Beyond Ascension', notes:[
     '🌠 4 new prestige layers past Ascension: Transcend, Apotheosis, Singularity and Omniverse. Each resets the layers below for a giant permanent multiplier',
     'Rebirth costs now grow with your Ascensions, layers and challenges, so every climb to 300 rebirths takes about as long as your first: no more endless shortcut loops, and no impossible walls',
@@ -3394,7 +3419,7 @@ if (FIREBASE) {
     if (!user) return Promise.resolve();
     const saved = setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
-    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
+    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip.slice(0, 4), npets:Object.keys(S.pets).length, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
       // older Firestore rules don't know the day/month fields yet: retry without them so the board keeps updating
       .catch(() => S.cheater ? 0 : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
     return saved;
@@ -3446,19 +3471,6 @@ if (FIREBASE) {
     } catch {}
   }
   loadAnnounce(); setInterval(loadAnnounce, 120000);
-  // shouts/{id} = {from, pet, ts}: everyone online sees a banner when someone unlocks the 1-in-a-billion pet
-  window.shoutPet = pet => user && addDoc(collection(db, 'shouts'), {from:me(), pet, ts:serverTimestamp()}).catch(() => {});
-  let shoutSeen = Date.now();
-  onSnapshot(query(collection(db, 'shouts'), orderBy('ts', 'desc'), limit(1)), qs => {
-    const d = qs.docs[0]; if (!d) return;
-    const g = d.data({serverTimestamps:'estimate'}), t = g.ts?.toMillis ? g.ts.toMillis() : 0;
-    if (t <= shoutSeen - 5000 || String(g.from) === me()) return;
-    shoutSeen = Date.now();
-    const q = PETS.find(x => x.id === g.pet); if (!q) return;
-    $('annBar').querySelector('span').textContent = `🚨 ${String(g.from)} just unlocked ${q.ic} ${q.nm} (${q.r})! That's 1 in a billion!`;
-    $('annBar').hidden = false; $('annBar').querySelector('button').onclick = () => { $('annBar').hidden = true; };
-    sfx('fanfare'); confetti(120);
-  }, () => {});
   async function loadAnnList(){
     const L = $('annList'); L.innerHTML = '';
     try {
@@ -3475,7 +3487,7 @@ if (FIREBASE) {
   }
   $('annPost').onclick = async () => {
     const t = $('annIn').value.trim(); if (!t) return;
-    try { await addDoc(collection(db, 'announce'), {text:t.slice(0, 300), by:me(), ts:serverTimestamp()}); $('annIn').value = ''; $('annMsg').textContent = '📢 Posted!'; loadAnnList(); loadAnnounce(); }
+    try { await addDoc(collection(db, 'announce'), {text:t.slice(0, 300), by:me(), ts:serverTimestamp()}); window.postGlobal?.('📢 ' + t); $('annIn').value = ''; $('annMsg').textContent = '📢 Posted to the banner and global chat!'; loadAnnList(); loadAnnounce(); }
     catch { $('annMsg').textContent = "Couldn't post (are you signed in as nkthn?)"; }
   };
   $('modBtn').onclick = () => { $('settings').close(); $('annMsg').textContent = ''; $('modPanel').showModal(); loadAnnList(); window.loadIdeas?.(); };
@@ -3522,9 +3534,12 @@ if (FIREBASE) {
   const frMsg = t => $('frMsg').textContent = t, pfMsg = t => $('pfMsg').textContent = t, trMsg = t => $('trMsg').textContent = t;
   const tok = v => Math.max(0, Math.min(1e6, Math.floor(Number(v) || 0)));
   const petOk = id => (id && PETS.some(q => q.id === id)) ? id : '';
-  const petLabel = id => { const q = PETS.find(q => q.id === id); return q ? `${q.ic} ${q.nm}` : ''; };
-  const deal = x => [x.tokens ? `${x.tokens} 💈` : '', petLabel(x.pet)].filter(Boolean).join(' + ') || 'nothing';
-  const clean = t => ({give:{tokens:tok(t.give?.tokens), pet:petOk(t.give?.pet)}, want:{tokens:tok(t.want?.tokens), pet:petOk(t.want?.pet)}});
+  // each side = tokens + up to 4 pets (one level of that pet each). Old offers stored a single `pet`
+  const petsOf = x => (Array.isArray(x?.pets) ? x.pets : [x?.pet]).map(petOk).filter(Boolean).slice(0, 4);
+  const deal = x => [x.tokens ? `${x.tokens} 💈` : '', ...x.pets.map(id => { const q = PETS.find(p => p.id === id); return `${q.ic} ${q.nm}`; })].filter(Boolean).join(' + ') || 'nothing';
+  const clean = t => ({give:{tokens:tok(t.give?.tokens), pets:petsOf(t.give)}, want:{tokens:tok(t.want?.tokens), pets:petsOf(t.want)}});
+  const hasPets = ids => ids.every(id => (S.pets[id] || 0) >= ids.filter(x => x === id).length);
+  const takeAll = ids => ids.forEach(petTake), giveAll = ids => ids.forEach(petGive);
   async function findPlayer(name){
     const qs = await getDocs(query(collection(db, 'leaderboard'), where('name', '==', name), limit(1)));
     let r = null; qs.forEach(d => r = d.data()); return r;
@@ -3559,24 +3574,29 @@ if (FIREBASE) {
   $('pfTrade').onclick = () => { $('friends').close(); openTrades(pf); };
   $('pfRemove').onclick = () => { S.friends = S.friends.filter(x => x !== pf); save(); frRender(); };
   $('friendBtn').onclick = () => { frMsg(''); $('friends').showModal(); frRender(); };
-  $('frAdd').onclick = async () => {
-    const n = $('frName').value.trim().toLowerCase();
-    if (!/^[a-z0-9_]{3,20}$/.test(n) || n === me()) return frMsg('Enter a valid username (not your own)');
-    if (S.friends.includes(n)) return frMsg('Already on your list');
-    if (S.friends.length >= 30) return frMsg('Your friend list is full (30)');
+  // friend requests ride on trades/ docs tagged kind:'friend' (same from/to rules as trades). Returns a message to show
+  async function friendReq(n){
+    if (!user) return 'Sign in to add friends';
+    if (!/^[a-z0-9_]{3,20}$/.test(n) || n === me()) return 'Enter a valid username (not your own)';
+    if (S.friends.includes(n)) return `${n} is already your friend`;
+    if (S.friends.length >= 30) return 'Your friend list is full (30)';
     const r = await findPlayer(n).catch(() => null);
-    if (!r) return frMsg('No player with that username on the leaderboard');
-    // friend requests ride on trades/ docs tagged kind:'friend' (same from/to rules as trades)
+    if (!r) return 'No player with that username on the leaderboard';
     try {
       const [theirs, mine] = await Promise.all([
         getDocs(query(collection(db, 'trades'), where('to', '==', me()), where('from', '==', n))),
         getDocs(query(collection(db, 'trades'), where('from', '==', me()), where('to', '==', n)))]);
       const inc = theirs.docs.find(d => d.data().kind === 'friend' && d.data().status === 'open');
-      if (inc) { await updateDoc(inc.ref, {status:'accepted'}); S.friends.push(n); save(); $('frName').value = ''; frMsg(`You and ${n} are now friends!`); return frRender(); }
-      if (mine.docs.some(d => d.data().kind === 'friend' && d.data().status === 'open')) return frMsg(`Request to ${n} is already pending`);
+      if (inc) { await updateDoc(inc.ref, {status:'accepted'}); S.friends.push(n); save(); return `You and ${n} are now friends!`; }
+      if (mine.docs.some(d => d.data().kind === 'friend' && d.data().status === 'open')) return `Request to ${n} is already pending`;
       await addDoc(collection(db, 'trades'), {from:me(), to:n, kind:'friend', status:'open', ts:Date.now()});
-      $('frName').value = ''; frMsg(`📨 Friend request sent to ${n}`); frRender();
-    } catch { frMsg("Couldn't send the request, try again"); }
+      return `📨 Friend request sent to ${n}`;
+    } catch { return "Couldn't send the request, try again"; }
+  }
+  $('frAdd').onclick = async () => {
+    const m = await friendReq($('frName').value.trim().toLowerCase());
+    if (m.startsWith('📨') || m.startsWith('You and')) $('frName').value = '';
+    frMsg(m); frRender();
   };
   $('giftSend').onclick = async () => {
     const to = pf, amount = tok($('giftAmt').value);
@@ -3589,22 +3609,58 @@ if (FIREBASE) {
   // --- trades window ---
   function openTrades(friend){
     trMsg(''); $('trOut').hidden = !!user; $('trIn').hidden = !user;
-    $('tradeTo').innerHTML = S.friends.length ? S.friends.map(n => `<option value="${n}"${n === friend ? ' selected' : ''}>${n}</option>`).join('') : '<option value="">add a friend in 👥 Friends first</option>';
-    $('tgPet').innerHTML = '<option value="">no pet</option>' + PETS.filter(q => S.pets[q.id]).map(q => `<option value="${q.id}">${q.ic} ${q.nm} (Lv ${S.pets[q.id]})</option>`).join('');
-    $('twPet').innerHTML = '<option value="">no pet</option>' + PETS.map(q => `<option value="${q.id}">${q.ic} ${q.nm}</option>`).join('');
+    const names = [...new Set([...(friend ? [friend] : []), ...S.friends])];
+    $('tradeTo').innerHTML = names.length ? names.map(n => `<option value="${n}"${n === friend ? ' selected' : ''}>${n}</option>`).join('') : '<option value="">add a friend in 👥 Friends first</option>';
+    tg = []; tw = []; renderOffer();
     if (!$('trades').open) $('trades').showModal();
     frPoll();
   }
   $('tradeBtn').onclick = () => openTrades();
+  // offer builder: tap a pet to add it, or drag it into a box (Adopt Me style). Tap a pet in a box to take it back out
+  let tg = [], tw = [];
+  const petBtn = (q, sub) => { const b = document.createElement('button'); b.style.borderColor = RARC[q.r]; b.title = `${q.nm} (${q.r})`; b.innerHTML = `${q.ic}<small>${sub}</small>`; return b; };
+  function renderOffer(){
+    for (const [zone, list] of [['tzGive', tg], ['tzWant', tw]]) {
+      const P = $(zone).querySelector('.tzp'); P.innerHTML = '';
+      list.forEach((id, k) => { const q = PETS.find(x => x.id === id), b = petBtn(q, 'tap to remove'); b.onclick = () => { list.splice(k, 1); renderOffer(); }; P.appendChild(b); });
+    }
+    const M = $('invMine'); M.innerHTML = '';
+    for (const q of PETS.filter(q => S.pets[q.id])) {
+      const left = S.pets[q.id] - tg.filter(x => x === q.id).length, b = petBtn(q, `×${left}`);
+      b.disabled = left <= 0 || tg.length >= 4; b.onpointerdown = e => !b.disabled && dragPet(e, q.id, 'give'); M.appendChild(b);
+    }
+    if (!M.children.length) M.innerHTML = '<div class="dimtxt" style="grid-column:1/-1">Hatch some pets first</div>';
+    const A2 = $('invAll'); A2.innerHTML = '';
+    for (const q of PETS.filter(q => q.r !== 'Secret')) { const b = petBtn(q, q.r.slice(0, 4)); b.disabled = tw.length >= 4; b.onpointerdown = e => !b.disabled && dragPet(e, q.id, 'want'); A2.appendChild(b); }
+  }
+  function dragPet(e, id, side){
+    e.preventDefault();
+    const D = $('trades'), ghost = Object.assign(document.createElement('div'), {className:'tghost', textContent:PETS.find(x => x.id === id).ic});
+    D.appendChild(ghost);
+    const sx = e.clientX, sy = e.clientY, target = side === 'give' ? 'tzGive' : 'tzWant'; let moved = false;
+    const over = ev => document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.tz');
+    const mv = ev => {
+      if (Math.hypot(ev.clientX - sx, ev.clientY - sy) > 6) moved = true;
+      ghost.style.left = ev.clientX + 'px'; ghost.style.top = ev.clientY + 'px';
+      const z = over(ev); for (const t of D.querySelectorAll('.tz')) t.classList.toggle('hot', t === z && t.id === target);
+    };
+    const up = ev => {
+      removeEventListener('pointermove', mv); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
+      ghost.remove(); D.querySelectorAll('.tz').forEach(t => t.classList.remove('hot'));
+      const list = side === 'give' ? tg : tw;
+      if ((!moved || over(ev)?.id === target) && list.length < 4) { list.push(id); sfx('click'); renderOffer(); }
+    };
+    mv(e); addEventListener('pointermove', mv); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  }
   $('tradeSend').onclick = async () => {
-    const to = $('tradeTo').value, give = {tokens:tok($('tgTok').value), pet:petOk($('tgPet').value)}, want = {tokens:tok($('twTok').value), pet:petOk($('twPet').value)};
-    if (!to) return trMsg('Pick a friend to trade with');
-    if (!give.tokens && !give.pet && !want.tokens && !want.pet) return trMsg('Put something in the trade');
+    const to = $('tradeTo').value, give = {tokens:tok($('tgTok').value), pets:[...tg]}, want = {tokens:tok($('twTok').value), pets:[...tw]};
+    if (!to) return trMsg('Pick someone to trade with');
+    if (!give.tokens && !give.pets.length && !want.tokens && !want.pets.length) return trMsg('Put something in the trade');
     if (S.hc < give.tokens) return trMsg(`You only have ${S.hc} 💈`);
-    if (give.pet && !S.pets[give.pet]) return trMsg("You don't own that pet");
-    S.hc -= give.tokens; petTake(give.pet); save(); renderPets(); refresh();          // escrow
+    if (!hasPets(give.pets)) return trMsg("You don't have those pets anymore");
+    S.hc -= give.tokens; takeAll(give.pets); save(); renderPets(); refresh();          // escrow
     try { await addDoc(collection(db, 'trades'), {from:me(), to, give, want, status:'open', ts:Date.now()}); trMsg(`🤝 Offer sent to ${to}`); openTrades(to); }
-    catch { S.hc += give.tokens; petGive(give.pet); save(); renderPets(); trMsg('Could not send the offer, refunded'); }
+    catch { S.hc += give.tokens; giveAll(give.pets); save(); renderPets(); trMsg('Could not send the offer, refunded'); }
   };
   async function frPoll(){
     if (!user) return;
@@ -3655,9 +3711,9 @@ if (FIREBASE) {
         row.firstChild.textContent = `🤝 ${String(t.from)} offers ${deal(give)} for your ${deal(want)}`;
         const [acc, dec] = row.querySelectorAll('button');
         acc.onclick = async () => {
-          if (S.hc < want.tokens || (want.pet && !S.pets[want.pet])) return trMsg("You don't have what they want");
+          if (S.hc < want.tokens || !hasPets(want.pets)) return trMsg("You don't have what they want");
           try { await updateDoc(d.ref, {status:'accepted'}); } catch { return trMsg('That offer is no longer available'); }
-          S.hc -= want.tokens; petTake(want.pet); S.hc += give.tokens; petGive(give.pet);
+          S.hc -= want.tokens; takeAll(want.pets); S.hc += give.tokens; giveAll(give.pets);
           save(); renderPets(); refresh(); sfx('gold'); toast(`🤝 Trade with ${String(t.from)} done!`); frPoll();
         };
         dec.onclick = async () => { try { await updateDoc(d.ref, {status:'declined'}); } catch {} frPoll(); };
@@ -3670,8 +3726,8 @@ if (FIREBASE) {
       for (const d of out.docs) {
         if (d.data().kind === 'friend') continue;
         const t = d.data(), {give, want} = clean(t);
-        if (t.status === 'accepted') { try { await deleteDoc(d.ref); S.hc += want.tokens; petGive(want.pet); toast(`🤝 ${String(t.to)} accepted your trade!`); sfx('gold'); } catch {} continue; }
-        if (t.status === 'declined') { try { await deleteDoc(d.ref); S.hc += give.tokens; petGive(give.pet); toast(`${String(t.to)} declined your trade, items returned`); } catch {} continue; }
+        if (t.status === 'accepted') { try { await deleteDoc(d.ref); S.hc += want.tokens; giveAll(want.pets); toast(`🤝 ${String(t.to)} accepted your trade!`); sfx('gold'); } catch {} continue; }
+        if (t.status === 'declined') { try { await deleteDoc(d.ref); S.hc += give.tokens; giveAll(give.pets); toast(`${String(t.to)} declined your trade, items returned`); } catch {} continue; }
         const row = document.createElement('div'); row.className = 'trRow';
         row.innerHTML = '<div></div><div class="row"><button class="ab">Cancel offer</button></div>';
         row.firstChild.textContent = `⏳ Waiting on ${String(t.to)}: your ${deal(give)} for their ${deal(want)}`;
@@ -3679,7 +3735,7 @@ if (FIREBASE) {
           // re-check first: if they accepted in the meantime, the trade completes instead of being cancelled
           try {
             const fresh = await getDoc(d.ref);
-            if (fresh.exists() && fresh.data().status === 'open') { await deleteDoc(d.ref); S.hc += give.tokens; petGive(give.pet); save(); renderPets(); refresh(); }
+            if (fresh.exists() && fresh.data().status === 'open') { await deleteDoc(d.ref); S.hc += give.tokens; giveAll(give.pets); save(); renderPets(); refresh(); }
           } catch {}
           frPoll();
         };
@@ -3787,6 +3843,9 @@ if (FIREBASE) {
     const m = d.data({serverTimestamps:'estimate'}), from = String(m.from || '?');
     if (S.muted.includes(from)) return null;
     const row = document.createElement('div'); row.className = 'msg';
+    // big announcement cards: the 1-in-a-billion pet shout, and 📢 posts from the dev
+    const txt0 = String(m.text || '');
+    if (txt0.startsWith('🚨') || (MODS.includes(from) && txt0.startsWith('📢'))) row.classList.add('announce');
     const body = document.createElement('div'); body.className = 'mbody';
     const who = document.createElement('span'); who.className = 'who';
     const hat = cosItem('hat', m.badge), t = cosItem('title', m.title), c = nameColor(m.color);
@@ -3806,16 +3865,30 @@ if (FIREBASE) {
     body.appendChild(Object.assign(document.createElement('span'), {className:'t', textContent:time}));
     body.appendChild(Object.assign(document.createElement('div'), {className:'txt', textContent:cleanChat(String(m.text || ''))}));
     row.append(av, body); av.onclick = () => who.onclick();
-    // tap a name for actions: mute, message (friends), delete (own / mod), ban (mod)
-    who.onclick = () => {
+    // tap a name: a mini profile (lifetime coins, rebirths, Ascensions, layers, pets) plus friend / trade / message / mute
+    who.onclick = async () => {
       const old = body.querySelector('.mact'); if (old) return old.remove();
-      const act = document.createElement('div'); act.className = 'mact';
-      const btn = (label, fn) => act.appendChild(Object.assign(document.createElement('button'), {className:'ab', textContent:label, onclick:fn}));
-      if (from !== me()) btn(S.muted.includes(from) ? 'Unmute' : '🔇 Mute', () => { S.muted = S.muted.includes(from) ? S.muted.filter(x => x !== from) : [...S.muted, from].slice(-100); save(); listen(); });
+      const act = document.createElement('div'); act.className = 'mact pcard';
+      const info = document.createElement('div'); info.className = 'pstats'; info.textContent = 'Loading profile…'; act.appendChild(info);
+      const btns = document.createElement('div'); btns.className = 'mact'; act.appendChild(btns);
+      const btn = (label, fn) => btns.appendChild(Object.assign(document.createElement('button'), {className:'ab', textContent:label, onclick:fn}));
+      if (from !== me() && !S.friends.includes(from)) btn('👋 Add friend', async e => { e.target.disabled = true; chatNote(await friendReq(from)); });
+      if (from !== me()) btn('🤝 Offer trade', () => { $('chat').close(); openTrades(from); });
       if (from !== me() && S.friends.includes(from) && room === 'global') btn('💬 Message', () => openRoom('dm', from));
+      if (from !== me()) btn(S.muted.includes(from) ? '🔊 Unmute' : '🔇 Mute', () => { S.muted = S.muted.includes(from) ? S.muted.filter(x => x !== from) : [...S.muted, from].slice(-100); save(); listen(); });
       if (from === me() || isMod()) btn('🗑️ Delete', () => deleteDoc(d.ref).catch(() => chatNote("Couldn't delete that")));
       if (isMod() && from !== me()) btn('🔨 Ban from chat', () => setDoc(doc(db, 'bans', from), {by:me(), ts:Date.now()}).then(() => { chatNote(`${from} is banned from chat`); loadBans(); }).catch(() => chatNote('Ban failed')));
       body.appendChild(act);
+      const r = await findPlayer(from).catch(() => null);
+      if (!r) { info.textContent = 'Not on the leaderboard'; return; }
+      const N = x => Number(x) || 0, lay = [['🌠', r.tr], ['🔆', r.apo], ['🕳️', r.sing], ['🌌', r.omni]].filter(([, v]) => N(v)).map(([i, v]) => `${i} ${N(v)}`).join(' · ');
+      const pets = (Array.isArray(r.pets) ? r.pets : []).map(id => PETS.find(q => q.id === id)).filter(Boolean);
+      info.innerHTML = `<div>🪙 <b></b> lifetime · 🔁 <b></b> rebirths · ✨ <b></b> Ascensions</div><div class="dimtxt"></div><div class="ppets"></div>`;
+      const [a, b2, c] = info.querySelectorAll('b'); a.textContent = fmt(N(r.score)); b2.textContent = N(r.rebirths); c.textContent = N(r.asc);
+      info.querySelector('.dimtxt').textContent = [lay, N(r.npets) ? `${N(r.npets)}/${PETS.length} pets found` : '', typeof r.guild === 'string' && r.guild ? `🛡️ [${r.guild}]` : ''].filter(Boolean).join(' · ');
+      const pp = info.querySelector('.ppets');
+      for (const q of pets) pp.appendChild(Object.assign(document.createElement('span'), {textContent:q.ic, title:`${q.nm} (${q.r})`, style:`border-color:${RARC[q.r]}`}));
+      if (!pets.length) pp.remove();
     };
     return row;
   }
@@ -3859,6 +3932,19 @@ if (FIREBASE) {
     });
     if (!list.children.length) list.innerHTML = '<div class="dimtxt">Nobody is banned.</div>';
   }
+  // post straight to global chat (used for the 1-in-a-billion pet and dev announcements); same rules and rate limit as chat
+  async function postGlobal(text){
+    if (!user) return false;
+    const b = writeBatch(db);
+    b.set(doc(db, 'chatmeta', user.uid), {last:serverTimestamp()});
+    b.set(doc(collection(db, 'global')), {from:me(), text:text.slice(0, 200), ts:serverTimestamp(), display:S.display, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, guild:guildTag});
+    try { await b.commit(); return true; } catch { return false; }
+  }
+  window.shoutPet = async pet => {
+    const q = PETS.find(x => x.id === pet), t = `🚨 just unlocked ${q.ic} ${q.nm}, the 1-in-a-billion ${q.r} pet!`;
+    if (!(await postGlobal(t))) setTimeout(() => postGlobal(t), 3500);   // rate limit: try once more after 3.5s
+  };
+  window.postGlobal = postGlobal;
   async function send(){
     const text = cleanChat($('chatIn').value.trim()).slice(0, 200);
     if (!user) return chatNote('Sign in to chat');
