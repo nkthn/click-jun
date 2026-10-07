@@ -24,6 +24,8 @@ aside{grid-column:2;grid-row:1;min-height:0}
 #coins{font-size:56px;font-weight:700;letter-spacing:-1px;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 #rates{color:var(--dim);font-size:14px;margin-top:4px}
 .jun{position:absolute;width:150px;cursor:pointer;clip-path:polygon(50% 2.5%,60% 3.5%,70% 7%,79% 12%,87% 20%,92% 28%,94% 38%,95% 48%,96% 58%,95% 66%,92% 72%,88% 77%,83% 82%,77% 87%,70% 91.5%,61% 95%,50% 96%,40% 94.5%,31% 90.5%,24% 85%,19% 79%,15% 74%,12% 70.5%,7% 68.5%,3% 64%,1.5% 57%,2.5% 51%,5% 48%,4% 40%,5% 31%,9% 22%,15% 15%,22% 9%,31% 5%,40% 3%);filter:drop-shadow(0 10px 30px rgba(124,92,255,.5));left:0;top:0;will-change:transform}
+.swarm.gold{width:90px;filter:sepia(1) saturate(4) hue-rotate(5deg) brightness(1.15)}
+.swarm.dia{width:72px;filter:grayscale(1) sepia(1) hue-rotate(150deg) saturate(5) brightness(1.25) drop-shadow(0 0 16px #7ef)}
 #golden{width:90px;filter:sepia(1) saturate(4) hue-rotate(5deg) brightness(1.15);display:none}
 .pop{position:absolute;pointer-events:none;font-weight:700;color:var(--gold);font-size:22px;animation:up 1s ease-out forwards;z-index:6;text-shadow:0 2px 8px #000}
 @keyframes up{to{transform:translateY(-80px);opacity:0}}
@@ -70,7 +72,10 @@ h2.shut::after{transform:rotate(-90deg)}
 #skipScene{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:101;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
 #ending:not([hidden])+#skipScene{display:block}
 #liveBar{position:absolute;bottom:46px;left:50%;transform:translateX(-50%);z-index:8;max-width:calc(100% - 120px);background:rgba(0,0,0,.55);color:#ffd166;border:1px solid rgba(255,209,102,.5);border-radius:999px;padding:6px 14px;font:800 13px 'Nunito',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#liveBar[hidden]{display:none}#liveBar.on{background:linear-gradient(90deg,#ff5c7a,#c77dff);color:#fff;border-color:transparent;animation:livepulse 1.6s ease-in-out infinite}
+#liveBar[hidden],#liveBig[hidden]{display:none}
+#liveBar.final{font-size:18px;padding:10px 20px;color:#fff;background:linear-gradient(90deg,#ff8a3d,#ff5c7a);border-color:transparent;animation:livepulse .5s ease-in-out infinite}
+#liveBig{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;pointer-events:none;font:700 min(38vh,230px) 'Fredoka',sans-serif;color:#ffd166;text-shadow:0 0 40px rgba(255,209,102,.8),0 8px 0 rgba(0,0,0,.35)}
+#liveBig.red{color:#ff5c7a;text-shadow:0 0 50px rgba(255,92,122,.9),0 8px 0 rgba(0,0,0,.35)}#liveBar.on{background:linear-gradient(90deg,#ff5c7a,#c77dff);color:#fff;border-color:transparent;animation:livepulse 1.6s ease-in-out infinite}
 @keyframes livepulse{50%{box-shadow:0 0 22px rgba(255,92,122,.7)}}
 #annBar{position:absolute;top:118px;left:50%;transform:translateX(-50%);z-index:8;width:min(560px,calc(100% - 24px));display:flex;gap:10px;align-items:center;background:rgba(124,92,255,.92);color:#fff;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 #annBar[hidden]{display:none}#annBar span{flex:1;overflow-wrap:anywhere}#annBar button{background:none;border:0;color:#fff;font-size:16px;cursor:pointer}
@@ -480,6 +485,7 @@ body.light .ab:hover{background:#e6e8f2}
 <main id="stage">
   <button id="muteBtn" title="Mute / unmute (M)"></button>
   <div id="liveBar" hidden></div>
+  <div id="liveBig" hidden></div>
   <div id="annBar" hidden><b>📢</b><span></span><button aria-label="Dismiss">✕</button></div>
   <div id="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <img id="jhat" class="hat" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M8 58 Q30 0 70 8 Q92 14 90 40 L80 42 Q78 24 64 22 Q50 30 92 58Z' fill='%23d62839'/%3E%3Crect x='2' y='52' width='96' height='16' rx='8' fill='%23fff'/%3E%3Ccircle cx='86' cy='42' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="">
@@ -764,7 +770,7 @@ body.light .ab:hover{background:#e6e8f2}
   <div id="annList"></div>
   <label>🎉 Live event</label>
   <input id="evName" class="tin" maxlength="60" placeholder="Event name, e.g. Double Coin Weekend" style="width:100%">
-  <div class="row" style="margin-top:6px"><select id="evKind" class="tin"><option value="coins">× Everything (coins)</option><option value="luck">× Rare pet odds</option><option value="gold">× Golden Jun spawns</option></select><input id="evMult" class="tin" type="number" min="1" max="100" value="2" style="width:70px;flex:none"></div>
+  <div class="row" style="margin-top:6px"><select id="evKind" class="tin"><option value="coins">× Everything (coins)</option><option value="luck">× Rare pet odds</option><option value="gold">× Golden Jun spawns</option><option value="diamond">× Diamond Jun spawns</option><option value="goldrain">🌟 Golden Jun rain (amount)</option><option value="diarain">💎 Diamond Jun rain (amount)</option></select><input id="evMult" class="tin" type="number" min="1" max="100" value="2" style="width:70px;flex:none"></div>
   <div class="row" style="margin-top:6px;align-items:center"><span class="dimtxt">Starts in</span><input id="evIn" class="tin" type="number" min="0" value="0" style="width:70px;flex:none"><span class="dimtxt">min · lasts</span><input id="evLen" class="tin" type="number" min="1" value="60" style="width:70px;flex:none"><span class="dimtxt">min</span></div>
   <button class="ab" id="evPost" style="width:100%;margin-top:6px">⏳ Schedule event (with countdown)</button>
   <div id="evMsg" class="dimtxt" style="margin-top:4px"></div>
@@ -844,7 +850,9 @@ body.light .ab:hover{background:#e6e8f2}
     <button class="ab" id="aPets">All pets max</button><button class="ab" id="aBH2">Get Event Horizon</button><button class="ab" id="aVoid">Hatch 25 Void eggs</button><button class="ab" id="aCos">All cosmetics</button>
     <button class="ab" id="aBoss">Beat all bosses</button><button class="ab" id="aChal">Win all challenges</button><button class="ab" id="aAch">All achievements</button><button class="ab" id="aDaily">Reset daily + quests</button></div>
   <label>Cheats</label>
-  <div class="row"><button class="ab" id="aUps">+10 every upgrade</button><button class="ab" id="aGold">Spawn Golden Jun</button><button class="ab" id="aDia">Spawn Diamond Jun</button><button class="ab" id="aVc">Spawn VC offer</button><button class="ab" id="aEvt">Start 4× frenzy</button><button class="ab" id="aEnd">Play ending</button><button class="ab" id="aTrue">Play true ending</button><button class="ab" id="aAscS">Play ascension</button><button class="ab" id="aLayer">Play layer cutscene</button><button class="ab" id="aBH">Play black hole cutscene</button><button class="ab" id="aBest">Reset Flappy best</button></div>
+  <div class="row"><button class="ab" id="aUps">+10 every upgrade</button><button class="ab" id="aGold">Spawn Golden Jun</button><button class="ab" id="aDia">Spawn Diamond Jun</button></div>
+  <div class="row" style="margin-top:6px"><input id="aSwN" class="tin" type="number" min="1" max="200" value="20" style="width:80px;flex:none"><button class="ab" id="aSwG">🌟 Spawn that many Golden</button><button class="ab" id="aSwD">💎 Spawn that many Diamond</button></div>
+  <div class="row" style="margin-top:6px"><button class="ab" id="aVc">Spawn VC offer</button><button class="ab" id="aEvt">Start 4× frenzy</button><button class="ab" id="aEnd">Play ending</button><button class="ab" id="aTrue">Play true ending</button><button class="ab" id="aAscS">Play ascension</button><button class="ab" id="aLayer">Play layer cutscene</button><button class="ab" id="aBH">Play black hole cutscene</button><button class="ab" id="aBest">Reset Flappy best</button></div>
   <div class="row" style="margin-top:18px"><button class="ab" id="aClose" style="flex:1">Close</button></div>
 </dialog>
 <script>
@@ -1077,20 +1085,40 @@ const evtMult = () => performance.now() < evtUntil ? evtX : 1;
 let LIVE = null, liveWasOn = false;
 const liveOn = () => !!LIVE && Date.now() >= LIVE.start && Date.now() < LIVE.end;
 const liveMult = k => liveOn() && LIVE.kind === k ? LIVE.mult : 1;
-const LIVE_KIND = {coins:'everything', luck:'rare pet odds', gold:'Golden Jun spawns'};
+const LIVE_KIND = {coins:'everything', luck:'rare pet odds', gold:'Golden Jun spawns', diamond:'Diamond Jun spawns', goldrain:'Golden Juns raining in', diarain:'Diamond Juns raining in'};
 const hms = ms => { const t = Math.max(0, Math.floor(ms/1000)), h = Math.floor(t/3600), m = Math.floor(t/60) % 60, x = t % 60;
   return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
+let liveSec = -1;
 function liveTick(){
-  const B = $('liveBar');
-  if (!LIVE || Date.now() >= LIVE.end) { B.hidden = true; liveWasOn = false; return; }
-  const on = liveOn();
-  B.hidden = false; B.classList.toggle('on', on);
-  B.textContent = on ? `🎉 ${LIVE.name} · LIVE · ×${LIVE.mult} ${LIVE_KIND[LIVE.kind]} · ends in ${hms(LIVE.end - Date.now())}`
-                     : `⏳ ${LIVE.name} starts in ${hms(LIVE.start - Date.now())} · ×${LIVE.mult} ${LIVE_KIND[LIVE.kind]}`;
-  if (on && !liveWasOn) { toast(`🎉 ${LIVE.name} is LIVE! ×${LIVE.mult} ${LIVE_KIND[LIVE.kind]}`); confetti(100); sfx('fanfare'); refresh(); }
-  liveWasOn = on;
+  const B = $('liveBar'), G = $('liveBig'), next = LIVES.filter(e => e.end > Date.now()).sort((a, b) => a.start - b.start)[0] || null;
+  const key = e => e ? `${e.start}|${e.kind}|${e.name}` : '';
+  if (key(next) !== key(LIVE)) { liveWasOn = false; liveSec = -1; }   // a new event gets its own countdown + GO
+  LIVE = next;
+  if (!LIVE) { B.hidden = true; G.hidden = true; return; }   // event over: the bar goes away
+  const on = liveOn(), left = LIVE.start - Date.now(), sec = Math.ceil(left / 1000), rain = LIVE.kind.endsWith('rain');
+  const what = rain ? `${LIVE.mult} ${LIVE_KIND[LIVE.kind]}` : `×${LIVE.mult} ${LIVE_KIND[LIVE.kind]}`;
+  B.hidden = false; B.classList.toggle('on', on); B.classList.toggle('final', !on && sec <= 10);
+  B.textContent = on ? `🎉 ${LIVE.name} · LIVE · ${what} · ends in ${hms(LIVE.end - Date.now())}` : `⏳ ${LIVE.name} starts in ${hms(left)} · ${what}`;
+  // final 10 seconds: a giant number in the middle of the screen, one beat per second, red for the last 3
+  if (!on && sec <= 10 && sec >= 1) {
+    if (sec !== liveSec) {
+      G.hidden = false; G.textContent = sec; G.classList.toggle('red', sec <= 3);
+      G.animate([{transform:'scale(1.8)', opacity:0}, {transform:'scale(1)', opacity:1, offset:.25}, {transform:'scale(.9)', opacity:.85}], {duration:950, easing:'ease-out'});
+      document.body.animate([{transform:'translate(0,0)'}, {transform:`translate(${sec <= 3 ? 6 : 2}px,0)`}, {transform:'translate(0,0)'}], {duration:120, iterations:sec <= 3 ? 3 : 1});
+      tone(sec <= 3 ? 880 : 520, .12, 'square', .35, .6);
+    }
+  } else if (on && !liveWasOn) {
+    G.hidden = false; G.classList.remove('red'); G.textContent = 'GO! 🎉';
+    G.animate([{transform:'scale(.3)', opacity:0}, {transform:'scale(1.25)', opacity:1, offset:.3}, {transform:'scale(1)', opacity:0}], {duration:1800, fill:'forwards'}).onfinish = () => { G.hidden = true; };
+    toast(`🎉 ${LIVE.name} is LIVE! ${what}`); confetti(160); sfx('fanfare'); refresh();
+    if (rain) swarm(LIVE.kind === 'diarain' ? 'dia' : 'gold', LIVE.mult);   // everyone online gets the rain
+  } else G.hidden = true;
+  liveSec = sec; liveWasOn = on;
 }
-window.setLive = ev => { LIVE = ev; liveTick(); };
+setInterval(liveTick, 250);
+let LIVES = [];   // every scheduled event; the bar always follows the next one that hasn't ended
+window.setLive = ev => { LIVES = ev ? [ev] : []; liveTick(); };
+window.setLives = list => { LIVES = list; liveTick(); };
 function startEvt(x, sec){
   const now = performance.now();
   evtX = now < evtUntil ? Math.max(evtX, x) : x;
@@ -1553,9 +1581,12 @@ function spawnGold(){
   Object.assign(gold, {x:0, y:Math.random()*(stage.clientHeight-100), vx:380, vy:(Math.random()-.5)*400});
   $('golden').style.display = 'block'; goldUntil = performance.now() + 7000 * (1 + .15*lv('linger'));
 }
-$('golden').addEventListener('pointerdown', e => {
+function goldPay(e){
   const n = Math.max(income()*60, perClick()*100) * (1 + .2*lv('gold')) * RM.gold * (1 + .1*petLv('fly')); earn(n); S.golds++; sfx('gold'); pop('+'+fmt(n)+' ✨', e);
-  toast(`GOLDEN JUN! +${fmt(n)} coins`); $('golden').style.display = 'none'; goldUntil = 0;
+  toast(`GOLDEN JUN! +${fmt(n)} coins`);
+}
+$('golden').addEventListener('pointerdown', e => {
+  goldPay(e); $('golden').style.display = 'none'; goldUntil = 0;
   setTimeout(spawnGold, goldDelay()); refresh();
 });
 setTimeout(spawnGold, goldDelay());
@@ -1563,15 +1594,31 @@ setTimeout(spawnGold, goldDelay());
 // diamond Jun: rare (every 3–6 min), tiny, fast, 4s on screen. Worth 10 min of income + click frenzy
 const dia = mover($('diamond'), 600);
 let diaUntil = 0;
-const diaDelay = () => (180000 + Math.random()*180000) / (1 + .25*lv('diamond')) / (1 + .2*petLv('baby'));
+const diaDelay = () => (180000 + Math.random()*180000) / (1 + .25*lv('diamond')) / (1 + .2*petLv('baby')) / liveMult('diamond');
 function spawnDiamond(){
   Object.assign(dia, {x:0, y:Math.random()*(stage.clientHeight-80), vx:600, vy:(Math.random()-.5)*600});
   $('diamond').style.display = 'block'; diaUntil = performance.now() + 4000 * (1 + .15*lv('linger'));
 }
-$('diamond').addEventListener('pointerdown', e => {
+function diaPay(e){
   const n = Math.max(income()*600, perClick()*1000) * (1 + .15*petLv('ember')); earn(n); S.diamonds++; sfx('gold'); frenzyUntil = performance.now() + (20 + 3*lv('frenzy') + 2*petLv('baby'))*1000;
   pop('+'+fmt(n)+' 💎', e); toast(`💎 DIAMOND JUN! +${fmt(n)} and 7× clicks for 20s`);
-  $('diamond').style.display = 'none'; diaUntil = 0; setTimeout(spawnDiamond, diaDelay()); save(); refresh();
+}
+// a swarm: n extra Golden or Diamond Juns drift across the screen at once, each one tappable for its normal payout
+function swarm(kind, n){
+  const src = $(kind === 'dia' ? 'diamond' : 'golden');
+  for (let i = 0; i < Math.min(200, n); i++) setTimeout(() => {
+    const el = document.createElement('img'); el.src = src.src; el.className = 'jun swarm ' + kind; el.alt = '';
+    const W = stage.clientWidth, H = stage.clientHeight, y0 = Math.random()*(H - 100), y1 = Math.random()*(H - 100), dir = Math.random() < .5;
+    el.style.cssText = `position:absolute;left:0;top:0;display:block;z-index:5;cursor:pointer;clip-path:${getComputedStyle($('jun')).clipPath}`;
+    stage.appendChild(el);
+    const a = el.animate([{transform:`translate(${dir ? -100 : W}px,${y0}px) rotate(0)`}, {transform:`translate(${dir ? W : -100}px,${y1}px) rotate(${dir ? 360 : -360}deg)`}],
+      {duration:(kind === 'dia' ? 4000 : 7000) + Math.random()*3000});
+    a.onfinish = () => el.remove();
+    el.addEventListener('pointerdown', e => { e.stopPropagation(); (kind === 'dia' ? diaPay : goldPay)(e); el.remove(); save(); refresh(); }, {once:true});
+  }, i * 120);
+}
+$('diamond').addEventListener('pointerdown', e => {
+  diaPay(e); $('diamond').style.display = 'none'; diaUntil = 0; setTimeout(spawnDiamond, diaDelay()); save(); refresh();
 });
 setTimeout(spawnDiamond, diaDelay());
 
@@ -2011,7 +2058,7 @@ function tick(now){
   earnLive(perSec()*dt);
   autoClick(dt);
   if ((acc += dt) > .2) { acc = 0; refresh(); renderResearch(); }
-  if ((achAcc += dt) > 1) { achAcc = 0; liveTick(); chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if (asu('auto') && S.autoBuy) autoBuyer(); }
+  if ((achAcc += dt) > 1) { achAcc = 0; chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if (asu('auto') && S.autoBuy) autoBuyer(); }
   requestAnimationFrame(tick);
 }
 setInterval(save, 5000);
@@ -2181,6 +2228,8 @@ $('aSpd').oninput = e => { BASE = +e.target.value; $('aSpdV').textContent = BASE
 $('aUps').onclick = () => { UPS.forEach(u => S.own[u.id] = own(u) + 10); save(); refresh(); };
 $('aGold').onclick = () => { A.close(); spawnGold(); };
 $('aDia').onclick = () => { A.close(); spawnDiamond(); };
+$('aSwG').onclick = () => { A.close(); swarm('gold', +$('aSwN').value || 20); };
+$('aSwD').onclick = () => { A.close(); swarm('dia', +$('aSwN').value || 20); };
 $('aVc').onclick = () => { A.close(); vcPing(); };
 $('aBest').onclick = () => { S.best = 0; $('fbest').textContent = 0; save(); };
 // Jun-Man (hangman): 7 wrong guesses draws the whole gallows
@@ -3656,9 +3705,9 @@ if (FIREBASE) {
   let evDocs = [];
   onSnapshot(query(collection(db, 'events'), orderBy('end', 'desc'), limit(10)), qs => {
     evDocs = qs.docs;
-    const now = Date.now(), live = qs.docs.map(d => d.data()).filter(e => Number(e.end) > now && ['coins', 'luck', 'gold'].includes(e.kind))
-      .sort((a, b) => a.start - b.start)[0];
-    window.setLive(live ? {name:String(live.name).slice(0, 60), kind:live.kind, mult:Math.min(100, Math.max(1, Number(live.mult) || 1)), start:Number(live.start), end:Number(live.end)} : null);
+    const now = Date.now(), list = qs.docs.map(d => d.data()).filter(e => Number(e.end) > now && Object.keys(LIVE_KIND).includes(e.kind))
+      .map(e => ({name:String(e.name).slice(0, 60), kind:e.kind, mult:Math.min(e.kind.endsWith('rain') ? 200 : 100, Math.max(1, Number(e.mult) || 1)), start:Number(e.start), end:Number(e.end)}));
+    window.setLives(list);
     if ($('modPanel').open) renderEvList();
   }, () => {});
   function renderEvList(){
@@ -3674,7 +3723,7 @@ if (FIREBASE) {
     }
   }
   $('evPost').onclick = async () => {
-    const name = $('evName').value.trim(), mult = Math.min(100, Math.max(1, +$('evMult').value || 2)), kind = $('evKind').value;
+    const kind = $('evKind').value, name = $('evName').value.trim(), mult = Math.min(kind.endsWith('rain') ? 200 : 100, Math.max(1, +$('evMult').value || 2));
     const start = Date.now() + Math.max(0, +$('evIn').value || 0)*60e3, end = start + Math.max(1, +$('evLen').value || 60)*60e3;
     if (!name) return $('evMsg').textContent = 'Give the event a name';
     try {
