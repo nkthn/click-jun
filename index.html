@@ -803,6 +803,11 @@ body.light .ab:hover{background:#e6e8f2}
   <button class="ab" id="annPost" style="width:100%;margin-top:6px">Post announcement</button>
   <div id="annMsg" class="dimtxt" style="margin-top:4px"></div>
   <div id="annList"></div>
+  <label>📲 Push notification</label>
+  <input id="puTitle" class="tin" maxlength="60" placeholder="Title, e.g. 🎉 Double coins tonight!" style="width:100%">
+  <input id="puBody" class="tin" maxlength="160" placeholder="Message" style="width:100%;margin-top:6px">
+  <button class="ab" id="puSend" style="width:100%;margin-top:6px">📲 Send to everyone</button>
+  <div id="puMsg" class="dimtxt" style="margin-top:4px"></div>
   <label>🎉 Live event</label>
   <input id="evName" class="tin" maxlength="60" placeholder="Event name, e.g. Double Coin Weekend" style="width:100%">
   <div class="row" style="margin-top:6px"><select id="evKind" class="tin"><option value="coins">× Everything (coins)</option><option value="luck">× Rare pet odds</option><option value="gold">× Golden Jun spawns</option><option value="diamond">× Diamond Jun spawns</option><option value="goldrain">🌟 Golden Jun rain (amount)</option><option value="diarain">💎 Diamond Jun rain (amount)</option></select><input id="evMult" class="tin" type="number" min="1" max="100" value="2" style="width:70px;flex:none"></div>
@@ -3928,6 +3933,21 @@ if (FIREBASE) {
     } catch {}
   }
   loadAnnounce(); setInterval(loadAnnounce, 120000);
+  // pushes/{id} = {title, body, by, ts}: the mod sends, every open (or backgrounded) game shows a system notification + in-game toast
+  const pushSince = Date.now(); let pushSeen = '';
+  onSnapshot(query(collection(db, 'pushes'), orderBy('ts', 'desc'), limit(1)), qs => {
+    const d = qs.docs[0]; if (!d || d.id === pushSeen) return; pushSeen = d.id;
+    const g = d.data({serverTimestamps:'estimate'}), t = g.ts?.toMillis ? g.ts.toMillis() : 0;
+    if (t < pushSince - 5000) return;   // only pushes sent while you're here
+    const title = String(g.title || 'Click Jun').slice(0, 60), body = String(g.body || '').slice(0, 160);
+    notify(title, body); toast(`📲 ${title}${body ? ': ' + body : ''}`); sfx('gold');
+  }, () => {});
+  $('puSend').onclick = async () => {
+    const title = $('puTitle').value.trim(), body = $('puBody').value.trim();
+    if (!title) return $('puMsg').textContent = 'Give it a title';
+    try { await addDoc(collection(db, 'pushes'), {title, body, by:me(), ts:serverTimestamp()}); $('puTitle').value = $('puBody').value = ''; $('puMsg').textContent = '📲 Sent! Everyone with the game open or in the background gets it'; }
+    catch { $('puMsg').textContent = "Couldn't send (signed in as nkthn?)"; }
+  };
   async function loadAnnList(){
     const L = $('annList'); L.innerHTML = '';
     try {
@@ -3996,7 +4016,7 @@ if (FIREBASE) {
       $('gvMsg').textContent = `🎁 Sent to ${to}. They get it within 30 seconds of being online`;
     } catch { $('gvMsg').textContent = "Couldn't send (signed in as nkthn?)"; }
   };
-  $('modBtn').onclick = () => { $('settings').close(); $('annMsg').textContent = ''; $('evMsg').textContent = ''; $('gvMsg').textContent = ''; $('modPanel').showModal(); loadAnnList(); renderEvList(); loadGvPlayers(); window.loadIdeas?.(); };
+  $('modBtn').onclick = () => { $('settings').close(); $('annMsg').textContent = ''; $('evMsg').textContent = ''; $('gvMsg').textContent = ''; $('puMsg').textContent = ''; $('modPanel').showModal(); loadAnnList(); renderEvList(); loadGvPlayers(); window.loadIdeas?.(); };
   $('modChat').onclick = () => { $('modPanel').close(); window.openChat?.('global'); };
   $('modHax').onclick = () => { $('modPanel').close(); toggleAdmin(); };
   $('modAll').onclick = () => { $('modPanel').close(); window.unlockAll(); };
