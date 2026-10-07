@@ -128,6 +128,24 @@ h2.shut::after{transform:rotate(-90deg)}
 body.xmas #pac{background:#07110c}
 #pc{width:100%;height:100%;display:block;touch-action:none}
 #pclose{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;cursor:pointer}
+#ghouse{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:#0b0d12}
+#ghouse[hidden]{display:none}
+#ghTop{display:flex;gap:10px;align-items:center;padding:10px 14px;background:rgba(0,0,0,.4)}#ghTop b{font:600 18px 'Fredoka',sans-serif}#ghTop span{flex:1}
+#ghScene{position:relative;flex:1;overflow:hidden;cursor:pointer;background:radial-gradient(ellipse at 50% 35%,#3f8f4f,#1f5a2e 70%,#143d20);touch-action:manipulation}
+#ghScene.stone{background:repeating-conic-gradient(#6b6f7a 0 25%,#5c606a 0 50%) 0 0/48px 48px}
+#ghScene.gold{background:radial-gradient(ellipse at 50% 35%,#ffe08a,#c8961a 70%,#7a5200)}
+#ghScene.rainbow{background:linear-gradient(135deg,#ff5c7a,#ffcf4a,#57cc99,#4cc9f0,#c77dff)}
+.ghd{position:absolute;transform:translate(-50%,-100%);line-height:1;pointer-events:none;filter:drop-shadow(0 6px 6px rgba(0,0,0,.35))}
+.gav{position:absolute;transform:translate(-50%,-100%);transition:left 1.2s linear,top 1.2s linear;text-align:center;pointer-events:none;z-index:2}
+.gav .gf{position:relative;width:52px;height:52px;margin:0 auto}.gav .gf img{width:52px;height:52px;clip-path:var(--jclip)}
+.gav .gf b{position:absolute;left:50%;top:-20px;transform:translateX(-50%);font-size:28px}
+.gav .gn{font:800 12px 'Nunito',sans-serif;color:#fff;text-shadow:0 1px 3px #000;white-space:nowrap;margin-top:2px}
+.gav.me .gn::after{content:' (you)';opacity:.7}
+.gav .bub{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-26px);background:#fff;color:#111;border-radius:12px;padding:6px 10px;font:700 13px 'Nunito',sans-serif;max-width:200px;width:max-content;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+#ghBar{display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.4)}#ghBar input{flex:1}
+#ghPanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);max-height:80vh;overflow-y:auto;background:var(--panel);border-radius:22px;padding:18px;z-index:5;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+#ghPanel[hidden]{display:none}
+.hall{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}.hall .hi{font-size:28px}.hall .ht{flex:1;min-width:0}.hall .hn{font-weight:800}
 #boss{position:absolute;inset:0;z-index:10;display:none;flex-direction:column;align-items:center;padding:60px 20px 20px;background:radial-gradient(circle at 50% 45%,#3a1020,#0b0d12 70%);user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #bclose{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:0;color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;cursor:pointer}
 #bTop{display:flex;justify-content:space-between;align-items:baseline;width:min(520px,100%);font-family:'Fredoka',sans-serif}
@@ -527,7 +545,13 @@ body.light .ab:hover{background:#e6e8f2}
   <div id="tank"><canvas id="tc"></canvas><button id="tclose">✕ Back to clicking</button></div>
   <div id="pac"><canvas id="pc"></canvas>
     <div id="dpad"><span></span><button data-d="0,-1">▲</button><span></span><button data-d="-1,0">◀</button><span></span><button data-d="1,0">▶</button><span></span><button data-d="0,1">▼</button></div><button id="pclose">✕ Back to clicking</button></div>
-  <div id="boss">
+  <div id="ghouse" hidden>
+  <div id="ghTop"><b id="ghName"></b><span id="ghOnline" class="dimtxt"></span><button class="ab" id="ghHall">🏛️ Town Hall</button><button class="ab" id="ghClose">✕</button></div>
+  <div id="ghScene"><div id="ghDeco"></div><div id="ghPeople"></div></div>
+  <div id="ghBar"><input id="ghSay" class="tin" maxlength="200" placeholder="Say something to your guild…" autocomplete="off"><button class="ab" id="ghSend">Say</button></div>
+  <div id="ghPanel" hidden><h3>🏛️ Town <span>Hall</span></h3><div class="dimtxt">Upgrades are shared by the whole guild. Whoever buys one pays with their own coins, rebirths or Ascensions.</div><div id="ghList"></div><button class="ab" id="ghPanelClose" style="width:100%;margin-top:10px">Close</button></div>
+</div>
+<div id="boss">
   <button id="bclose">✕ Run away</button>
   <div id="bTop"><div id="bName"></div><div id="bTime"></div></div>
   <div id="bBar"><i></i><span></span></div>
@@ -745,6 +769,7 @@ body.light .ab:hover{background:#e6e8f2}
     <div id="gTotal" class="dimtxt"></div>
     <div id="gMembers"></div>
     <div class="row" style="margin-top:10px"><button class="ab" id="gChat">💬 Guild chat</button><button class="ab" id="gLeave">Leave guild</button></div>
+    <button class="ab" id="gHouse" style="width:100%;margin-top:8px;background:linear-gradient(90deg,#57cc99,#4cc9f0);color:#06281c;font-weight:800">🏰 Enter the Guild House</button>
   </div>
   <div id="gMsg" class="dimtxt" style="margin-top:6px"></div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:14px">Close</button></form>
@@ -1276,6 +1301,23 @@ const AUP = [
   {id:'auto',   ic:'🤖', nm:'Auto Buyer',    ds:'Buys the cheapest upgrade every 2 seconds, only if it costs 10% of your coins or less (switch it off here)', cost:10},
 ];
 const asu = id => !!S.aup[id];
+// Guild House: Town Hall levels + decorations, bought by any member with their own coins / rebirths / Ascensions / Transcends
+const HALL_LV = [['🛖', 'Hut'], ['🏠', 'House', 'rebirths:50'], ['🏛️', 'Hall', 'asc:2'], ['🏰', 'Castle', 'asc:5'], ['🏯', 'Palace', 'tr:1']];
+const HALL = [
+  {id:'trees', ic:'🌳', nm:'Trees', cost:'coins:1e9', at:[[12, 30], [88, 30], [8, 75], [92, 75]], sz:44},
+  {id:'torch', ic:'🔥', nm:'Torches', cost:'rebirths:30', at:[[38, 28], [62, 28]], sz:30},
+  {id:'fountain', ic:'⛲', nm:'Fountain', cost:'coins:1e12', at:[[50, 62]], sz:64},
+  {id:'flags', ic:'🚩', nm:'Guild Flags', cost:'coins:1e15', at:[[25, 22], [75, 22]], sz:36},
+  {id:'statue', ic:'🗽', nm:'Statue', cost:'rebirths:100', at:[[22, 52]], sz:56},
+  {id:'tent', ic:'🎪', nm:'Party Tent', cost:'asc:1', at:[[78, 52]], sz:60},
+  {id:'stone', ic:'🧱', nm:'Stone Floor', cost:'coins:1e18', floor:'stone'},
+  {id:'rainbow', ic:'🌈', nm:'Rainbow Floor', cost:'asc:3', floor:'rainbow'},
+  {id:'goldfloor', ic:'🟨', nm:'Golden Floor', cost:'asc:5', floor:'gold'},
+  {id:'dragon', ic:'🐉', nm:'Dragon Statue', cost:'tr:1', at:[[50, 86]], sz:70},
+  {id:'junstatue', ic:'🗿', nm:'Giant Jun Statue', cost:'asc:10', jun:true, at:[[50, 40]], sz:90},
+];
+const PAYC = {coins:'🪙 coins', ...{rebirths:'🔁 rebirths', asc:'✨ Ascensions', tr:'🌠 Transcend'}};
+const parseCost = c => ({k:c.split(':')[0], n:+c.split(':')[1]});
 // Transcendence Shop: bought with 🌠 (1 per Transcend)
 const TUP = [
   {id:'auto5', ic:'🤖', nm:'Auto Buyer+', ds:'5× Auto Buyer: buys 5 upgrades every 2 seconds, each only if it costs 10% of your coins or less (switch it off here)', cost:2},
@@ -2926,6 +2968,11 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'5.2', date:'Oct 7, 2026', title:'Guild House', notes:[
+    '🏰 Guild House: walk around a shared base with your guildmates in real time, and chat bubbles pop over people\'s heads',
+    '🏛️ Town Hall: level it from Hut to Palace and build trees, torches, a fountain, flags, statues, a party tent, floors and a giant Jun statue. Anyone in the guild can chip in with coins, rebirths or Ascensions',
+    '⏱️ Player cards show hours played',
+    '📊 Coins-per-second graph in Stats, a detailed welcome-back report, sound packs and live event alerts']},
   {v:'5.1', date:'Oct 7, 2026', title:'Pets, Eggs & Cutscenes', notes:[
     '🐾 10 new pets: Buzzby, Pinchy, Peep, Lucky Ribbit, Sir Slowpoke, Chomper, King Leo, Boo, Big Tusk and the Mythic Prince Jun. Some boost bosses, roulette, eggs and offline earnings',
     '🥚 3 new eggs: 🌴 Jungle (coins), 🍀 Lucky (tokens) and 🕳️ Void (✨, 60% Mythic)',
@@ -3507,7 +3554,7 @@ function playerCard(r){
   info.appendChild(nm);
   if (t) info.appendChild(Object.assign(document.createElement('div'), {className:'pcTitle', textContent:`${t.ic} ${t.nm}`}));
   const lay = [['🌠', r.tr], ['🔆', r.apo], ['🕳️', r.sing], ['🌌', r.omni]].filter(([, v]) => N(v)).map(([i, v]) => `${i}${N(v)}`).join(' ');
-  info.appendChild(Object.assign(document.createElement('div'), {className:'pcStats', textContent:`🪙 ${fmt(N(r.score))} · 🔁 ${fmt(N(r.rebirths))} · ✨ ${N(r.asc)}${lay ? ' · ' + lay : ''}`}));
+  info.appendChild(Object.assign(document.createElement('div'), {className:'pcStats', textContent:`🪙 ${fmt(N(r.score))} · 🔁 ${fmt(N(r.rebirths))} · ✨ ${N(r.asc)}${lay ? ' · ' + lay : ''}${r.hours !== undefined ? ` · ⏱️ ${fmt(N(r.hours))}h played` : ''}`}));
   const pets = (Array.isArray(r.pets) ? r.pets : []).map(id => PETS.find(q => q.id === id)).filter(Boolean);
   if (pets.length || N(r.npets)) {
     const pp = document.createElement('div'); pp.className = 'ppets';
@@ -3518,7 +3565,7 @@ function playerCard(r){
   C.append(face, info); return C;
 }
 const myCardData = () => ({name:window.myName?.() || 'you', display:S.display, title:S.cos.title, color:S.cos.color, badge:S.cos.hat, acc:S.cos.acc, card:S.cos.card,
-  score:S.lifetime, rebirths:S.rebTotal, asc:S.asc, tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip, npets:Object.keys(S.pets).length, guild:''});
+  score:S.lifetime, rebirths:S.rebTotal, asc:S.asc, hours:Math.floor(S.playtime/3600), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip, npets:Object.keys(S.pets).length, guild:''});
 function renderWardrobe(){
   $('cosBal').textContent = S.hc; $('cosBig').textContent = fmt(S.hc);
   $('wJun').src = $('jun').src; $('wJun').style.clipPath = getComputedStyle($('jun')).clipPath;
@@ -3829,7 +3876,7 @@ if (FIREBASE) {
     if (!user) return Promise.resolve();
     const saved = setDoc(doc(db, 'saves', user.uid), {...S, updated:Date.now()}).catch(() => {});
     const ref = doc(db, 'leaderboard', user.uid);
-    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip.slice(0, 4), npets:Object.keys(S.pets).length, card:S.cos.card, acc:S.cos.acc, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
+    (S.cheater ? deleteDoc(ref) : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), day:S.day, dscore:Math.floor(S.dcoins), month:S.month, mscore:Math.floor(S.mcoins), tr:S.tr, apo:S.apo, sing:S.sing, omni:S.omni, pets:S.equip.slice(0, 4), npets:Object.keys(S.pets).length, card:S.cos.card, acc:S.cos.acc, hours:Math.floor(S.playtime/3600), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()}))
       // older Firestore rules don't know the day/month fields yet: retry without them so the board keeps updating
       .catch(() => S.cheater ? 0 : setDoc(ref, {name:user.email.split('@')[0], score:Math.floor(S.lifetime), rebirths:S.rebTotal, asc:S.asc, week:S.week, wscore:Math.floor(S.wcoins), badge:S.cos.hat, title:S.cos.title, color:S.cos.color, display:S.display, guild:guildTag, updated:Date.now()})).catch(() => {});
     return saved;
@@ -4300,6 +4347,97 @@ if (FIREBASE) {
   $('gJoin').onclick = () => joinGuild($('gCode').value);
   $('gCopy').onclick = () => { navigator.clipboard?.writeText(S.guild).then(() => toast('Invite code copied!'), () => {}); };
   $('gChat').onclick = () => { $('guild').close(); window.openChat?.('guild'); };
+  // ---------- Guild House: guilds/{gid}/presence/{name} = {x, y, ts, hat, acc, color, display}. Tap to walk; one write per move ----------
+  let ghUnsub = [], ghMe = null, ghBeat = 0, ghPeople = {}, ghGid = '';
+  const ghPres = () => doc(db, 'guilds', ghGid, 'presence', me());
+  const ghWrite = () => setDoc(ghPres(), {...ghMe, ts:Date.now(), hat:S.cos.hat, acc:S.cos.acc, color:S.cos.color, display:S.display}).catch(() => {});
+  function ghAvatar(n, p){
+    if (!n) return null;
+    let a = ghPeople[n];
+    if (!a) {
+      a = document.createElement('div'); a.className = 'gav' + (n === me() ? ' me' : '');
+      a.innerHTML = '<div class="gf"><img alt=""></div><div class="gn"></div>'; a.querySelector('img').src = $('jun').src;
+      $('ghPeople').appendChild(a); ghPeople[n] = a;
+    }
+    const hat = cosItem('hat', p.hat), f = a.querySelector('.gf'); f.querySelector('b')?.remove(); if (hat) f.appendChild(Object.assign(document.createElement('b'), {textContent:hat.ic}));
+    const nm = a.querySelector('.gn'); nm.textContent = cleanName(p.display) || n; const c = nameColor(p.color); nm.style.color = c && c !== 'rainbow' ? c : '#fff';
+    a.style.left = Math.min(96, Math.max(4, +p.x || 50)) + '%'; a.style.top = Math.min(96, Math.max(12, +p.y || 70)) + '%';
+    return a;
+  }
+  function ghBubble(n, text){
+    const a = ghPeople[n]; if (!a) return;
+    a.querySelector('.bub')?.remove(); const b = Object.assign(document.createElement('div'), {className:'bub', textContent:text}); a.appendChild(b);
+    setTimeout(() => b.remove(), 6000);
+  }
+  function ghRender(g){
+    const hall = g.hall || {}, lv = Math.min(HALL_LV.length, Math.max(1, +hall.lvl || 1)), items = hall.items || {};
+    $('ghName').textContent = `[${g.tag}] ${g.name}`;
+    const floor = HALL.filter(h => h.floor && items[h.id]).pop(); $('ghScene').className = floor ? floor.floor : '';
+    const D = $('ghDeco'); D.innerHTML = '';
+    const put = (ic, x, y, sz, img) => { const d = document.createElement('div'); d.className = 'ghd'; d.style.cssText = `left:${x}%;top:${y}%;font-size:${sz}px`;
+      if (img) { const im = Object.assign(document.createElement('img'), {src:$('jun').src}); im.style.cssText = `width:${sz}px;clip-path:var(--jclip);filter:sepia(1) saturate(3) brightness(1.1)`; d.appendChild(im); } else d.textContent = ic; D.appendChild(d); };
+    put(HALL_LV[lv - 1][0], 50, 24, 60 + lv*14);
+    for (const h of HALL) if (items[h.id] && h.at) for (const [x, y] of h.at) put(h.ic, x, y, h.sz, h.jun);
+    // town hall shop
+    const L = $('ghList'); L.innerHTML = '';
+    const row = (ic, nm, sub, cost, owned, buy) => {
+      const r = document.createElement('div'); r.className = 'hall';
+      r.innerHTML = `<div class="hi">${ic}</div><div class="ht"><div class="hn"></div><div class="dimtxt"></div></div>`; r.querySelector('.hn').textContent = nm; r.querySelector('.dimtxt').textContent = sub;
+      if (owned) r.appendChild(Object.assign(document.createElement('span'), {className:'dimtxt', textContent:'Built ✓'}));
+      else { const c = parseCost(cost), b = document.createElement('button'); b.className = 'ab'; b.textContent = `${c.k === 'coins' ? fmt(c.n) : c.n} ${PAYC[c.k]}`; b.onclick = () => buy(c); r.appendChild(b); }
+      L.appendChild(r);
+    };
+    const next = HALL_LV[lv];
+    row(HALL_LV[lv - 1][0], `Town Hall · Lv ${lv} ${HALL_LV[lv - 1][1]}`, next ? `Next: ${next[0]} ${next[1]}` : 'Max level!', next?.[2], !next, c => ghBuy(c, {'hall.lvl':lv + 1}, `${next[0]} Town Hall upgraded to ${next[1]}!`));
+    for (const h of HALL) row(h.ic, h.nm, h.floor ? 'Changes the whole floor' : `Adds ${h.at.length > 1 ? h.at.length + ' ' : ''}${h.nm.toLowerCase()} to the house`, h.cost, !!items[h.id],
+      c => ghBuy(c, {['hall.items.' + h.id]:true}, `${h.ic} ${h.nm} built in the Guild House!`));
+  }
+  async function ghBuy(c, patch, msg){
+    const have = c.k === 'coins' ? S.coins : S[c.k];
+    if (have < c.n) return toast(`You need ${c.k === 'coins' ? fmt(c.n) : c.n} ${PAYC[c.k]} (you have ${c.k === 'coins' ? fmt(have) : have})`);
+    if (c.k !== 'coins' && !confirm(`Spend ${c.n} ${PAYC[c.k]} on this Guild House upgrade? Your count really goes down.`)) return;
+    try { await updateDoc(doc(db, 'guilds', ghGid), patch); } catch { return toast("Couldn't build that right now"); }
+    if (c.k === 'coins') S.coins -= c.n; else S[c.k] -= c.n;
+    recalcResearch(); save(); refresh(); sfx('fanfare'); confetti(90); toast(msg);
+    window.postGuildLine?.(`🏗️ ${msg}`);
+  }
+  function ghOpen(){
+    if (!guildDoc || !S.guild) return;
+    ghGid = S.guild; ghPeople = {}; $('ghPeople').innerHTML = ''; $('guild').close(); $('ghouse').hidden = false;
+    ghMe = {x:20 + Math.random()*60, y:65 + Math.random()*25}; ghWrite();
+    ghUnsub.push(onSnapshot(doc(db, 'guilds', ghGid), d => d.exists() && ghRender(d.data()), () => {}));
+    ghUnsub.push(onSnapshot(collection(db, 'guilds', ghGid, 'presence'), qs => {
+      const now = Date.now(), live = new Set();
+      qs.forEach(d => { const p = d.data(); if (now - (+p.ts || 0) < 150e3) { live.add(d.id); ghAvatar(d.id, p); } });
+      for (const n in ghPeople) if (!live.has(n)) { ghPeople[n].remove(); delete ghPeople[n]; }
+      $('ghOnline').textContent = `${live.size} here now`;
+    }, () => {}));
+    let since = Date.now();
+    ghUnsub.push(onSnapshot(query(collection(db, 'guilds', ghGid, 'msgs'), orderBy('ts', 'desc'), limit(5)), qs => {
+      qs.docs.slice().reverse().forEach(d => { const m = d.data({serverTimestamps:'estimate'}), t = m.ts?.toMillis ? m.ts.toMillis() : 0;
+        if (t > since - 2000) ghBubble(String(m.from), cleanChat(String(m.text || ''))); });
+      since = Date.now();
+    }, () => {}));
+    ghBeat = setInterval(ghWrite, 45e3);
+  }
+  function ghClose(){
+    ghUnsub.forEach(u => u()); ghUnsub = []; clearInterval(ghBeat); $('ghouse').hidden = true; $('ghPanel').hidden = true;
+    if (ghGid) deleteDoc(ghPres()).catch(() => {});
+  }
+  $('gHouse').onclick = ghOpen; $('ghClose').onclick = ghClose;
+  window.ghPreview = g => { $('ghouse').hidden = false; ghRender(g); for (const [n, p] of Object.entries(g.people || {})) ghAvatar(n, p); };   // render-only preview (no Firestore)
+  $('ghHall').onclick = () => { $('ghPanel').hidden = false; }; $('ghPanelClose').onclick = () => { $('ghPanel').hidden = true; };
+  $('ghScene').addEventListener('pointerdown', e => {
+    const r = $('ghScene').getBoundingClientRect();
+    ghMe = {x:(e.clientX - r.left) / r.width * 100, y:(e.clientY - r.top) / r.height * 100 + 4};
+    ghAvatar(me(), {...ghMe, hat:S.cos.hat, color:S.cos.color, display:S.display}); ghWrite();
+  });
+  const ghSend = async () => {
+    const t = cleanChat($('ghSay').value.trim()).slice(0, 200); if (!t) return;
+    if (await window.postGuildLine?.(t)) $('ghSay').value = ''; else toast('Slow down! One message every 3 seconds');
+  };
+  $('ghSend').onclick = ghSend; $('ghSay').addEventListener('keydown', e => { if (e.key === 'Enter') ghSend(); });
+  addEventListener('pagehide', () => { if (!$('ghouse').hidden) ghClose(); });
   $('gLeave').onclick = async () => {
     const mine = guildDoc?.owner === me();
     if (!confirm(mine ? 'Disband your guild? Everyone will be removed.' : 'Leave this guild?')) return;
@@ -4416,6 +4554,13 @@ if (FIREBASE) {
     if (!(await postGlobal(t))) setTimeout(() => postGlobal(t), 3500);   // rate limit: try once more after 3.5s
   };
   window.postGlobal = postGlobal;
+  window.postGuildLine = async text => {
+    if (!user || !S.guild) return false;
+    const b = writeBatch(db);
+    b.set(doc(db, 'chatmeta', user.uid), {last:serverTimestamp()});
+    b.set(doc(collection(db, 'guilds', S.guild, 'msgs')), {from:me(), text:text.slice(0, 200), ts:serverTimestamp(), display:S.display, badge:S.cos.hat, title:S.cos.title, color:S.cos.color, guild:guildTag});
+    try { await b.commit(); return true; } catch { return false; }
+  };
   async function send(){
     const text = cleanChat($('chatIn').value.trim()).slice(0, 200);
     if (!user) return chatNote('Sign in to chat');
