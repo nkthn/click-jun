@@ -59,6 +59,8 @@ h2.shut::after{transform:rotate(-90deg)}
 #ascBtn{width:100%;margin-top:10px;background:linear-gradient(90deg,#ffd166,#ff8a3d,#c77dff);border:0;color:#111;border-radius:10px;padding:10px;font:inherit;font-weight:800;cursor:pointer}
 #ascBtn[hidden],#ascLine[hidden]{display:none}
 #ascLine{margin-top:8px;font-size:13px;color:#ffd166;font-weight:600}
+#skipScene{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:101;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
+#ending:not([hidden])+#skipScene{display:block}
 #ending{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 45%,#3a2160,#05030a 70%);overflow:hidden;font-family:'Space Grotesk',sans-serif}
 #ending[hidden]{display:none}
 #ending .end-btn{background:linear-gradient(90deg,#ffd166,#ff8a3d);border:0;color:#111;border-radius:999px;padding:12px 22px;font:inherit;font-weight:800;cursor:pointer;margin:6px}
@@ -193,11 +195,11 @@ body.rainbow .flake{font-size:14px!important}
 #achGrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
 #achGrid button{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:17px;cursor:pointer;padding:0;filter:grayscale(1);opacity:.3}
 #achGrid button.got{filter:none;opacity:1;border-color:rgba(255,201,77,.45)}
-#perkList{margin-top:12px;max-height:55vh;overflow-y:auto}
+#perkList{margin-top:12px}
 .perk.owned{border-color:rgba(255,201,77,.45);opacity:1}
 #topBtns button{position:relative}
 #topBtns button.new::after{content:'';position:absolute;top:2px;right:2px;width:9px;height:9px;border-radius:50%;background:#ff5c7a}
-#updList{margin-top:12px;max-height:60vh;overflow-y:auto}
+#updList{margin-top:12px}
 .upd{padding:12px 0;border-top:1px solid var(--line)}
 .upd:first-child{border-top:0}
 .upd h4{font-size:15px;display:flex;gap:8px;align-items:baseline}
@@ -316,7 +318,13 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .bal{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;padding:10px;border-radius:12px;background:rgba(255,201,77,.12);border:1px solid rgba(255,201,77,.35);font-size:15px}
 .bal b{font-size:24px;color:var(--gold);font-variant-numeric:tabular-nums}
 #chatBox{height:min(46vh,360px);overflow-y:auto;display:flex;flex-direction:column-reverse;gap:8px;margin-top:10px;padding:10px;background:var(--panel);border-radius:12px;overscroll-behavior:contain}
-.msg{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.msg{font-size:14px;line-height:1.35;overflow-wrap:anywhere;display:flex;gap:9px;align-items:flex-start}
+.mbody{flex:1;min-width:0}
+.av{position:relative;flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--panel2);cursor:pointer;margin-top:4px}
+.av img{position:absolute;inset:2px;width:26px;height:26px;object-fit:cover;clip-path:var(--jclip)}
+.av b{position:absolute;left:50%;top:-11px;transform:translateX(-50%);font-size:16px;line-height:1}
+.av.rb{border-color:#ff5c7a;animation:rbring 3s linear infinite}
+@keyframes rbring{0%{border-color:#ff5c7a}33%{border-color:#4cc9f0}66%{border-color:#ffcf4a}100%{border-color:#ff5c7a}}
 .msg .who{font-weight:700;cursor:pointer}
 .msg .t{color:var(--dim);font-size:11px;margin-left:6px}
 .ttl-in{color:var(--gold);font-size:10px;font-weight:600;margin-left:6px}
@@ -401,6 +409,9 @@ body.light #coins{background:none;color:#e0a100;text-shadow:0 3px 0 rgba(0,0,0,.
 #live{background:rgba(61,220,151,.14);color:var(--good)}
 #toast{background:var(--panel2);color:var(--text);font:700 14px 'Nunito',sans-serif;box-shadow:0 6px 0 rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.4);border:1px solid var(--line)}
 dialog{background:var(--panel);border:0;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+/* dialogs never grow past the screen; the Close button stays pinned at the bottom */
+dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
+dialog>form[method=dialog]:last-child{position:sticky;bottom:-22px;margin:0 -22px -22px;padding:4px 22px 16px;background:inherit;z-index:3}
 dialog h3{font-weight:700;font-size:22px}
 .bal{background:var(--panel2);border:0;box-shadow:var(--depth)}
 .tin,.setb,#acct input,#welcome input{background:var(--panel2);border:1px solid transparent;border-radius:12px}
@@ -546,7 +557,7 @@ body.light .ab:hover{background:#e6e8f2}
   <div class="row" style="margin-top:16px"><button class="ab" id="vcAccept">✅ Accept</button><button class="ab" id="vcNeg">📈 Negotiate +50%</button></div>
   <div class="row" style="margin-top:6px"><button class="ab" id="vcDecline">Decline</button></div>
 </dialog>
-<div id="ending" hidden></div>
+<div id="ending" hidden></div><button id="skipScene">Skip ⏭</button>
 <dialog id="settings">
   <h3>⚙️ <span>Settings</span></h3>
   <div id="acct" hidden>
@@ -572,6 +583,7 @@ body.light .ab:hover{background:#e6e8f2}
   <label>Sound</label><button id="sndBtn" class="setb"></button>
   <input type="range" id="vol" min="0" max="1" step="0.05" style="margin-top:8px">
   <label>Numbers</label><button id="sciBtn" class="setb"></button>
+  <label>Cutscenes</label><button id="animBtn" class="setb"></button>
   <button id="reset">Reset progress</button>
   <button id="adminBtn">⚙ Admin panel <span style="opacity:.5">(`)</span></button>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:16px">Done</button></form>
@@ -603,8 +615,9 @@ body.light .ab:hover{background:#e6e8f2}
     <h3>👥 <span>Friends</span></h3>
     <div id="frOut" class="dimtxt" style="margin-top:8px">Sign in to add friends.</div>
     <div id="frIn" hidden>
-      <div class="row" style="margin-top:12px"><input id="frName" class="tin" placeholder="Add a friend by username" autocapitalize="off" maxlength="20"><button class="ab" id="frAdd">Add</button></div>
+      <div class="row" style="margin-top:12px"><input id="frName" class="tin" placeholder="Send a friend request by username" autocapitalize="off" maxlength="20"><button class="ab" id="frAdd">Send</button></div>
       <div id="frMsg" class="dimtxt" style="margin-top:4px"></div>
+      <div id="frReqs"></div>
       <div id="frList"></div>
     </div>
   </div>
@@ -693,7 +706,7 @@ body.light .ab:hover{background:#e6e8f2}
   <h3>✨ Ascension <span>Shop</span></h3>
   <div class="bal">You have <b id="apBig">0</b> ✨ Ascension points</div>
   <div class="dimtxt" style="margin-top:4px">Cheap one-time upgrades that last forever. You earn 1 ✨ every time you Ascend. You have <b id="apBal2" style="color:var(--gold)"></b> ✨.</div>
-  <div id="aList" style="margin-top:12px;max-height:55vh;overflow-y:auto"></div>
+  <div id="aList" style="margin-top:12px"></div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
 </dialog>
 <dialog id="away">
@@ -908,7 +921,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, skipAnim:false, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -1218,7 +1231,7 @@ function renderShop(){
   for (const [box,t] of [[$('favUps'),'*'],[$('clickUps'),'c'],[$('kUps'),'k'],[$('autoUps'),'a']]) {
     box.innerHTML = '';
     let list = UPS.filter(u => t === '*' ? S.stars[u.id] : u.t === t && !S.stars[u.id]), hid = 0;
-    if (t !== '*') { const all = UPS.filter(u => u.t === t), f = all.findIndex(u => !own(u)), lim = f < 0 ? all.length : f + 2;
+    if (t !== '*') { const all = UPS.filter(u => u.t === t), lim = all.findLastIndex(u => own(u)) + 3;   // 2 past the furthest one you own (skipping one still unlocks more)
       const keep = new Set(all.slice(0, lim)); hid = list.length - list.filter(u => keep.has(u)).length; list = list.filter(u => keep.has(u)); }
     for (const u of list) {
       const b = document.createElement('button');
@@ -1274,7 +1287,7 @@ function refresh(){
   $('rbBtn').disabled = g < 1 || capped;
   $('rbBtn').textContent = capped ? '👑 You beat Click Jun! Ascend to climb again' : g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
   setText($('hcBal'), String(S.hc));
-  $('rbNext').textContent = capped ? `${MAXR}/${MAXR} rebirths` : g < 1 ? `Rebirth ${S.rebirths}/${MAXR} · each one needs more coins than the last` : `${fmt(rbBase() * 10 ** ((g + 1)/rbMult() - 1) - S.total)} more coins this run for +1 💈 token`;
+  $('rbNext').textContent = !(rbBase() < CAP) ? `You've reached the Ascension ceiling: rebirths now cost more coins than exist. Bosses, pets and the leaderboard are your climb now.` : capped ? `${MAXR}/${MAXR} rebirths` : g < 1 ? `Rebirth ${S.rebirths}/${MAXR} · each one needs more coins than the last` : `${fmt(rbBase() * 10 ** ((g + 1)/rbMult() - 1) - S.total)} more coins this run for +1 💈 token`;
 }
 
 // floating heads
@@ -1370,9 +1383,10 @@ setTimeout(spawnDiamond, diaDelay());
 // rebirth tokens per rebirth = (1 + log10 of how far past the requirement this run got) × rbMult, so huge runs pay more but don't explode
 const rbMult = (r = S.rebirths) => 1 + .1 * Math.sqrt(r);   // diminishing: 1 rebirth ×1.1, 4 → ×1.2, 25 → ×1.5, 100 → ×2
 // the base requirement climbs 20% with every rebirth you've done: 100 rebirths → 8e13, 200 → 7e21, 300 → 6e29
-const MAXR = 300;   // beat the game at 300 rebirths, then Ascend
+const MAXR = 300;
+const ASC_HARD = 1000;   // rebirths cost ×1000 more per Ascension past 6: each climb is longer than the last (×3 per Ascension used to snowball forever)   // beat the game at 300 rebirths, then Ascend
 // +20% per rebirth, sharply steeper past 200, and 10× cheaper for every Ascension
-const rbBase = (r = S.rebirths) => 1e6 * 1.2 ** r * (r > 200 ? 10 ** ((r - 200) ** 2 / 1000) : 1) / 10 ** Math.min(S.asc, 6);   // discount caps at ×1,000,000 so every climb stays a real climb
+const rbBase = (r = S.rebirths) => 1e6 * 1.2 ** r * (r > 200 ? 10 ** ((r - 200) ** 2 / 1000) : 1) / 10 ** Math.min(S.asc, 6) * ASC_HARD ** Math.max(0, S.asc - 6);   // discount caps at ×1,000,000; past Ascension 6 every climb costs more so ×3 per Ascension can't snowball
 const rbReq = r => rbBase(r);                           // coins this run needed to rebirth at all, only ever goes up
 const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbBase()) * rbMult());
 // multi-rebirth ×n: n real rebirths in one go. Needs the coins of n back-to-back rebirths (each requirement 10% higher),
@@ -1419,6 +1433,7 @@ $('ascBtn').onclick = ascend;
 // the ending: Jun sweats, a giant finger rises, one last poke sends him spinning into another dimension
 // TRUE ENDING at ∞ coins: Jun clones spiral in from every direction, merge into one golden Jun, then the credits roll
 function playTrueEnding(){
+  if (S.skipAnim) return toast('♾️ TRUE ENDING reached. You beat Click Jun, forever.');
   const E = $('ending'); E.innerHTML = ''; E.hidden = false;
   E.style.background = '#000';
   const el = (tag, css, html = '') => { const d = document.createElement(tag); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
@@ -1457,6 +1472,7 @@ function playTrueEnding(){
 }
 // Jun ascends into heaven: sky, drifting clouds, a beam of light, Jun with halo and flapping wings rising out of view
 function playAscendScene(){
+  if (S.skipAnim) return toast(`✨ Ascension ${S.asc}! Everything ×${fmt(3 ** S.asc)}`);
   const E = $('ending'); E.innerHTML = ''; E.hidden = false; sfx('angel'); setTimeout(() => sfx('angel'), 3200);
   E.style.background = 'linear-gradient(#9fd3ff 0%,#d9efff 55%,#fff6dd 100%)';
   const el = (tag, css, html = '') => { const d = document.createElement(tag); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
@@ -1489,6 +1505,7 @@ function playAscendScene(){
   }, 5600);
 }
 function playEnding(){
+  if (S.skipAnim) return toast('🏆 You beat Jun! 300 rebirths. Ascend to keep climbing.');
   const E = $('ending'); E.innerHTML = ''; E.hidden = false; E.style.background = '';
   const el = (tag, css, html = '') => { const d = document.createElement(tag); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; E.appendChild(d); return d; };
   const go = (node, frames, o) => node.animate(frames, {fill:'forwards', easing:'ease-in-out', ...o});
@@ -1729,7 +1746,7 @@ function applyState(d, keepCheat = true){
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
-    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true,
+    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
@@ -2387,6 +2404,13 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'4.7', date:'Oct 7, 2026', title:'Friends & Fixes', notes:[
+    '👋 Friend requests: send one by username, they accept or decline in 👥 Friends',
+    '🖼️ Profile pictures in chat show your hat and name colour',
+    '⏭ Skip any cutscene, or turn cutscenes and big effects off in ⚙️ Settings',
+    'Ascending past 6 now makes each climb harder instead of easier (no more endless ascension loops)',
+    'Fixed: skipping an upgrade no longer stops the next ones from unlocking',
+    'Fixed: Rebirth Shop and other windows fit on phones, with Close always visible']},
   {v:'4.6', date:'Oct 6, 2026', title:'Bosses & Casino', notes:[
     '⚔️ Boss Fights: 60 bosses in the 🎮 Games tab. Tap them down in 30 seconds using only your per-click damage',
     'Every boss you beat gives permanent click power: +10%, +15%, +25%, +35%… and it keeps climbing. Each boss is much tougher than the last',
@@ -2702,6 +2726,7 @@ function rollEgg(egg){
 // bulk hatch: one wobble, then every pet pops in on a grid. One sound and one confetti for the best pull
 const RAR_ORD = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
 function hatchManyFx(egg, got){
+  if (S.skipAnim) return toast(`${egg.ic} Hatched ${got.length}: ${got.map(g => g.q.ic).join('')}`);
   const F = document.createElement('div'); F.className = 'fxLayer'; F.style.background = 'rgba(8,9,16,.86)'; document.body.appendChild(F);
   const e = Object.assign(document.createElement('div'), {className:'fxEgg', textContent:egg.ic}); F.appendChild(e);
   e.animate([{transform:'rotate(0)'}, {transform:'rotate(-14deg)'}, {transform:'rotate(14deg)'}, {transform:'rotate(0) scale(1.15)'}], {duration:700});
@@ -2723,6 +2748,7 @@ function hatchManyFx(egg, got){
 }
 // hatch animation: the egg wobbles, cracks with a flash, and the pet pops out with its rarity colour
 function hatchFx(eggIc, q, note){
+  if (S.skipAnim) return toast(`${q.ic} ${q.nm} (${q.r}): ${note}`);
   const F = document.createElement('div'); F.className = 'fxLayer'; document.body.appendChild(F);
   const egg = Object.assign(document.createElement('div'), {className:'fxEgg', textContent:eggIc}); F.appendChild(egg);
   egg.animate([{transform:'rotate(0)'}, {transform:'rotate(-14deg)'}, {transform:'rotate(14deg)'}, {transform:'rotate(-10deg)'}, {transform:'rotate(10deg)'}, {transform:'rotate(0) scale(1.15)'}], {duration:900});
@@ -2753,6 +2779,7 @@ function confetti(n = 60){
 }
 // rebirth burst: white flash, a ring expanding from Jun, big text, coins swirling
 function rebirthFx(n){
+  if (S.skipAnim) return;
   const F = document.createElement('div'); F.className = 'fxLayer fxPass'; document.body.appendChild(F);
   const r = $('jun').getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
   const flash = Object.assign(document.createElement('div'), {className:'fxFlash'}); F.appendChild(flash);
@@ -2805,12 +2832,15 @@ function renderSettings(){
   $('vol').value = S.vol;
   $('sciBtn').textContent = S.sci ? '🔢 Numbers: scientific (1.50e6)' : '🔢 Numbers: short (1.50M)';
   $('dispIn').value = S.display;
+  $('animBtn').textContent = S.skipAnim ? '⏭ Cutscenes & big effects: skipped' : '🎬 Cutscenes & big effects: on';
 }
 $('setBtn').onclick = () => { renderSettings(); $('dispMsg').textContent = ''; $('settings').showModal(); };
 document.querySelectorAll('#appRow button').forEach(b => b.onclick = () => { S.appearance = b.dataset.v; save(); applyAppearance(); });
 $('sndBtn').onclick = () => { S.sound = !S.sound; save(); renderSettings(); sfx('buy'); };
 $('vol').oninput = e => { S.vol = +e.target.value; save(); };
 $('vol').onchange = () => sfx('coin');
+$('animBtn').onclick = () => { S.skipAnim = !S.skipAnim; save(); renderSettings(); };
+$('skipScene').onclick = () => { const E = $('ending'); E.hidden = true; E.innerHTML = ''; E.style.background = ''; };
 $('sciBtn').onclick = () => { S.sci = !S.sci; save(); renderSettings(); refresh(); renderShop(); };
 $('dispSave').onclick = () => {
   S.display = cleanName($('dispIn').value); save(); renderSettings(); window.pushNow?.();
@@ -2939,7 +2969,7 @@ setTimeout(() => { if (dailyState().can && !document.querySelector('dialog[open]
 // --- accounts: a local save belongs to the account it was synced with ---
 function resetLocal(){
   // daily is kept too, so signing out doesn't re-offer (or let you re-claim) today's reward
-  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx, daily:{...S.daily}, quests:JSON.parse(JSON.stringify(S.quests))};
+  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx,  skipAnim:S.skipAnim, daily:{...S.daily}, quests:JSON.parse(JSON.stringify(S.quests))};
   S = {...DEF(), ...keep, started:Date.now()}; shown = 0;
   recalcResearch(); applyPerks(); applyCos(); applyXmas(); applyAppearance(); applyBuy(); renderAch(); renderPets(); renderShop(); renderDaily(); refresh(); save();
 }
@@ -3029,6 +3059,7 @@ function renderQuests(){
 }
 renderQuests();
 $('logoJun').src = $('jun').src; $('logoJun').style.clipPath = getComputedStyle($('jun')).clipPath;
+document.documentElement.style.setProperty('--jclip', getComputedStyle($('jun')).clipPath);   // chat avatars reuse Jun's head outline
 applyPerks(); renderAch(); renderPets();
 if (!S.rebTotal) S.rebTotal = S.asc*MAXR + S.rebirths;   // all-time rebirths (never resets) for the Rebirths leaderboard
 if (S.rebirths >= MAXR && !S.beaten) { S.beaten = true; save(); setTimeout(playEnding, 1200); }
@@ -3164,7 +3195,17 @@ if (FIREBASE) {
     if (S.friends.length >= 30) return frMsg('Your friend list is full (30)');
     const r = await findPlayer(n).catch(() => null);
     if (!r) return frMsg('No player with that username on the leaderboard');
-    S.friends.push(n); save(); $('frName').value = ''; frMsg(`Added ${n}!`); frRender();
+    // friend requests ride on trades/ docs tagged kind:'friend' (same from/to rules as trades)
+    try {
+      const [theirs, mine] = await Promise.all([
+        getDocs(query(collection(db, 'trades'), where('to', '==', me()), where('from', '==', n))),
+        getDocs(query(collection(db, 'trades'), where('from', '==', me()), where('to', '==', n)))]);
+      const inc = theirs.docs.find(d => d.data().kind === 'friend' && d.data().status === 'open');
+      if (inc) { await updateDoc(inc.ref, {status:'accepted'}); S.friends.push(n); save(); $('frName').value = ''; frMsg(`You and ${n} are now friends!`); return frRender(); }
+      if (mine.docs.some(d => d.data().kind === 'friend' && d.data().status === 'open')) return frMsg(`Request to ${n} is already pending`);
+      await addDoc(collection(db, 'trades'), {from:me(), to:n, kind:'friend', status:'open', ts:Date.now()});
+      $('frName').value = ''; frMsg(`📨 Friend request sent to ${n}`); frRender();
+    } catch { frMsg("Couldn't send the request, try again"); }
   };
   $('giftSend').onclick = async () => {
     const to = pf, amount = tok($('giftAmt').value);
@@ -3205,9 +3246,38 @@ if (FIREBASE) {
       }
       const [inc, out] = await Promise.all([getDocs(query(collection(db, 'trades'), where('to', '==', me()))), getDocs(query(collection(db, 'trades'), where('from', '==', me())))]);
       // incoming offers
+      // friend requests
+      const reqs = $('frReqs'); reqs.innerHTML = '';
+      for (const d of inc.docs) {
+        const t = d.data(), from = String(t.from); if (t.kind !== 'friend' || t.status !== 'open') continue;
+        if (S.friends.includes(from)) { updateDoc(d.ref, {status:'accepted'}).catch(() => {}); continue; }
+        const row = document.createElement('div'); row.className = 'trRow';
+        row.innerHTML = '<div></div><div class="row"><button class="ab">✅ Accept</button><button class="ab">❌ Decline</button></div>';
+        row.firstChild.textContent = `👋 ${from} wants to be friends`;
+        const [acc, dec] = row.querySelectorAll('button');
+        acc.onclick = async () => {
+          if (S.friends.length >= 30) return frMsg('Your friend list is full (30)');
+          try { await updateDoc(d.ref, {status:'accepted'}); } catch { return frMsg('That request is gone'); }
+          if (!S.friends.includes(from)) S.friends.push(from); save(); sfx('coin'); frRender();
+        };
+        dec.onclick = async () => { try { await updateDoc(d.ref, {status:'declined'}); } catch {} frPoll(); };
+        reqs.appendChild(row);
+      }
+      for (const d of out.docs) {
+        const t = d.data(), to = String(t.to); if (t.kind !== 'friend') continue;
+        if (t.status === 'accepted') { try { await deleteDoc(d.ref); if (!S.friends.includes(to) && S.friends.length < 30) S.friends.push(to); toast(`👥 ${to} accepted your friend request!`); sfx('gold'); } catch {} continue; }
+        if (t.status === 'declined') { try { await deleteDoc(d.ref); } catch {} continue; }
+        const row = document.createElement('div'); row.className = 'trRow';
+        row.innerHTML = '<div></div><div class="row"><button class="ab">Cancel request</button></div>';
+        row.firstChild.textContent = `⏳ Friend request sent to ${to}`;
+        row.querySelector('button').onclick = async () => { try { await deleteDoc(d.ref); } catch {} frPoll(); };
+        reqs.appendChild(row);
+      }
+      if (reqs.children.length) reqs.insertAdjacentHTML('afterbegin', '<label>Friend requests</label>');
+      $('friendBtn').classList.toggle('new', [...inc.docs].some(d => d.data().kind === 'friend' && d.data().status === 'open'));
       const inbox = $('tradeInbox'); inbox.innerHTML = '';
       for (const d of inc.docs) {
-        const t = d.data(); if (t.status !== 'open') continue;
+        const t = d.data(); if (t.status !== 'open' || t.kind === 'friend') continue;
         const {give, want} = clean(t);
         const row = document.createElement('div'); row.className = 'trRow';
         row.innerHTML = '<div></div><div class="row"><button class="ab">✅ Accept</button><button class="ab">❌ Decline</button></div>';
@@ -3227,6 +3297,7 @@ if (FIREBASE) {
       // your offers: finish accepted ones, refund declined ones, list the open ones
       const mine = $('tradeOut'); mine.innerHTML = '';
       for (const d of out.docs) {
+        if (d.data().kind === 'friend') continue;
         const t = d.data(), {give, want} = clean(t);
         if (t.status === 'accepted') { try { await deleteDoc(d.ref); S.hc += want.tokens; petGive(want.pet); toast(`🤝 ${String(t.to)} accepted your trade!`); sfx('gold'); } catch {} continue; }
         if (t.status === 'declined') { try { await deleteDoc(d.ref); S.hc += give.tokens; petGive(give.pet); toast(`${String(t.to)} declined your trade, items returned`); } catch {} continue; }
@@ -3345,28 +3416,35 @@ if (FIREBASE) {
     const m = d.data({serverTimestamps:'estimate'}), from = String(m.from || '?');
     if (S.muted.includes(from)) return null;
     const row = document.createElement('div'); row.className = 'msg';
+    const body = document.createElement('div'); body.className = 'mbody';
     const who = document.createElement('span'); who.className = 'who';
     const hat = cosItem('hat', m.badge), t = cosItem('title', m.title), c = nameColor(m.color);
     const tag = typeof m.guild === 'string' && /^[A-Z0-9]{1,4}$/.test(m.guild) ? `[${m.guild}] ` : '';
-    const nm = document.createElement('span'); nm.textContent = (hat ? hat.ic + ' ' : '') + tag + (cleanName(m.display) || from);
+    // profile picture: Jun wearing their hat, ringed in their name colour
+    const av = document.createElement('div'); av.className = 'av' + (c === 'rainbow' ? ' rb' : '');
+    if (c && c !== 'rainbow') av.style.borderColor = c;
+    av.appendChild(Object.assign(document.createElement('img'), {src:$('jun').src, alt:''}));
+    if (hat) av.appendChild(Object.assign(document.createElement('b'), {textContent:hat.ic}));
+    const nm = document.createElement('span'); nm.textContent = tag + (cleanName(m.display) || from);
     if (c === 'rainbow') nm.className = 'nc-rainbow'; else if (c) nm.style.color = c;
     who.appendChild(nm);
     if (MODS.includes(from)) who.appendChild(Object.assign(document.createElement('span'), {className:'modtag', textContent:'MOD'}));
     if (t) who.appendChild(Object.assign(document.createElement('span'), {className:'ttl-in', textContent:`${t.ic} ${t.nm}`}));
     const time = m.ts?.toDate ? m.ts.toDate().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}) : '';
-    row.appendChild(who);
-    row.appendChild(Object.assign(document.createElement('span'), {className:'t', textContent:time}));
-    row.appendChild(Object.assign(document.createElement('div'), {className:'txt', textContent:cleanChat(String(m.text || ''))}));
+    body.appendChild(who);
+    body.appendChild(Object.assign(document.createElement('span'), {className:'t', textContent:time}));
+    body.appendChild(Object.assign(document.createElement('div'), {className:'txt', textContent:cleanChat(String(m.text || ''))}));
+    row.append(av, body); av.onclick = () => who.onclick();
     // tap a name for actions: mute, message (friends), delete (own / mod), ban (mod)
     who.onclick = () => {
-      const old = row.querySelector('.mact'); if (old) return old.remove();
+      const old = body.querySelector('.mact'); if (old) return old.remove();
       const act = document.createElement('div'); act.className = 'mact';
       const btn = (label, fn) => act.appendChild(Object.assign(document.createElement('button'), {className:'ab', textContent:label, onclick:fn}));
       if (from !== me()) btn(S.muted.includes(from) ? 'Unmute' : '🔇 Mute', () => { S.muted = S.muted.includes(from) ? S.muted.filter(x => x !== from) : [...S.muted, from].slice(-100); save(); listen(); });
       if (from !== me() && S.friends.includes(from) && room === 'global') btn('💬 Message', () => openRoom('dm', from));
       if (from === me() || isMod()) btn('🗑️ Delete', () => deleteDoc(d.ref).catch(() => chatNote("Couldn't delete that")));
       if (isMod() && from !== me()) btn('🔨 Ban from chat', () => setDoc(doc(db, 'bans', from), {by:me(), ts:Date.now()}).then(() => { chatNote(`${from} is banned from chat`); loadBans(); }).catch(() => chatNote('Ban failed')));
-      row.appendChild(act);
+      body.appendChild(act);
     };
     return row;
   }
