@@ -379,6 +379,7 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .pc .ppets em{font-style:normal;font-size:11px;align-self:center;opacity:.85}
 #wGrid button.flex{box-shadow:inset 0 0 0 2px #b388ff}
 #admin .hx{flex-wrap:wrap}#admin .hx .ab{flex:1 1 30%;font-size:12px;padding:8px 4px}
+.fxSkip{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
 .pcard{flex-direction:column;background:var(--panel2);border-radius:12px;padding:10px;margin-top:6px}
 .pstats{font-size:13px}.pstats b{color:var(--gold)}
 .ppets{display:flex;gap:6px;margin-top:6px}.ppets span{font-size:22px;border:2px solid;border-radius:10px;padding:2px 5px;background:var(--panel)}
@@ -1008,6 +1009,7 @@ const ACH = [
   ['asc5', '🌟', 'Ascension Addict', 'Ascend 5 times', () => S.asc >= 5],
   ['egg', '🥚', 'Theme Hopper', 'Find a secret (hint: someone can\'t decide on a theme)', () => S.rainbow],
   ['logoegg', '🙅', 'Don\'t Touch The Logo', 'Find a secret (hint: Jun is watching from the corner)', () => S.logoEgg],
+  ['ko', '🥊', 'Knocked Out', 'Find a secret (hint: he warned you about the logo)', () => S.koEgg],
   ['inf', '♾️', 'To Infinity', 'Reach ∞ coins and see the true ending', () => S.trueEnd],
   ['candy', '🎃', 'Trick or Treat', 'Catch a Halloween pumpkin', () => S.candy >= 1],
   ['night', '🦉', 'Past Your Bedtime', 'Play between 2 and 4 AM', () => [2, 3].includes(new Date().getHours())],
@@ -1038,7 +1040,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, logoEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, logoEgg:false, koEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -2160,7 +2162,7 @@ function applyState(d, keepCheat = true){
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
-    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true, logoEgg:d.logoEgg === true,
+    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true, logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
@@ -3621,12 +3623,18 @@ function renderQuests(){
 renderQuests();
 $('logoJun').src = $('jun').src; $('logoJun').style.clipPath = getComputedStyle($('jun')).clipPath;
 // easter egg: tap the little Jun in the logo and the big Jun shakes his head at you, then jumps
-let logoBusy = false;
+let logoBusy = false, logoTaps = [], logoScene = null;
+const addSkip = (F, fn) => { const b = document.createElement('button'); b.textContent = 'Skip ⏭'; b.className = 'fxSkip';
+  b.onclick = e => { e.stopPropagation(); fn(); }; F.appendChild(b); };
 $('logoJun').style.cursor = 'pointer';
 $('logoJun').onclick = () => {
-  if (logoBusy) return; logoBusy = true;
+  const now = Date.now(); logoTaps = logoTaps.filter(t => now - t < 3000); logoTaps.push(now);
+  if (logoTaps.length >= 6 && logoBusy !== 'ko') { logoTaps = []; return playKO(); }   // spam him and he snaps
+  if (logoBusy) return;
+  if (S.skipAnim) { if (!S.logoEgg) { S.logoEgg = true; save(); checkAch(); } return toast('🙅 Jun: "don\'t touch the logo."'); }
+  logoBusy = true;
   $('logoJun').animate([{transform:'rotate(0)'}, {transform:'rotate(-25deg)'}, {transform:'rotate(25deg)'}, {transform:'rotate(0)'}], {duration:300});
-  const F = document.createElement('div'); F.className = 'fxLayer'; F.style.background = 'rgba(8,9,16,.7)'; document.body.appendChild(F);
+  const F = document.createElement('div'); F.className = 'fxLayer'; F.style.background = 'rgba(8,9,16,.7)'; document.body.appendChild(F); logoScene = F;
   const wrap = document.createElement('div'); wrap.style.cssText = 'position:relative;text-align:center';
   const head = Object.assign(document.createElement('img'), {src:$('jun').src, alt:''}); head.style.cssText = `width:min(48vmin,260px);clip-path:${getComputedStyle($('jun')).clipPath};display:block;margin:0 auto`;
   const say = document.createElement('div'); say.style.cssText = "font:700 clamp(20px,5vw,30px) 'Fredoka',sans-serif;color:#fff;margin-top:14px;opacity:0;text-shadow:0 3px 10px #000";
@@ -3635,20 +3643,77 @@ $('logoJun').onclick = () => {
   wrap.append(head, shadow, say); F.appendChild(wrap);
   head.animate([{transform:'scale(0) rotate(-20deg)'}, {transform:'scale(1.1)'}, {transform:'scale(1)'}], {duration:450, easing:'ease-out'});
   // the head shake: no, no, no
-  setTimeout(() => { sfx('error'); say.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'translateY(0)'}], {duration:300, fill:'forwards'});
+  setTimeout(() => { if (!F.isConnected) return; sfx('error'); say.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'translateY(0)'}], {duration:300, fill:'forwards'});
     head.animate([0, -18, 18, -16, 16, -12, 12, -6, 0].map(d => ({transform:`rotate(${d}deg) translateX(${d*.6}px)`})), {duration:1100, easing:'ease-in-out'}); }, 500);
   // then the jump: squash, launch, land, little bounce
-  setTimeout(() => { sfx('buy');
+  setTimeout(() => { if (!F.isConnected) return; sfx('buy');
     head.animate([{transform:'translateY(0) scale(1,1)'}, {transform:'translateY(0) scale(1.15,.85)', offset:.15}, {transform:'translateY(-42vmin) scale(.92,1.1)', offset:.5},
       {transform:'translateY(0) scale(1.18,.82)', offset:.8}, {transform:'translateY(-4vmin) scale(1)', offset:.9}, {transform:'translateY(0) scale(1)'}], {duration:1100, easing:'ease-in-out'});
     shadow.animate([{transform:'scale(1)', opacity:1}, {transform:'scale(.4)', opacity:.3, offset:.5}, {transform:'scale(1)', opacity:1}], {duration:1100}); }, 1700);
-  const done = () => { F.remove(); logoBusy = false; };
+  const done = () => { F.remove(); if (logoBusy !== 'ko') logoBusy = false; };
   setTimeout(() => {
+    if (!F.isConnected) return;   // the KO scene took over
     if (!S.logoEgg) { S.logoEgg = true; save(); checkAch(); confetti(90); }
     F.animate([{opacity:1}, {opacity:0}], {duration:350}).onfinish = done;
   }, 3100);
-  F.onclick = () => {};   // let the scene play out (it's short)
+  F.onclick = () => $('logoJun').onclick();   // taps on the scene count toward making him mad
+  addSkip(F, () => { if (!S.logoEgg) { S.logoEgg = true; save(); checkAch(); } F.remove(); logoBusy = false; });
 };
+// spam the logo and Jun snaps: turns red and steams, winds up, a fist flies at the screen, the glass cracks, K.O.
+function playKO(){
+  logoScene?.remove();
+  const award = () => { if (!S.koEgg) { S.koEgg = true; save(); checkAch(); } };
+  if (S.skipAnim) { logoBusy = false; award(); return toast('🥊 Jun punched you. K.O.'); }
+  logoBusy = 'ko';
+  const F = document.createElement('div'); F.className = 'fxLayer'; F.style.background = 'rgba(30,0,0,.75)'; F.style.overflow = 'hidden'; document.body.appendChild(F);
+  addSkip(F, () => { award(); F.remove(); logoBusy = false; });
+  const el = (css, html = '') => { const d = document.createElement('div'); d.innerHTML = html; d.style.cssText = 'position:absolute;' + css; F.appendChild(d); return d; };
+  const head = document.createElement('img'); head.src = $('jun').src;
+  head.style.cssText = `position:absolute;left:50%;top:50%;width:min(44vmin,240px);transform:translate(-50%,-50%);clip-path:${getComputedStyle($('jun')).clipPath};filter:sepia(1) saturate(6) hue-rotate(-30deg) brightness(.95)`;
+  F.appendChild(head);
+  const say = el("left:0;right:0;top:12%;text-align:center;font:700 clamp(24px,6vw,40px) 'Fredoka',sans-serif;color:#ff5c7a;text-shadow:0 3px 12px #000", 'OK THAT\'S IT. 😡');
+  // shaking with rage + steam puffs
+  head.animate([0, -6, 6, -6, 6, 0].map(x => ({transform:`translate(calc(-50% + ${x}px),-50%)`})), {duration:140, iterations:9});
+  sfx('error'); setTimeout(() => sfx('error'), 300);
+  for (let k = 0; k < 10; k++) { const p = el(`left:${42 + Math.random()*16}%;top:34%;font-size:${22 + Math.random()*16}px`, Math.random() < .5 ? '💢' : '💨');
+    p.animate([{transform:'translateY(0) scale(.6)', opacity:1}, {transform:`translate(${(Math.random() - .5)*120}px,-120px) scale(1.3)`, opacity:0}], {duration:900, delay:k*110, fill:'forwards'}); }
+  // wind up (lean back), then the punch flies at the camera
+  setTimeout(() => {
+    if (!F.isConnected) return;
+    say.textContent = '';
+    head.animate([{transform:'translate(-50%,-50%) scale(1)'}, {transform:'translate(-50%,-50%) scale(.85) rotate(-8deg)'}], {duration:350, fill:'forwards'});
+    const fist = el('left:50%;top:55%;font-size:60px;transform:translate(-50%,-50%) scale(.3);filter:drop-shadow(0 10px 20px #000)', '🤜');
+    fist.animate([{transform:'translate(-50%,-50%) scale(.3) rotate(0)'}, {transform:'translate(-20%,-30%) scale(.7) rotate(-15deg)', offset:.4}, {transform:'translate(-50%,-50%) scale(14) rotate(0)'}],
+      {duration:550, delay:350, easing:'cubic-bezier(.6,0,1,.6)', fill:'forwards'});
+  }, 1300);
+  // impact: white flash, big shake, cracked glass
+  setTimeout(() => {
+    if (!F.isConnected) return;
+    sfx('crack'); tone(80, .4, 'sawtooth', .9, .2);
+    document.body.animate([{transform:'translate(0,0)'}, {transform:'translate(-18px,10px)'}, {transform:'translate(16px,-12px)'}, {transform:'translate(-10px,6px)'}, {transform:'translate(0,0)'}], {duration:400});
+    el('inset:0;background:#fff').animate([{opacity:1}, {opacity:0}], {duration:400, fill:'forwards'});
+    const crack = el('inset:0;pointer-events:none');
+    crack.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width:100%;height:100%"><g stroke="rgba(255,255,255,.85)" stroke-width=".4" fill="none">
+      <path d="M50 50 L20 10 M50 50 L85 15 M50 50 L95 60 M50 50 L70 95 M50 50 L25 90 M50 50 L5 55 M50 50 L45 0"/>
+      <path d="M35 30 L62 28 L80 45 L72 72 L45 78 L28 62 Z"/><path d="M42 40 L58 39 L64 52 L56 64 L44 64 L38 52 Z"/></g></svg>`;
+  }, 2200);
+  // knocked out: fade to black, dizzy stars, K.O.
+  setTimeout(() => {
+    if (!F.isConnected) return;
+    const black = el('inset:0;background:#000;opacity:0'); black.animate([{opacity:0}, {opacity:1}], {duration:700, fill:'forwards'});
+    const ko = el("left:0;right:0;top:38%;text-align:center;font:700 clamp(60px,16vw,120px) 'Fredoka',sans-serif;color:#ff5c7a;opacity:0;text-shadow:0 0 30px rgba(255,92,122,.8)", 'K.O.');
+    ko.animate([{opacity:0, transform:'scale(2.5)'}, {opacity:1, transform:'scale(1)'}], {duration:500, delay:700, fill:'forwards', easing:'ease-out'});
+    const stars = el('left:50%;top:30%;width:0;height:0');
+    for (let k = 0; k < 5; k++) { const st = document.createElement('div'); st.textContent = k % 2 ? '💫' : '⭐'; st.style.cssText = 'position:absolute;font-size:30px;left:-15px;top:-15px'; stars.appendChild(st);
+      st.animate([{transform:`rotate(${k*72}deg) translateX(110px) rotate(-${k*72}deg)`}, {transform:`rotate(${k*72 + 360}deg) translateX(110px) rotate(-${k*72 + 360}deg)`}], {duration:1600, iterations:Infinity}); }
+    stars.animate([{opacity:0}, {opacity:1}], {duration:400, delay:900, fill:'forwards'});
+    const sub = el("left:0;right:0;top:62%;text-align:center;color:#ddd;font-weight:700;opacity:0", 'You were knocked out by Jun. Maybe leave the logo alone.');
+    sub.animate([{opacity:0}, {opacity:1}], {duration:600, delay:1300, fill:'forwards'});
+    setTimeout(() => { if (F.isConnected) { sfx('ach'); award(); } }, 1500);
+  }, 2700);
+  // wake up
+  setTimeout(() => { if (!F.isConnected) return; F.animate([{opacity:1}, {opacity:0}], {duration:600}).onfinish = () => { F.remove(); logoBusy = false; }; toast('😵 You wake up with a buzzcut-shaped bruise'); }, 6200);
+}
 document.documentElement.style.setProperty('--jclip', getComputedStyle($('jun')).clipPath);   // chat avatars reuse Jun's head outline
 applyPerks(); renderAch(); renderPets();
 if (!S.rebTotal) S.rebTotal = S.asc*MAXR + S.rebirths;   // all-time rebirths (never resets) for the Rebirths leaderboard
