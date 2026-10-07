@@ -3980,7 +3980,11 @@ if (FIREBASE) {
   const newCode = () => Array.from({length:6}, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random()*32|0]).join('');
   async function syncGuild(){
     guildDoc = null; guildTag = '';
-    if (!user || !S.guild) return;
+    if (!user) return;
+    if (!S.guild) {   // lost the link? if the server still lists you as a member somewhere, reconnect
+      const qs = await getDocs(query(collection(db, 'guilds'), where('members', 'array-contains', me()), limit(1))).catch(() => null);
+      if (qs && !qs.empty) { S.guild = qs.docs[0].id; save(); } else return;
+    }
     const g = await getDoc(doc(db, 'guilds', S.guild)).catch(() => null);
     if (g && g.exists() && (g.data().members || []).includes(me())) { guildDoc = g.data(); guildTag = String(guildDoc.tag || ''); }
     else if (g) { S.guild = ''; save(); }          // guild gone or you were removed
@@ -4228,7 +4232,14 @@ if (FIREBASE) {
     // a save from a different account never merges into this one; guest progress can still be adopted on first sign-in
     const mine = S.owner === u.uid;
     if (S.owner && !mine) resetLocal();
+    // friends, guild and mutes are merged from both saves (the coin progress still comes from whichever is further)
+    const okName = n => typeof n === 'string' && /^[a-z0-9_]{3,20}$/.test(n);
+    const social = {friends:[...S.friends, ...(Array.isArray(cloud?.friends) ? cloud.friends : [])], muted:[...S.muted, ...(Array.isArray(cloud?.muted) ? cloud.muted : [])],
+      guild:S.guild || (typeof cloud?.guild === 'string' && /^[A-Z0-9]{6}$/.test(cloud.guild) ? cloud.guild : '')};
     if (cloud && Math.max(cloud.lifetime || 0, cloud.total || 0) >= S.lifetime) { applyState(cloud, mine); toast('Cloud save loaded!'); }
+    S.friends = [...new Set([...S.friends, ...social.friends].filter(okName))].filter(n => n !== me()).slice(0, 30);
+    S.muted = [...new Set([...S.muted, ...social.muted].filter(okName))].slice(-100);
+    S.guild = S.guild || social.guild;
     S.owner = u.uid; save();
     if (me() === 'nkthn' && !S.allUnlocked) window.unlockAll?.();
     await syncGuild(); push(); loadBoard(); frPoll();
