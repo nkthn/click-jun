@@ -69,7 +69,10 @@ h2.shut::after{transform:rotate(-90deg)}
 #ascLine{margin-top:8px;font-size:13px;color:#ffd166;font-weight:600}
 #skipScene{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:101;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
 #ending:not([hidden])+#skipScene{display:block}
-#annBar{position:absolute;top:58px;left:50%;transform:translateX(-50%);z-index:8;width:min(560px,calc(100% - 24px));display:flex;gap:10px;align-items:center;background:rgba(124,92,255,.92);color:#fff;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#liveBar{position:absolute;bottom:46px;left:50%;transform:translateX(-50%);z-index:8;max-width:calc(100% - 120px);background:rgba(0,0,0,.55);color:#ffd166;border:1px solid rgba(255,209,102,.5);border-radius:999px;padding:6px 14px;font:800 13px 'Nunito',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#liveBar[hidden]{display:none}#liveBar.on{background:linear-gradient(90deg,#ff5c7a,#c77dff);color:#fff;border-color:transparent;animation:livepulse 1.6s ease-in-out infinite}
+@keyframes livepulse{50%{box-shadow:0 0 22px rgba(255,92,122,.7)}}
+#annBar{position:absolute;top:118px;left:50%;transform:translateX(-50%);z-index:8;width:min(560px,calc(100% - 24px));display:flex;gap:10px;align-items:center;background:rgba(124,92,255,.92);color:#fff;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 #annBar[hidden]{display:none}#annBar span{flex:1;overflow-wrap:anywhere}#annBar button{background:none;border:0;color:#fff;font-size:16px;cursor:pointer}
 #modBtn[hidden]{display:none}
 #muteBtn{position:absolute;top:12px;right:12px;z-index:7;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:18px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.3)}
@@ -476,6 +479,7 @@ body.light .ab:hover{background:#e6e8f2}
 <body>
 <main id="stage">
   <button id="muteBtn" title="Mute / unmute (M)"></button>
+  <div id="liveBar" hidden></div>
   <div id="annBar" hidden><b>📢</b><span></span><button aria-label="Dismiss">✕</button></div>
   <div id="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <img id="jhat" class="hat" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M8 58 Q30 0 70 8 Q92 14 90 40 L80 42 Q78 24 64 22 Q50 30 92 58Z' fill='%23d62839'/%3E%3Crect x='2' y='52' width='96' height='16' rx='8' fill='%23fff'/%3E%3Ccircle cx='86' cy='42' r='9' fill='%23fff'/%3E%3C/svg%3E" alt="">
@@ -632,6 +636,7 @@ body.light .ab:hover{background:#e6e8f2}
   <input type="range" id="vol" min="0" max="1" step="0.05" style="margin-top:8px">
   <label>Numbers</label><button id="sciBtn" class="setb"></button>
   <label>Cutscenes</label><button id="animBtn" class="setb"></button>
+  <label>🔇 Muted players</label><div id="setMuted"></div>
   <label>💡 Suggest an idea</label>
   <textarea id="ideaIn" class="tin" maxlength="500" rows="3" placeholder="What should Click Jun add next?" style="width:100%;resize:vertical"></textarea>
   <button class="ab" id="ideaSend" style="width:100%;margin-top:6px">Send idea</button>
@@ -757,6 +762,19 @@ body.light .ab:hover{background:#e6e8f2}
   <button class="ab" id="annPost" style="width:100%;margin-top:6px">Post announcement</button>
   <div id="annMsg" class="dimtxt" style="margin-top:4px"></div>
   <div id="annList"></div>
+  <label>🎉 Live event</label>
+  <input id="evName" class="tin" maxlength="60" placeholder="Event name, e.g. Double Coin Weekend" style="width:100%">
+  <div class="row" style="margin-top:6px"><select id="evKind" class="tin"><option value="coins">× Everything (coins)</option><option value="luck">× Rare pet odds</option><option value="gold">× Golden Jun spawns</option></select><input id="evMult" class="tin" type="number" min="1" max="100" value="2" style="width:70px;flex:none"></div>
+  <div class="row" style="margin-top:6px;align-items:center"><span class="dimtxt">Starts in</span><input id="evIn" class="tin" type="number" min="0" value="0" style="width:70px;flex:none"><span class="dimtxt">min · lasts</span><input id="evLen" class="tin" type="number" min="1" value="60" style="width:70px;flex:none"><span class="dimtxt">min</span></div>
+  <button class="ab" id="evPost" style="width:100%;margin-top:6px">⏳ Schedule event (with countdown)</button>
+  <div id="evMsg" class="dimtxt" style="margin-top:4px"></div>
+  <div id="evList"></div>
+  <label>🎁 Give a player stuff</label>
+  <select id="gvTo" class="tin" style="width:100%"><option value="">Loading players…</option></select>
+  <div class="row" style="margin-top:6px"><select id="gvKind" class="tin"><option value="hc">💈 Tokens</option><option value="ap">✨ Ascension points</option><option value="coins">🪙 Coins</option><option value="rebirths">🔁 Rebirths</option><option value="pet">🐾 Pet levels</option></select><input id="gvAmt" class="tin" type="number" min="1" value="100" style="width:90px;flex:none"></div>
+  <select id="gvPet" class="tin" hidden style="width:100%;margin-top:6px"></select>
+  <button class="ab" id="gvSend" style="width:100%;margin-top:6px">🎁 Send gift</button>
+  <div id="gvMsg" class="dimtxt" style="margin-top:4px"></div>
   <label>📬 Ideas from players</label><div id="ideaList"></div>
   <label>Tools</label>
   <div class="row"><button class="ab" id="modChat">💬 Chat moderation</button><button class="ab" id="modHax">🧪 Hax panel</button></div>
@@ -1055,6 +1073,24 @@ const RES = [
 // frenzy events: random 2× (60s) or rarer 4× (30s) multiplier on all income, or bought with tokens in the Rebirth Shop
 let evtUntil = 0, evtX = 1;
 const evtMult = () => performance.now() < evtUntil ? evtX : 1;
+// live events scheduled by the dev: {name, kind:'coins'|'luck'|'gold', mult, start, end} (ms timestamps)
+let LIVE = null, liveWasOn = false;
+const liveOn = () => !!LIVE && Date.now() >= LIVE.start && Date.now() < LIVE.end;
+const liveMult = k => liveOn() && LIVE.kind === k ? LIVE.mult : 1;
+const LIVE_KIND = {coins:'everything', luck:'rare pet odds', gold:'Golden Jun spawns'};
+const hms = ms => { const t = Math.max(0, Math.floor(ms/1000)), h = Math.floor(t/3600), m = Math.floor(t/60) % 60, x = t % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
+function liveTick(){
+  const B = $('liveBar');
+  if (!LIVE || Date.now() >= LIVE.end) { B.hidden = true; liveWasOn = false; return; }
+  const on = liveOn();
+  B.hidden = false; B.classList.toggle('on', on);
+  B.textContent = on ? `🎉 ${LIVE.name} · LIVE · ×${LIVE.mult} ${LIVE_KIND[LIVE.kind]} · ends in ${hms(LIVE.end - Date.now())}`
+                     : `⏳ ${LIVE.name} starts in ${hms(LIVE.start - Date.now())} · ×${LIVE.mult} ${LIVE_KIND[LIVE.kind]}`;
+  if (on && !liveWasOn) { toast(`🎉 ${LIVE.name} is LIVE! ×${LIVE.mult} ${LIVE_KIND[LIVE.kind]}`); confetti(100); sfx('fanfare'); refresh(); }
+  liveWasOn = on;
+}
+window.setLive = ev => { LIVE = ev; liveTick(); };
 function startEvt(x, sec){
   const now = performance.now();
   evtX = now < evtUntil ? Math.max(evtX, x) : x;
@@ -1302,7 +1338,7 @@ const rbBoost = (r = S.rebirths) => 1 + .2 * r ** .85;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 1) * RM[u.t];
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => evtMult() * rbBoost() * 3 ** S.asc * layerMult() * chalMult() * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn')) * (1 + .2*petLv('mammoth')) * (1 + .1*petLv('kingjun')) * (1 + .35*petLv('tiger')) * (1 + .8*petLv('dodo')) * (1 + petLv('orca')) * (petLv('blackhole') ? 201 : 1);
+const prestige = () => evtMult() * liveMult('coins') * rbBoost() * 3 ** S.asc * layerMult() * chalMult() * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn')) * (1 + .2*petLv('mammoth')) * (1 + .1*petLv('kingjun')) * (1 + .35*petLv('tiger')) * (1 + .8*petLv('dodo')) * (1 + petLv('orca')) * (petLv('blackhole') ? 201 : 1);
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.g;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
@@ -1510,7 +1546,7 @@ $('jun').addEventListener('pointerdown', e => {
   refresh();
 });
 
-function goldDelay(){ return (45000 + Math.random()*45000) / (1 + .25*lv('luck')) / (1 + .1*petLv('parrot')) / (asu('gold') ? 2 : 1); }
+function goldDelay(){ return (45000 + Math.random()*45000) / (1 + .25*lv('luck')) / (1 + .1*petLv('parrot')) / (asu('gold') ? 2 : 1) / liveMult('gold'); }
 // golden Jun: shows up every 45–90s, worth 60s of income incl. auto clickers (min 100× click)
 let goldUntil = 0;
 function spawnGold(){
@@ -1969,7 +2005,7 @@ function tick(now){
   earnLive(perSec()*dt);
   autoClick(dt);
   if ((acc += dt) > .2) { acc = 0; refresh(); renderResearch(); }
-  if ((achAcc += dt) > 1) { achAcc = 0; chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if (asu('auto') && S.autoBuy) autoBuyer(); }
+  if ((achAcc += dt) > 1) { achAcc = 0; liveTick(); chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if (asu('auto') && S.autoBuy) autoBuyer(); }
   requestAnimationFrame(tick);
 }
 setInterval(save, 5000);
@@ -3094,7 +3130,7 @@ function hatchEgg(free, tier = 'basic', want = 1){
 function rollEgg(egg){
   S.eggs[egg.id] = (S.eggs[egg.id] || 0) + 1; S.hatches++;
   // pick a rarity by the egg's odds (Lucky Eggs doubles the non-Common odds), then a pet of that rarity
-  const odds = Object.fromEntries(Object.entries(egg.odds).map(([k, v]) => [k, v * (asu('luck') && k !== 'Common' ? 2 : 1)]));
+  const odds = Object.fromEntries(Object.entries(egg.odds).map(([k, v]) => [k, v * (asu('luck') && k !== 'Common' ? 2 : 1) * (k !== 'Common' ? liveMult('luck') : 1)]));
   let pick = Math.random() * Object.values(odds).reduce((a, b) => a + b, 0), rar = 'Common';
   for (const [k, v] of Object.entries(odds)) if ((pick -= v) <= 0) { rar = k; break; }
   if (Math.random() < 1e-9) rar = 'Secret';   // 🕳️ Event Horizon: 0.0000001% from any egg
@@ -3214,6 +3250,13 @@ function renderSettings(){
   $('vol').value = S.vol;
   $('sciBtn').textContent = S.sci ? '🔢 Numbers: scientific (1.50e6)' : '🔢 Numbers: short (1.50M)';
   $('dispIn').value = S.display;
+  const M = $('setMuted'); M.innerHTML = S.muted.length ? '' : '<div class="dimtxt">Nobody. Tap a name in chat to mute someone.</div>';
+  for (const n of S.muted) {
+    const row = document.createElement('div'); row.className = 'frRow';
+    row.innerHTML = '<b></b><span></span><button class="ab">🔊 Unmute</button>'; row.querySelector('b').textContent = n;
+    row.querySelector('button').onclick = () => { S.muted = S.muted.filter(x => x !== n); save(); renderSettings(); };
+    M.appendChild(row);
+  }
   $('animBtn').textContent = S.skipAnim ? '⏭ Cutscenes & big effects: skipped' : '🎬 Cutscenes & big effects: on';
 }
 $('setBtn').onclick = () => { renderSettings(); $('modBtn').hidden = !window.permaAdmin; $('ideaMsg').textContent = ''; $('dispMsg').textContent = ''; $('settings').showModal(); };
@@ -3602,7 +3645,56 @@ if (FIREBASE) {
     try { await addDoc(collection(db, 'announce'), {text:t.slice(0, 300), by:me(), ts:serverTimestamp()}); window.postGlobal?.('📢 ' + t); $('annIn').value = ''; $('annMsg').textContent = '📢 Posted to the banner and global chat!'; loadAnnList(); loadAnnounce(); }
     catch { $('annMsg').textContent = "Couldn't post (are you signed in as nkthn?)"; }
   };
-  $('modBtn').onclick = () => { $('settings').close(); $('annMsg').textContent = ''; $('modPanel').showModal(); loadAnnList(); window.loadIdeas?.(); };
+  // ---------- live events: events/{id} = {name, kind, mult, start, end, by}. Everyone watches; only the mod schedules ----------
+  let evDocs = [];
+  onSnapshot(query(collection(db, 'events'), orderBy('end', 'desc'), limit(10)), qs => {
+    evDocs = qs.docs;
+    const now = Date.now(), live = qs.docs.map(d => d.data()).filter(e => Number(e.end) > now && ['coins', 'luck', 'gold'].includes(e.kind))
+      .sort((a, b) => a.start - b.start)[0];
+    window.setLive(live ? {name:String(live.name).slice(0, 60), kind:live.kind, mult:Math.min(100, Math.max(1, Number(live.mult) || 1)), start:Number(live.start), end:Number(live.end)} : null);
+    if ($('modPanel').open) renderEvList();
+  }, () => {});
+  function renderEvList(){
+    const L = $('evList'); L.innerHTML = '';
+    for (const d of evDocs) {
+      const e = d.data(); if (Number(e.end) < Date.now()) continue;
+      const row = document.createElement('div'); row.className = 'idea';
+      row.innerHTML = '<b></b><div class="dimtxt"></div><button class="ab" style="margin-top:6px;padding:4px 10px;font-size:12px">✕ Cancel event</button>';
+      row.querySelector('b').textContent = `🎉 ${e.name} · ×${e.mult} ${LIVE_KIND[e.kind] || ''}`;
+      row.querySelector('.dimtxt').textContent = `${new Date(e.start).toLocaleString()} → ${new Date(e.end).toLocaleString()}`;
+      row.querySelector('button').onclick = () => deleteDoc(d.ref).catch(() => {});
+      L.appendChild(row);
+    }
+  }
+  $('evPost').onclick = async () => {
+    const name = $('evName').value.trim(), mult = Math.min(100, Math.max(1, +$('evMult').value || 2)), kind = $('evKind').value;
+    const start = Date.now() + Math.max(0, +$('evIn').value || 0)*60e3, end = start + Math.max(1, +$('evLen').value || 60)*60e3;
+    if (!name) return $('evMsg').textContent = 'Give the event a name';
+    try {
+      await addDoc(collection(db, 'events'), {name, kind, mult, start, end, by:me()});
+      window.postGlobal?.(`📢 🎉 ${name}: ×${mult} ${LIVE_KIND[kind]} ${start > Date.now() + 30e3 ? `starts in ${hms(start - Date.now())}` : 'is LIVE now'} for ${hms(end - start)}!`);
+      $('evName').value = ''; $('evMsg').textContent = '🎉 Scheduled! Everyone sees the countdown now';
+    } catch { $('evMsg').textContent = "Couldn't schedule (signed in as nkthn?)"; }
+  };
+  // ---------- admin gifts: grants/{id} = {to, kind, amount, pet, by, ts}. Only the mod creates; the player claims it on their next poll ----------
+  async function loadGvPlayers(){
+    try {
+      const qs = await getDocs(query(collection(db, 'leaderboard'), limit(500)));
+      const names = qs.docs.map(d => String(d.data().name || '')).filter(n => /^[a-z0-9_]{3,20}$/.test(n)).sort();
+      $('gvTo').innerHTML = names.map(n => `<option value="${n}">${n}</option>`).join('') || '<option value="">No players found</option>';
+    } catch { $('gvTo').innerHTML = '<option value="">Couldn\'t load players</option>'; }
+  }
+  $('gvPet').innerHTML = PETS.map(q => `<option value="${q.id}">${q.ic} ${q.nm} (${q.r})</option>`).join('');
+  $('gvKind').onchange = () => { $('gvPet').hidden = $('gvKind').value !== 'pet'; };
+  $('gvSend').onclick = async () => {
+    const to = $('gvTo').value, kind = $('gvKind').value, amount = Math.max(1, Math.min(1e300, +$('gvAmt').value || 1)), pet = kind === 'pet' ? $('gvPet').value : '';
+    if (!to) return $('gvMsg').textContent = 'Pick a player';
+    try {
+      await addDoc(collection(db, 'grants'), {to, kind, amount, pet, by:me(), ts:Date.now()});
+      $('gvMsg').textContent = `🎁 Sent to ${to}. They get it within 30 seconds of being online`;
+    } catch { $('gvMsg').textContent = "Couldn't send (signed in as nkthn?)"; }
+  };
+  $('modBtn').onclick = () => { $('settings').close(); $('annMsg').textContent = ''; $('evMsg').textContent = ''; $('gvMsg').textContent = ''; $('modPanel').showModal(); loadAnnList(); renderEvList(); loadGvPlayers(); window.loadIdeas?.(); };
   $('modChat').onclick = () => { $('modPanel').close(); window.openChat?.('global'); };
   $('modHax').onclick = () => { $('modPanel').close(); toggleAdmin(); };
   $('modAll').onclick = () => { $('modPanel').close(); window.unlockAll(); };
@@ -3777,6 +3869,21 @@ if (FIREBASE) {
   async function frPoll(){
     if (!user) return;
     try {
+      // admin grants: delete first, then apply
+      const gr = await getDocs(query(collection(db, 'grants'), where('to', '==', me()))).catch(() => ({docs:[], size:0}));
+      for (const d of gr.docs) {
+        const g = d.data(), n = Math.max(0, Math.min(1e300, Number(g.amount) || 0));
+        try { await deleteDoc(d.ref); } catch { continue; }
+        let what = '';
+        if (g.kind === 'hc') { S.hc = Math.min(TOKEN_CAP, S.hc + Math.floor(n)); what = `${fmt(n)} 💈`; }
+        else if (g.kind === 'ap') { S.ap += Math.floor(n); what = `${fmt(n)} ✨`; }
+        else if (g.kind === 'coins') { S.coins = Math.min(CAP, S.coins + n); what = `${fmt(n)} coins`; }
+        else if (g.kind === 'rebirths') { const k = Math.min(Math.floor(n), ascNeed() - S.rebirths); S.rebirths += k; S.rebTotal += k; what = `${k} rebirths`; }
+        else if (g.kind === 'pet') { const q = PETS.find(x => x.id === g.pet); if (!q) continue; S.pets[q.id] = Math.min(PET_MAX, (S.pets[q.id] || 0) + Math.floor(n)); if (!S.equip.includes(q.id) && S.equip.length < PET_SLOTS) S.equip.push(q.id); what = `${q.ic} ${q.nm}`; }
+        else continue;
+        toast(`🎁 ${String(g.by || 'The dev')} sent you ${what}!`); sfx('fanfare'); confetti(80);
+      }
+      if (gr.size) { save(); recalcResearch(); renderPets(); refresh(); }
       // gifts: delete first, then credit, so the same gift can't be claimed twice
       const gs = await getDocs(query(collection(db, 'gifts'), where('to', '==', me())));
       for (const d of gs.docs) {
