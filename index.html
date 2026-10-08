@@ -74,6 +74,40 @@ h2.shut::after{transform:rotate(-90deg)}
 #ending:not([hidden])+#skipScene{display:block}
 #liveBar{position:absolute;bottom:46px;left:50%;transform:translateX(-50%);z-index:8;max-width:calc(100% - 120px);background:rgba(0,0,0,.55);color:#ffd166;border:1px solid rgba(255,209,102,.5);border-radius:999px;padding:6px 14px;font:800 13px 'Nunito',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #liveBar[hidden],#liveBig[hidden]{display:none}
+#liveBar{cursor:pointer}
+/* ---------- stealth theme ---------- */
+#stealth[hidden]{display:none}
+body.stealth{display:block;height:auto;min-height:100vh;overflow:auto;background:#f7f7f9;color:#444;font-family:'Nunito',system-ui,sans-serif;
+  --bg:#fff;--panel:#f3f4f8;--panel2:#e8eaf2;--line:rgba(0,0,0,.08);--text:#333;--dim:#6b6f80;--accent:#1565c0;--accent-d:#0b4f9c;--gold:#1565c0;--good:#1565c0}
+#stealth{width:min(1020px,100%);margin:0 auto;background:#fff;min-height:100vh;box-shadow:0 0 0 1px #eceef3}
+.stH{background:#1a66c2;color:#fff;text-align:center;font:600 28px 'Nunito',sans-serif;padding:14px 0}
+.stSub{background:#0d4d9a;color:#fff;text-align:center;font-size:16px;padding:12px 0}
+.stFrame{margin:14px;background:#d6d0e6;padding:16px}
+.stSlide{background:#fbfbfd;padding:10px 22px}
+.stRule{display:flex;align-items:center;gap:20px;color:#c5c0d8}.stRule i{flex:1;height:2px;background:#d4d0e2;position:relative}
+.stRule i::before{content:'';position:absolute;left:0;top:-3px;width:8px;height:8px;border-radius:50%;background:#d4d0e2}.stRule i:last-child::before{left:auto;right:0}
+.stRule span{font-size:22px}#stNum{font-size:15px;color:#9a96b0;cursor:pointer;padding:4px 8px}
+.stCols{display:flex;gap:18px;height:min(62vh,520px)}
+.stLeft{flex:1;min-width:0;position:relative;overflow:hidden}.stRight{flex:1.05;min-width:0;position:relative}
+#stQ{padding:8px 4px}.stLogo{display:inline-flex;align-items:center;gap:10px;background:#fff;padding:8px 12px;font:600 26px 'Nunito',sans-serif;color:#222}
+.stLogo b{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#2a73d9;color:#fff;font-size:22px}.stLogo em{font-style:normal;color:#2a73d9}
+#stQ p{font-size:clamp(15px,2.1vw,22px);line-height:1.45;color:#555;margin:22px 0 18px}
+#stQ ol{font-size:clamp(15px,2vw,21px);color:#555;padding-left:30px;line-height:1.7}
+#stL{display:none;position:absolute;inset:0}
+#stealth.shop #stQ{display:none}#stealth.shop #stL{display:block}
+body.stealth aside{position:absolute;inset:0;overflow-y:auto;border:0;background:#fbfbfd!important;padding:4px 6px 20px;color:#333}
+body.stealth aside .logo{display:none}
+body.stealth #tabs{background:#fbfbfd!important;border-bottom:1px solid #e3e1ee}body.stealth #tabs button{color:#5b6070}body.stealth #tabs button.on{color:#fff}
+#stR{position:absolute;inset:0}
+body.stealth #stage{position:absolute!important;inset:0;height:auto!important;background:#fff!important;border-left:2px solid #333;border-bottom:2px solid #333}
+body.stealth #lights,body.stealth #snow,body.stealth #muteBtn,body.stealth #newsBox,body.stealth #annBar,body.stealth #fxc,body.stealth #jaura,body.stealth #jwings{display:none!important}
+body.stealth #liveBar{bottom:auto;top:8px;left:8px;transform:none;max-width:none;padding:3px 8px;font-size:11px;animation:none;box-shadow:none}
+body.stealth #coins{font-size:26px!important;color:#333!important;text-shadow:none!important}
+body.stealth #rates,body.stealth #live{font-size:11px!important;color:#777!important;background:none!important}
+.stAns{text-align:center;color:#555;font-size:17px;margin:26px 0 18px}
+.stBtns{display:flex;justify-content:space-around;padding:0 40px 40px}
+.stBtns button{width:66px;height:66px;border-radius:50%;border:2px solid #1d63c6;background:#fff;color:#1d63c6;font:700 22px 'Nunito',sans-serif;cursor:pointer}
+@media(max-width:760px){.stCols{flex-direction:column;height:auto}.stLeft{flex:none;height:42vh}.stRight{flex:none;height:46vh}.stBtns{padding:0 8px 30px}.stBtns button{width:52px;height:52px;font-size:18px}.stH{font-size:22px}}#liveBar.mini{bottom:auto;top:12px;left:12px;transform:none;max-width:none;padding:4px 10px;font-size:12px}
 #liveBar.final{font-size:18px;padding:10px 20px;color:#fff;background:linear-gradient(90deg,#ff8a3d,#ff5c7a);border-color:transparent;animation:livepulse .5s ease-in-out infinite}
 #liveBig{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;pointer-events:none;font:700 min(38vh,230px) 'Fredoka',sans-serif;color:#ffd166;text-shadow:0 0 40px rgba(255,209,102,.8),0 8px 0 rgba(0,0,0,.35)}
 #liveBig.red{color:#ff5c7a;text-shadow:0 0 50px rgba(255,92,122,.9),0 8px 0 rgba(0,0,0,.35)}#liveBar.on{background:linear-gradient(90deg,#ff5c7a,#c77dff);color:#fff;border-color:transparent;animation:livepulse 1.6s ease-in-out infinite}
@@ -529,6 +563,26 @@ body.light .ab:hover{background:#e6e8f2}
 </style>
 </head>
 <body>
+<div id="stealth" hidden>
+  <div class="stH">Question 1</div><div class="stSub">Multiple Choice</div>
+  <div class="stFrame"><div class="stSlide">
+    <div class="stRule"><i></i><span>✧</span><i></i></div>
+    <div class="stCols">
+      <div class="stLeft">
+        <div id="stQ">
+          <div class="stLogo"><b>☁</b><span>Cloud <em>Poll</em></span></div>
+          <p>For the enzyme responsible for NH<sub>4</sub><sup>+</sup> uptake in <i>N. maritimus</i> SCM1, what is the approximate half-saturation constant (K<sub>m</sub>)?</p>
+          <ol type="A"><li>1.6 µM</li><li>0.8 µM</li><li>0.4 µM</li><li>0.15 µM</li></ol>
+        </div>
+        <div id="stL"></div>
+      </div>
+      <div class="stRight"><div id="stR"></div></div>
+    </div>
+    <div class="stRule"><i></i><span id="stNum" title="">11</span><i></i></div>
+  </div></div>
+  <div class="stAns">Answer</div>
+  <div class="stBtns"><button>A</button><button>B</button><button>C</button><button>D</button><button>E</button></div>
+</div>
 <main id="stage">
   <button id="muteBtn" title="Mute / unmute (M)"></button>
   <div id="liveBar" hidden></div>
@@ -1207,7 +1261,8 @@ const liveMult = k => liveOn() && LIVE.kind === k ? LIVE.mult : 1;
 const LIVE_KIND = {coins:'everything', luck:'rare pet odds', gold:'Golden Jun spawns', diamond:'Diamond Jun spawns', goldrain:'Golden Juns raining in', diarain:'Diamond Juns raining in'};
 const hms = ms => { const t = Math.max(0, Math.floor(ms/1000)), h = Math.floor(t/3600), m = Math.floor(t/60) % 60, x = t % 60;
   return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
-let liveSec = -1, notified = '';
+let liveSec = -1, notified = '', liveMini = false;
+try { liveMini = localStorage.getItem('clickjun-livemini') === '1'; } catch {}
 // system notification (works while the game is open or in the background; iPhone needs the home-screen app)
 async function notify(title, body){
   try {
@@ -1228,7 +1283,10 @@ function liveTick(){
   if (!on && left <= 60e3 && notified !== nk + 'soon') { notified = nk + 'soon'; notify(`⏳ ${LIVE.name} starts in 1 minute`, what); }
   if (on && notified !== nk + 'live' && Date.now() - LIVE.start < 60e3) { notified = nk + 'live'; notify(`🎉 ${LIVE.name} is LIVE!`, what); }
   B.hidden = false; B.classList.toggle('on', on); B.classList.toggle('final', !on && sec <= 10);
-  B.textContent = on ? `🎉 ${LIVE.name} · LIVE · ${what} · ends in ${hms(LIVE.end - Date.now())}` : `⏳ ${LIVE.name} starts in ${hms(left)} · ${what}`;
+  B.classList.toggle('mini', liveMini && !(!on && sec <= 10));   // the last 10s always go big
+  B.textContent = liveMini && B.classList.contains('mini') ? (on ? `🎉 ${hms(LIVE.end - Date.now())}` : `⏳ ${hms(left)}`)
+    : on ? `🎉 ${LIVE.name} · LIVE · ${what} · ends in ${hms(LIVE.end - Date.now())}` : `⏳ ${LIVE.name} starts in ${hms(left)} · ${what}`;
+  B.title = liveMini ? 'Tap to expand' : 'Tap to minimize';
   // final 10 seconds: a giant number in the middle of the screen, one beat per second, red for the last 3
   if (!on && sec <= 10 && sec >= 1) {
     if (sec !== liveSec) {
@@ -1246,6 +1304,7 @@ function liveTick(){
   liveSec = sec; liveWasOn = on;
 }
 setInterval(liveTick, 250);
+$('liveBar').onclick = () => { liveMini = !liveMini; try { localStorage.setItem('clickjun-livemini', liveMini ? '1' : '0'); } catch {} liveTick(); };
 let LIVES = [];   // every scheduled event; the bar always follows the next one that hasn't ended
 window.setLive = ev => { LIVES = ev ? [ev] : []; liveTick(); };
 window.setLives = list => { LIVES = list; liveTick(); };
@@ -1690,7 +1749,7 @@ const setText = (el, t) => { if (el.textContent !== t) el.textContent = t; };
 function refresh(){
   const fz = frenzy() > 1 ? ` · 💎 FRENZY ${Math.ceil((frenzyUntil - performance.now())/1000)}s` : '';
   $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}${S.chal ? ` · ⚔️ ${CHALS.find(c => c.id === S.chal.id).nm}` : ''}`;
-  document.title = `${fmt(S.coins)} coins · Click Jun`; PET_SLOTS = 4 + (lsu('spets') ? 2 : 0);
+  document.title = S.theme === 'stealth' ? 'Question 1 · Multiple Choice' : `${fmt(S.coins)} coins · Click Jun`; PET_SLOTS = 4 + (lsu('spets') ? 2 : 0);
   setText($('muteBtn'), S.sound ? '🔊' : '🔇');
   if (UPS.filter(u => own(u)).length !== shopSig) renderShop();   // a first purchase (any path, or a reset) changes which upgrades are revealed
   const pc = perClick();
@@ -2343,7 +2402,7 @@ function applyState(d, keepCheat = true){
     cheater:d.cheater === true || (keepCheat && S.cheater),   // once a cheater, always a cheater (on that account)
     owner:typeof d.owner === 'string' ? d.owner.slice(0, 128) : '',
     bought:int(d.bought), fPipes:int(d.fPipes), pdots:int(d.pdots), resBought:int(d.resBought), qcombo:num(d.qcombo) || 1, quests:cleanQuests(d.quests),
-    theme:['none', 'xmas', 'spooky'].includes(d.theme) || (d.theme === 'rainbow' && d.rainbow === true) ? d.theme : d.xmas === false ? 'none' : 'xmas', rainbow:d.rainbow === true,
+    theme:['none', 'xmas', 'spooky', 'stealth'].includes(d.theme) || (d.theme === 'rainbow' && d.rainbow === true) ? d.theme : d.xmas === false ? 'none' : 'xmas', rainbow:d.rainbow === true,
     hc:(d.hc === undefined ? int(d.bp) : int(d.hc)) + (d.perks && d.perks.maxbuy ? 5 : 0) + keepRefund(d.perks?.keep), golds:int(d.golds), clicks:int(d.clicks), maxCombo:num(d.maxCombo) || 1, candy:int(d.candy), vcDeals:int(d.vcDeals),
     ach:Object.fromEntries(ACH.filter(a => d.ach && d.ach[a.id] === true).map(a => [a.id, true])),
     perks:Object.fromEntries(PERKS.filter(k => d.perks && d.perks[k.id]).map(k => [k.id, d.perks[k.id] === true ? 1 : Math.min(int(d.perks[k.id]), k.max || Infinity)])),   // old saves stored true = level 1
@@ -2913,12 +2972,23 @@ for (let i = 0; i < 40; i++) {
   f.style.setProperty('--dx', (Math.random()-.5)*120+'px'); $('snow').appendChild(f);
 }
 // themes: classic / Christmas / Halloween (S.xmas is kept in sync for older code paths)
-const THEMES = {none:'Classic', xmas:'Christmas 🎄', spooky:'Halloween 🎃', rainbow:'Rainbow 🌈'};   // rainbow is secret until unlocked
+const THEMES = {none:'Classic', xmas:'Christmas 🎄', spooky:'Halloween 🎃', stealth:'Stealth 🕵️', rainbow:'Rainbow 🌈'};   // rainbow is secret until unlocked
 const SWORDS = ['pumpkin','witch hat','haunted','skeleton','cobweb','candy corn','jack o lantern','graveyard','vampire','trick or treat'];
 const SANTA = $('jhat').src, WITCH = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M28 58 Q44 30 50 6 Q54 -2 62 6 Q60 20 74 58Z' fill='%23231433'/%3E%3Crect x='33' y='44' width='37' height='8' fill='%23ff7a18'/%3E%3Cellipse cx='50' cy='60' rx='48' ry='9' fill='%232e1a44'/%3E%3C/svg%3E";
+// 🕵️ stealth: the whole game hides inside a lookalike classroom-poll slide. Jun plays in the chart's spot, the
+// slide number "11" swaps the question for your shop, Esc snaps back to the question, the A–E circles do nothing
+function applyStealth(on){
+  const W = $('stealth'), stage = $('stage'), aside = document.querySelector('aside');
+  if (on === document.body.classList.contains('stealth')) return;
+  document.body.classList.toggle('stealth', on); W.hidden = !on; W.classList.remove('shop');
+  if (on) { $('stR').appendChild(stage); $('stL').appendChild(aside); }
+  else { document.body.prepend(aside); document.body.prepend(stage); }
+  dispatchEvent(new Event('resize'));
+}
 function applyXmas(){
   S.xmas = S.theme === 'xmas';
   for (const t of ['xmas', 'spooky', 'rainbow']) document.body.classList.toggle(t, S.theme === t);
+  applyStealth(S.theme === 'stealth');
   $('xmasBtn').textContent = '🎨 Theme: ' + THEMES[S.theme];
   const ch = cosItem('hat', S.cos.hat), hat = ch ? emojiImg(ch.ic) : S.theme === 'spooky' ? WITCH : SANTA;
   document.body.classList.toggle('hatcos', !!ch);
@@ -2927,6 +2997,8 @@ function applyXmas(){
 }
 // easter egg: tap the theme button 10 times within 4 seconds to unlock the secret rainbow theme
 let themeTaps = [];
+$('stNum').onclick = () => $('stealth').classList.toggle('shop');
+addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('stealth')) { $('stealth').classList.remove('shop'); document.querySelectorAll('dialog[open]').forEach(d => d.close()); } });
 $('xmasBtn').onclick = () => {
   const now = Date.now(); themeTaps = [...themeTaps.filter(t => now - t < 4000), now];
   if (!S.rainbow && themeTaps.length >= 10) {
