@@ -1028,6 +1028,9 @@ const HEAD = [[50, 2.5], [60, 3.5], [70, 7], [79, 12], [87, 20], [92, 28], [94, 
 function headClip(g, x, y, w, h){ g.beginPath(); HEAD.forEach(([a, b], i) => g[i ? 'lineTo' : 'moveTo'](x + a/100*w, y + b/100*h)); g.closePath(); g.clip(); }
 
 // achievements: each one adds Shine (+2% to everything, +3% with the Extra Shiny perk)
+// all-time progress, so things unlocked by Ascending/beating the game don't vanish when a reset sets the counters back to 0
+const everAsc = () => Math.max(S.asc, S.ascEver || 0, (S.tr || S.apo || S.sing || S.omni) ? 8 : 0);
+const everBeat = () => S.rebirths >= 300 || S.rebTotal >= 300 || everAsc() > 0;
 const ACH = [
   ['click1', '👆', 'First Poke', 'Click Jun once', () => S.clicks >= 1],
   ['click100', '✌️', 'Poke Enthusiast', 'Click Jun 100 times', () => S.clicks >= 100],
@@ -1068,9 +1071,9 @@ const ACH = [
   ['reb200', '🌀', 'Eternal Recurrence', 'Rebirth 200 times', () => S.rebirths >= 200],
   ['earn1sx', '🌌', 'Sextillionaire', 'Earn 1Sx coins all-time', () => S.lifetime >= 1e21],
   ['earn1oc', '🕳️', 'Octillion Odyssey', 'Earn 1Oc coins all-time', () => S.lifetime >= 1e27],
-  ['beat', '👑', 'Click Jun Beaten', `Reach 300 rebirths`, () => S.rebirths >= 300 || S.asc > 0],
-  ['asc1', '✨', 'Ascended', 'Ascend once', () => S.asc >= 1],
-  ['asc5', '🌟', 'Ascension Addict', 'Ascend 5 times', () => S.asc >= 5],
+  ['beat', '👑', 'Click Jun Beaten', `Reach 300 rebirths`, () => everBeat()],
+  ['asc1', '✨', 'Ascended', 'Ascend once', () => everAsc() >= 1],
+  ['asc5', '🌟', 'Ascension Addict', 'Ascend 5 times', () => everAsc() >= 5],
   ['egg', '🥚', 'Theme Hopper', 'Find a secret (hint: someone can\'t decide on a theme)', () => S.rainbow],
   ['logoegg', '🙅', 'Don\'t Touch The Logo', 'Find a secret (hint: Jun is watching from the corner)', () => S.logoEgg],
   ['ko', '🥊', 'Knocked Out', 'Find a secret (hint: he warned you about the logo)', () => S.koEgg],
@@ -1104,7 +1107,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, pack:'classic', logoEgg:false, koEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, ascEver:0, pack:'classic', logoEgg:false, koEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -1116,14 +1119,32 @@ if (saved) {
   if (!('ap' in saved)) S.ap = S.asc || 0;                            // ✨ points for players who ascended before the shop existed
   if (!('hc' in saved)) S.hc = S.bp;                                    // tokens for players who rebirthed before the shop existed
   if (S.perks && S.perks.maxbuy) { S.hc += 5; delete S.perks.maxbuy; }
-  if (saved.tp === undefined) S.tp = S.tr || 0;   // 🌠 points for Transcends done before the shop existed
+  if (saved.tp === undefined) S.tp = S.tr || 0;
+  S.ascEver = Math.max(S.ascEver || 0, S.asc || 0);   // 🌠 points for Transcends done before the shop existed
   if (S.perks && S.perks.keep) { S.hc += keepRefund(S.perks.keep); delete S.perks.keep; }
   if (S.aup && (S.aup.rich || S.aup.keep)) { S.ap = (S.ap || 0) + (S.aup.rich ? 1 : 0) + (S.aup.keep ? 2 : 0); delete S.aup.rich; delete S.aup.keep; }  // MAX buy is free now: refund Bulk Buyer
   if (!('theme' in saved)) S.theme = saved.xmas === false ? 'none' : 'xmas';
   for (const k in S.perks) if (S.perks[k] === true) S.perks[k] = 1;
 }
 if (!S.lifetime) S.lifetime = S.total;
-const save = () => { S.lastSeen = Date.now(); try { localStorage.setItem('clickjun', JSON.stringify(S)); } catch {} };
+// settings that follow your account across devices (the newest change wins, separately from coin progress)
+const PREF_KEYS = ['sound', 'vol', 'sci', 'skipAnim', 'pack', 'appearance', 'theme', 'fx', 'autoBuy', 'autoBuy2', 'display', 'muted', 'buy', 'rbN'];
+const prefSnap = () => JSON.stringify(PREF_KEYS.map(k => S[k]));
+let lastPrefs = null;
+const save = () => {
+  S.lastSeen = Date.now();
+  const ps = prefSnap(); if (lastPrefs !== null && ps !== lastPrefs) { S.prefsAt = Date.now(); window.pushSoon?.(); } lastPrefs = ps;
+  try { localStorage.setItem('clickjun', JSON.stringify(S)); } catch {}
+};
+// adopt another device's newer settings without touching progress
+function adoptPrefs(d){
+  if (!d || !(+d.prefsAt > (S.prefsAt || 0))) return false;
+  for (const k of PREF_KEYS) if (d[k] !== undefined) S[k] = k === 'muted' ? (Array.isArray(d.muted) ? d.muted.filter(n => typeof n === 'string').slice(-100) : S.muted) : d[k];
+  S.prefsAt = +d.prefsAt; lastPrefs = prefSnap();
+  try { localStorage.setItem('clickjun', JSON.stringify(S)); } catch {}
+  applyXmas(); applyFx(); applyAppearance(); applyBuy(); renderSettings(); refresh();
+  return true;
+}
 
 // research: one-time upgrades that unlock at milestones and reset on rebirth.
 // Effects: up/x = one upgrade ×x; c/k/a = whole category ×; c2 = clicks earn that share of per-second income; gold; combo
@@ -1417,20 +1438,20 @@ const WINGS = {angel:wingSvg('#ffffff', '#9ec9ff'), gold:wingSvg('#ffd166', '#c8
 const COS = {
   hat:[['cap','🧢','Backwards Cap',5], ['flower','🌸','Flower Crown',4], ['bow','🎀','Big Bow',6], ['helmet','⛑️','Rescue Helmet',6], ['grad','🎓','Grad Cap',8],
        ['army','🪖','Army Helmet',8], ['tophat','🎩','Top Hat',10], ['star','⭐','Star Power',15], ['fire','🔥','Head on Fire',25], ['crown','👑','Royal Crown',50],
-       ['halo','😇','Halo Mode',0, () => S.asc >= 1, 'Ascend once'], ['planet','🪐','Planet Hat','asc:3'], ['comet','☄️','Comet Crown','tr:1'], ['sun','🌞','Sun Crown','apo:1']],
+       ['halo','😇','Halo Mode',0, () => everAsc() >= 1, 'Ascend once'], ['planet','🪐','Planet Hat','asc:3'], ['comet','☄️','Comet Crown','tr:1'], ['sun','🌞','Sun Crown','apo:1']],
   acc:[['eyes','👀','Googly Eyes',3,null,null,.44,.5,.55], ['glasses','👓','Nerd Glasses',5,null,null,.45,.66,.55], ['goggles','🥽','Swim Goggles',8,null,null,.44,.72,.55],
        ['shades','🕶️','Cool Shades',10,null,null,.45,.66,.55], ['chain','📿','Gold Chain',12,null,null,1.0,.7,.5], ['medal','🏅','Medal',15,null,null,1.05,.32,.5],
-       ['trophy','🏆','Champion Trophy',0, () => S.rebirths >= 300 || S.asc > 0, 'Beat Click Jun',1.05,.36,.5]],
+       ['trophy','🏆','Champion Trophy',0, () => everBeat(), 'Beat Click Jun',1.05,.36,.5]],
   aura:[['gold','✨','Golden Aura',20,null,null,'rgba(255,201,77,.75)'], ['fire','🔥','Fire Aura',30,null,null,'rgba(255,90,40,.8)'],
         ['ice','❄️','Ice Aura',30,null,null,'rgba(120,220,255,.8)'], ['void','🌑','Void Aura',45,null,null,'rgba(150,60,255,.85)'],
         ['rainbow','🌈','Rainbow Aura',60,null,null,'rgba(255,80,80,.8)'], ['inf','♾️','Infinity Aura',0, () => S.trueEnd, 'Reach ∞','rgba(255,255,255,.9)']],
   title:[['clicker','👆','Clicker',3], ['enjoyer','💈','Buzzcut Enjoyer',5], ['fanatic','🧠','Forehead Fanatic',8], ['stan','📣','Jun Stan',10],
          ['lord','🫅','Click Lord',20], ['grinder','⚙️','Certified Grinder',30], ['whale','🐋','Token Whale',100],
-         ['veteran','🔄','Rebirth Veteran',0, () => S.rebTotal >= 50, '50 rebirths'], ['slayer','🗡️','Jun Slayer',0, () => S.rebirths >= 300 || S.asc > 0, 'Beat Click Jun'],
-         ['ascended','✨','Ascended One',0, () => S.asc >= 1, 'Ascend once'], ['infinite','♾️','Infinite',0, () => S.trueEnd, 'Reach ∞'],
+         ['veteran','🔄','Rebirth Veteran',0, () => S.rebTotal >= 50, '50 rebirths'], ['slayer','🗡️','Jun Slayer',0, () => everBeat(), 'Beat Click Jun'],
+         ['ascended','✨','Ascended One',0, () => everAsc() >= 1, 'Ascend once'], ['infinite','♾️','Infinite',0, () => S.trueEnd, 'Reach ∞'],
          ['reborn','🔁','Reborn x100','rebirths:100'], ['ascendant','🌟','Ascendant','asc:5'], ['transcendent','🌠','Transcendent','tr:1'],
          ['demigod','🔆','Demigod','apo:1'], ['singular','🕳️','Singular','sing:1'], ['omnipotent','🌌','Omnipotent','omni:1']],
-  back:[['angel','🕊️','Angel Wings',0, () => S.asc >= 1, 'Ascend once'], ['bat','🦇','Bat Wings',40], ['gold','👼','Golden Wings',0, () => S.asc >= 5, 'Ascend 5 times']],
+  back:[['angel','🕊️','Angel Wings',0, () => everAsc() >= 1, 'Ascend once'], ['bat','🦇','Bat Wings',40], ['gold','👼','Golden Wings',0, () => everAsc() >= 5, 'Ascend 5 times']],
   color:[['mint','🟢','Mint',10,null,null,'#57cc99'], ['sky','🔵','Sky',10,null,null,'#4cc9f0'], ['pink','🩷','Pink',10,null,null,'#ff7eb6'],
          ['purple','🟣','Royal Purple',20,null,null,'#c77dff'], ['fire','🟠','Fire',25,null,null,'#ff8a3d'], ['gold','🟡','Gold',40,null,null,'#ffc94d'],
          ['rainbow','🌈','Rainbow',80,null,null,'rainbow'], ['ember','❤️‍🔥','Ember','rebirths:150',null,null,'#ff5c3d'], ['frost','🩵','Frost','asc:2',null,null,'#9be7ff']],
@@ -1449,7 +1470,7 @@ const COS = {
 const PAYI = {rebirths:'🔁 rebirths', asc:'✨ Ascensions', tr:'🌠 Transcend', apo:'🔆 Apotheosis', sing:'🕳️ Singularity', omni:'🌌 Omniverse'};
 for (const t in COS) COS[t] = COS[t].map(([id, ic, nm, cost, unlock, how, a, b, cx]) => ({id, ic, nm, cost, unlock, how, a, b, cx, pay:typeof cost === 'string' ? {k:cost.split(':')[0], n:+cost.split(':')[1]} : null}));
 const cosItem = (t, id) => COS[t].find(c => c.id === id);
-const cosOwned = (t, c) => S.allCos || (c.unlock ? c.unlock() : !!S.cos.owned[t + ':' + c.id]);
+const cosOwned = (t, c) => { const k = t + ':' + c.id; if (S.allCos || S.cos.owned[k]) return true; if (c.unlock && c.unlock()) { S.cos.owned[k] = true; return true; } return false; };
 // display names: up to 16 characters, no control characters or angle brackets, trimmed
 const cleanName = v => typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f<>]/g, '').trim().slice(0, 16) : '';
 function cleanCos(c){
@@ -1801,7 +1822,7 @@ function ascend(){
   if (S.rebirths < ascNeed() || S.chal) return;
   if (!confirm(`✨ Ascend? You reset coins, upgrades, research, rebirths, tokens and perks.\n\nYou keep lifetime coins (your leaderboard spot), pets, achievements and stars, your ${S.rebirths} rebirths still count on the Rebirths leaderboard, and you gain:\n• ×3 to everything (stacks every Ascension)\n• +50% rebirth tokens\n• 1 ✨ for the Ascension Shop`)) return;
   const carried = asu('carry') ? Object.fromEntries(Object.entries(S.perks).map(([k, v]) => [k, Math.floor(v/4)]).filter(([, v]) => v > 0)) : {};
-  Object.assign(S, {coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1});
+  Object.assign(S, {coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1, ascEver:Math.max(S.ascEver || 0, S.asc + 1)});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
   playAscendScene();
   if (S.asc === 1) setTimeout(() => toast('🕊️ Angel Wings unlocked! Wear them in your 👕 Wardrobe'), 9000);
@@ -2278,7 +2299,7 @@ function applyState(d, keepCheat = true){
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
-    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, sci:d.sci === true, skipAnim:d.skipAnim === true, pack:['classic', '8bit', 'cute', 'meme'].includes(d.pack) ? d.pack : 'classic', logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
+    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, prefsAt:num(d.prefsAt), ascEver:Math.max(int(d.ascEver), int(d.asc)), sci:d.sci === true, skipAnim:d.skipAnim === true, pack:['classic', '8bit', 'cute', 'meme'].includes(d.pack) ? d.pack : 'classic', logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
@@ -4746,11 +4767,18 @@ if (FIREBASE) {
     S.friends = [...new Set([...S.friends, ...social.friends].filter(okName))].filter(n => n !== me()).slice(0, 30);
     S.muted = [...new Set([...S.muted, ...social.muted].filter(okName))].slice(-100);
     S.guild = S.guild || social.guild;
+    adoptPrefs(cloud);
     S.owner = u.uid; save();
     if (me() === 'nkthn' && !S.allUnlocked) window.unlockAll?.();
     await syncGuild(); push(); loadBoard(); frPoll();
   });
   setInterval(push, 15000);
+  let soon = 0; window.pushSoon = () => { clearTimeout(soon); soon = setTimeout(push, 1500); };
+  let mineUnsub = null;
+  onAuthStateChanged(auth, u => {
+    mineUnsub?.(); mineUnsub = null;
+    if (u) mineUnsub = onSnapshot(doc(db, 'saves', u.uid), d => { if (!d.metadata.hasPendingWrites && d.exists() && adoptPrefs(d.data())) toast('⚙️ Settings synced from your other device'); }, () => {});
+  });
   document.addEventListener('visibilitychange', () => document.hidden && push());
   $('acct').hidden = false;
 }
