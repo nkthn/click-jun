@@ -77,6 +77,11 @@ h2.shut::after{transform:rotate(-90deg)}
 #liveBar{cursor:pointer}
 /* ---------- stealth theme ---------- */
 #stealth[hidden]{display:none}
+html:has(body.stealth){overflow-x:hidden}
+body.stealth,#stealth,body.stealth aside{overflow-x:hidden;touch-action:pan-y;overscroll-behavior-x:none}
+#stealth{max-width:100vw}
+body.stealth #resRow{flex-wrap:wrap;overflow-x:visible}
+body.stealth #tabs{margin:12px 0 0!important;padding:8px 0!important}
 body.stealth{display:block;height:auto;min-height:100vh;overflow:auto;background:#f7f7f9;color:#444;font-family:'Nunito',system-ui,sans-serif;
   --bg:#fff;--panel:#f3f4f8;--panel2:#e8eaf2;--line:rgba(0,0,0,.08);--text:#333;--dim:#6b6f80;--accent:#1565c0;--accent-d:#0b4f9c;--gold:#1565c0;--good:#1565c0}
 #stealth{width:min(1020px,100%);margin:0 auto;background:#fff;min-height:100vh;box-shadow:0 0 0 1px #eceef3}
@@ -250,6 +255,11 @@ body.xmas #tank{background:#0b1a12}
 .hat{position:absolute;left:0;top:0;will-change:transform;pointer-events:none;display:none;transform-origin:50% 150%;z-index:2}
 body.xmas .hat.show,body.spooky .hat.show{display:block}
 #snow,#lights{display:none;pointer-events:none}
+body.lowgfx #snow,body.lowgfx #lights,body.lowgfx #jaura,body.lowgfx #fxc{display:none!important}
+body.lowgfx *,body.lowgfx *::before,body.lowgfx *::after{animation-duration:0s!important;animation-iteration-count:1!important;transition-duration:0s!important}
+body.lowgfx .gav{transition:left .95s linear,top .95s linear!important}
+body.lowgfx .jun,body.lowgfx .ghd,body.lowgfx .pop,body.lowgfx #liveBig{text-shadow:none!important}
+body.lowgfx dialog{box-shadow:none}
 body.xmas #snow,body.spooky #snow,body.rainbow #snow{display:block;position:fixed;inset:0;z-index:20}
 .flake{position:absolute;top:-20px;color:#fff;animation:fall linear infinite}
 @keyframes fall{to{transform:translate(var(--dx),105vh) rotate(360deg)}}
@@ -320,7 +330,7 @@ body.rainbow .flake{font-size:14px!important}
 .res .rp{font-size:11px;color:var(--gold);font-weight:600}
 .res.can{border-color:rgba(255,201,77,.55);box-shadow:0 0 14px rgba(255,201,77,.12)}
 .res:not(.can){opacity:.55}
-#eggRow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+#eggRow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 #eggRow button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:8px 2px;font:inherit;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 #eggRow button b{font-size:24px}
 #eggRow button.can{border-color:rgba(87,204,153,.6);box-shadow:0 0 12px rgba(87,204,153,.15)}
@@ -331,7 +341,7 @@ body.rainbow .flake{font-size:14px!important}
 #petDetail .bar2{height:6px;border-radius:3px;background:var(--line);margin:6px 0;overflow:hidden}
 #petDetail .bar2 i{display:block;height:100%;background:var(--gold)}
 #petGrid button.sel{outline:2px solid var(--gold)}
-#petGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+#petGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
 .pgh{grid-column:1/-1;font:700 12px 'Nunito',sans-serif;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
 #petGrid button{border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;padding:8px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 #petGrid button .pi{font-size:26px}
@@ -757,6 +767,7 @@ body.light .ab:hover{background:#e6e8f2}
   <label>Sound</label><button id="sndBtn" class="setb"></button>
   <input type="range" id="vol" min="0" max="1" step="0.05" style="margin-top:8px">
   <label>Numbers</label><button id="sciBtn" class="setb"></button>
+  <label>Battery</label><button id="gfxBtn" class="setb"></button>
   <label>Cutscenes</label><button id="animBtn" class="setb"></button>
   <label>Sound pack</label><div class="seg" id="packRow"><button data-p="classic">Classic</button><button data-p="8bit">8-bit</button><button data-p="cute">Cute</button><button data-p="meme">Meme</button></div>
   <label>Notifications</label><button id="notiBtn" class="setb"></button>
@@ -1205,9 +1216,12 @@ if (saved) {
 }
 if (!S.lifetime) S.lifetime = S.total;
 // settings that follow your account across devices (the newest change wins, separately from coin progress)
-const PREF_KEYS = ['sound', 'vol', 'sci', 'skipAnim', 'pack', 'appearance', 'theme', 'fx', 'autoBuy', 'autoBuy2', 'display', 'muted', 'buy', 'rbN'];
+const PREF_KEYS = ['lowgfx', 'sound', 'vol', 'sci', 'skipAnim', 'pack', 'appearance', 'theme', 'fx', 'autoBuy', 'autoBuy2', 'display', 'muted', 'buy', 'rbN'];
 const prefSnap = () => JSON.stringify(PREF_KEYS.map(k => S[k]));
-let lastPrefs = null;
+let lastPrefs = null, lowBattery = false;
+const lowGfx = () => S.lowgfx === true || (S.lowgfx !== false && lowBattery);   // undefined = auto (low battery)
+const applyGfx = () => document.body.classList.toggle('lowgfx', lowGfx());
+navigator.getBattery?.().then(b => { const u = () => { lowBattery = !b.charging && b.level <= .2; applyGfx(); }; u(); b.onlevelchange = b.onchargingchange = u; }).catch(() => {});
 const save = () => {
   S.lastSeen = Date.now();
   const ps = prefSnap(); if (lastPrefs !== null && ps !== lastPrefs) { S.prefsAt = Date.now(); window.pushSoon?.(); } lastPrefs = ps;
@@ -1219,7 +1233,7 @@ function adoptPrefs(d){
   for (const k of PREF_KEYS) if (d[k] !== undefined) S[k] = k === 'muted' ? (Array.isArray(d.muted) ? d.muted.filter(n => typeof n === 'string').slice(-100) : S.muted) : d[k];
   S.prefsAt = +d.prefsAt; lastPrefs = prefSnap();
   try { localStorage.setItem('clickjun', JSON.stringify(S)); } catch {}
-  applyXmas(); applyFx(); applyAppearance(); applyBuy(); renderSettings(); refresh();
+  applyXmas(); applyFx(); applyAppearance(); applyBuy(); applyGfx(); renderSettings(); refresh();
   return true;
 }
 
@@ -1273,6 +1287,7 @@ async function notify(title, body){
   } catch {}
 }
 function liveTick(){
+  if (!LIVES.length && !LIVE) return;
   const B = $('liveBar'), G = $('liveBig'), next = LIVES.filter(e => e.end > Date.now()).sort((a, b) => a.start - b.start)[0] || null;
   const key = e => e ? `${e.start}|${e.kind}|${e.name}` : '';
   if (key(next) !== key(LIVE)) { liveWasOn = false; liveSec = -1; }   // a new event gets its own countdown + GO
@@ -1824,6 +1839,7 @@ function toast(msg){ $('toast').textContent = msg; $('toast').style.opacity = 1;
 let combo = 1, lastClick = 0, frenzyUntil = 0;
 const frenzy = () => performance.now() < frenzyUntil ? 7 : 1;
 function sparks(e){
+  if (lowGfx()) return;
   const r = stage.getBoundingClientRect();
   for (let i = 0; i < 4; i++) {
     const d = document.createElement('div'), a = Math.random()*Math.PI*2, v = 30 + Math.random()*50;
@@ -2226,11 +2242,12 @@ function drawIc(ic, size, x, y){
   }
   fxx.drawImage(c, x - c.width/2, y - c.height/2);
 }
+let fxIdle = false;
 function fxStep(dt, now){
   const W = SW, H = SH;
-  if (fxc.width !== W || fxc.height !== H) { fxc.width = W; fxc.height = H; }
-  fxx.clearRect(0, 0, W, H);
-  if (!S.fx) return;
+  if (fxc.width !== W || fxc.height !== H) { fxc.width = W; fxc.height = H; fxIdle = false; }
+  if (!S.fx || lowGfx() || document.body.classList.contains('stealth')) { if (!fxIdle) { fxx.clearRect(0, 0, W, H); fxIdle = true; } return; }
+  fxIdle = false; fxx.clearRect(0, 0, W, H);
   const cx = jun.x + jun.w/2, cy = jun.y + jun.h/2, R0 = jun.w*.62, t = now/1000;
   fxx.textAlign = 'center'; fxx.textBaseline = 'middle';
   // click upgrades orbit Jun in rings and every few seconds dive in to "click" him
@@ -2292,7 +2309,10 @@ function autoClick(dt){
 
 // main loop
 let last = performance.now(), acc = 0, achAcc = 0, wkAcc = 0, liveAcc = 0, shown = S.coins;
+let frameT = 0;
 function tick(now){
+  if (now - frameT < (lowGfx() ? 45 : 12)) { requestAnimationFrame(tick); return; }   // 🔋 ~20fps in low graphics, max 60fps otherwise (120Hz screens)
+  frameT = now;
   const dt = Math.min((now - last)/1000, .1); last = now;
   jun.step(dt);
   if (goldUntil) {
@@ -2326,7 +2346,7 @@ function tick(now){
   if (M.on) mStep(dt);
   earnLive(perSec()*dt);
   autoClick(dt);
-  if ((acc += dt) > .2) { acc = 0; refresh(); renderResearch(); }
+  if ((acc += dt) > (lowGfx() ? .6 : .2)) { acc = 0; refresh(); renderResearch(); }
   if ((achAcc += dt) > 1) { achAcc = 0; chalTick(); if (tab === 'rebirth') renderLayers(); if (tab === 'games' && !fight) renderBoss(); checkAch(); renderQuests(); if ((asu('auto') && S.autoBuy) || (tsu('auto5') && S.autoBuy2)) autoBuyer(); }
   requestAnimationFrame(tick);
 }
@@ -2412,7 +2432,7 @@ function applyState(d, keepCheat = true){
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
-    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, prefsAt:num(d.prefsAt), ascEver:Math.max(int(d.ascEver), int(d.asc)),
+    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, prefsAt:num(d.prefsAt), lowgfx:d.lowgfx === true ? true : d.lowgfx === false ? false : undefined, ascEver:Math.max(int(d.ascEver), int(d.asc)),
     lup:Object.fromEntries(Object.values(LUP).flat().filter(a => d.lup && d.lup[a.id] === true).map(a => [a.id, true])),
     lpts:d.lpts ? {apo:int(d.lpts.apo), sing:int(d.lpts.sing), omni:int(d.lpts.omni)} : {apo:int(d.apo), sing:int(d.sing), omni:int(d.omni)}, sci:d.sci === true, skipAnim:d.skipAnim === true, pack:['classic', '8bit', 'cute', 'meme'].includes(d.pack) ? d.pack : 'classic', logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
@@ -3559,6 +3579,7 @@ function hatchFx(eggIc, q, note){
 }
 // confetti burst from the top of the screen
 function confetti(n = 60){
+  if (lowGfx()) return;
   const C = document.createElement('div'); C.className = 'fxConf'; document.body.appendChild(C);
   const cols = ['#ff5c7a', '#ffc94d', '#57cc99', '#4cc9f0', '#c77dff', '#ff8a3d'];
   for (let i = 0; i < n; i++) {
@@ -3634,6 +3655,7 @@ function renderSettings(){
   const np = 'Notification' in window ? Notification.permission : 'unsupported';
   $('notiBtn').textContent = np === 'granted' ? '🔔 Live event alerts: on' : np === 'denied' ? '🔕 Alerts blocked (allow them in your phone/browser settings)' : np === 'unsupported' ? '🔕 Alerts need the home-screen app (iPhone: Share → Add to Home Screen)' : '🔔 Turn on live event alerts';
   document.querySelectorAll('#packRow button').forEach(b => b.classList.toggle('on', b.dataset.p === (S.pack || 'classic')));
+  $('gfxBtn').textContent = S.lowgfx === true ? '🔋 Low graphics: on (20fps, no effects)' : S.lowgfx === false ? '✨ Low graphics: off' : `🔋 Low graphics: auto (on when battery is low)${lowBattery ? ' · on now' : ''}`;
   $('animBtn').textContent = S.skipAnim ? '⏭ Cutscenes & big effects: skipped' : '🎬 Cutscenes & big effects: on';
 }
 $('setBtn').onclick = () => { renderSettings(); $('modBtn').hidden = !window.permaAdmin; $('ideaMsg').textContent = ''; $('dispMsg').textContent = ''; $('settings').showModal(); };
@@ -3647,6 +3669,7 @@ $('vol').oninput = e => { S.vol = +e.target.value; save(); };
 $('vol').onchange = () => sfx('coin');
 $('notiBtn').onclick = async () => { if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission(); renderSettings(); if (Notification?.permission === 'granted') notify('🔔 Alerts on', "You'll get a heads-up when a live event is about to start"); };
 document.querySelectorAll('#packRow button').forEach(b => b.onclick = () => { S.pack = b.dataset.p; save(); renderSettings(); sfx('gold'); });
+$('gfxBtn').onclick = () => { S.lowgfx = S.lowgfx === undefined ? true : S.lowgfx === true ? false : undefined; save(); applyGfx(); renderSettings(); };
 $('animBtn').onclick = () => { S.skipAnim = !S.skipAnim; save(); renderSettings(); };
 $('skipScene').onclick = () => { const E = $('ending'); E.hidden = true; E.innerHTML = ''; E.style.background = ''; };
 $('sciBtn').onclick = () => { S.sci = !S.sci; save(); renderSettings(); refresh(); renderShop(); };
@@ -3834,7 +3857,7 @@ setTimeout(() => { if (dailyState().can && !document.querySelector('dialog[open]
 // --- accounts: a local save belongs to the account it was synced with ---
 function resetLocal(){
   // daily is kept too, so signing out doesn't re-offer (or let you re-claim) today's reward
-  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx, pack:S.pack,  skipAnim:S.skipAnim, daily:{...S.daily}, quests:JSON.parse(JSON.stringify(S.quests))};
+  const keep = {theme:S.theme === 'rainbow' ? 'none' : S.theme, appearance:S.appearance, lowgfx:S.lowgfx, sound:S.sound, vol:S.vol, sci:S.sci, fx:S.fx, pack:S.pack,  skipAnim:S.skipAnim, daily:{...S.daily}, quests:JSON.parse(JSON.stringify(S.quests))};
   S = {...DEF(), ...keep, started:Date.now()}; shown = 0;
   recalcResearch(); applyPerks(); applyCos(); applyXmas(); applyAppearance(); applyBuy(); renderAch(); renderPets(); renderShop(); renderDaily(); refresh(); save();
 }
@@ -4059,7 +4082,7 @@ applyPerks(); renderAch(); renderPets();
 if (!S.rebTotal) S.rebTotal = S.asc*MAXR + S.rebirths;   // all-time rebirths (never resets) for the Rebirths leaderboard
 if (S.rebirths >= ascNeed() && !S.beaten) { S.beaten = true; save(); setTimeout(playEnding, 1200); }
 offline(S.lastSeen ? Date.now() - S.lastSeen : 0);
-renderShop(); refresh(); requestAnimationFrame(tick);
+applyGfx(); renderShop(); refresh(); requestAnimationFrame(tick);
 </script>
 <script type="module">
 // Cloud saves via Firebase. Usernames map to fake emails so nobody has to give a real one.
