@@ -423,6 +423,9 @@ body.light #hkeys button:disabled{background:#e4e5ea}
 .fxSkip{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 16px;font:700 14px 'Nunito',sans-serif;cursor:pointer}
 .awList{display:flex;flex-direction:column;gap:6px;margin:10px 0}.awRow{display:flex;gap:10px;align-items:center;background:var(--panel2);border-radius:12px;padding:8px 10px;font-size:14px}.awRow span:first-child{font-size:20px}
 #cpsChart{width:100%;height:150px;display:block;margin-top:8px;background:var(--panel2);border-radius:12px}
+.bsec{background:var(--panel2);border-radius:14px;padding:10px 12px;margin-top:10px}
+.bhead{display:flex;justify-content:space-between;align-items:baseline;font:600 15px 'Fredoka',sans-serif;margin-bottom:4px}.bhead b{color:var(--gold)}
+.brow{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;border-top:1px solid var(--line)}.brow b{color:var(--text)}.brow.off{opacity:.45}
 .pcard{flex-direction:column;background:var(--panel2);border-radius:12px;padding:10px;margin-top:6px}
 .pstats{font-size:13px}.pstats b{color:var(--gold)}
 .ppets{display:flex;gap:6px;margin-top:6px}.ppets span{font-size:22px;border:2px solid;border-radius:10px;padding:2px 5px;background:var(--panel)}
@@ -612,6 +615,9 @@ body.light .ab:hover{background:#e6e8f2}
     <div id="ascLine" hidden></div>
     <button class="ab" id="ashopBtn" hidden style="width:100%;margin-top:8px">✨ Ascension Shop · <span id="apBal">0</span> ✨</button>
     <button class="ab" id="tshopBtn" hidden style="width:100%;margin-top:8px">🌠 Transcendence Shop · <span id="tpBal">0</span> 🌠</button>
+    <button class="ab" id="ls_apo" hidden style="width:100%;margin-top:8px">🔆 Apotheosis Shop · <span>0</span> 🔆</button>
+    <button class="ab" id="ls_sing" hidden style="width:100%;margin-top:8px">🕳️ Singularity Shop · <span>0</span> 🕳️</button>
+    <button class="ab" id="ls_omni" hidden style="width:100%;margin-top:8px">🌌 Omniverse Shop · <span>0</span> 🌌</button>
     <div id="rbNext"></div>
     <button class="ab" id="shopBtn" style="width:100%;margin-top:10px">🛒 Rebirth Shop · <span id="hcBal">0</span> 💈 tokens</button>
   </div>
@@ -711,6 +717,7 @@ body.light .ab:hover{background:#e6e8f2}
 </dialog>
 <dialog id="stats">
   <h3>📊 Your <span>Stats</span></h3>
+  <button class="ab" id="bonusBtn" style="width:100%;margin-top:8px;background:linear-gradient(90deg,#7c5cff,#c77dff);color:#fff;font-weight:800">✖️ See all your bonuses & multipliers</button>
   <label>Coins per second</label>
   <div class="seg" id="cpsTabs"><button data-s="h" class="on">Last hour</button><button data-s="d">Last day</button></div>
   <svg id="cpsChart" viewBox="0 0 320 150" preserveAspectRatio="none"></svg>
@@ -870,6 +877,19 @@ body.light .ab:hover{background:#e6e8f2}
   <div class="bal">You have <b id="tpBig">0</b> 🌠 Transcend points</div>
   <div class="dimtxt" style="margin-top:4px">Permanent upgrades. You earn 1 🌠 every time you Transcend.</div>
   <div id="tList" style="margin-top:12px"></div>
+  <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
+</dialog>
+<dialog id="lshop">
+  <h3 id="lsTitle"></h3>
+  <div class="bal">You have <b id="lsBig">0</b></div>
+  <div class="dimtxt" id="lsSub" style="margin-top:4px"></div>
+  <div id="lsList" style="margin-top:12px"></div>
+  <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
+</dialog>
+<dialog id="bonus">
+  <h3>📊 Your <span>Bonuses</span></h3>
+  <div class="dimtxt">Everything that multiplies your income right now.</div>
+  <div id="bonusList"></div>
   <form method="dialog"><button class="ab" style="width:100%;margin-top:12px">Close</button></form>
 </dialog>
 <dialog id="ashop">
@@ -1107,7 +1127,7 @@ const lv = id => S.perks[id] || 0;
 const keepRefund = L => { let t = 0; for (let l = 0; l < Math.min(10, Math.floor(+L || 0)); l++) t += Math.ceil(4 * 1.6 ** l); return t; };
 const perkCost = k => Math.ceil(k.cost * k.g ** lv(k.id));
 const DEF = () => ({coins:0, total:0, lifetime:0, own:{}, best:0, hwins:0, twins:0, pwins:0, xmas:true, theme:'xmas', fx:true, buy:1, rebirths:0, bp:0, hc:0,
-  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, ascEver:0, pack:'classic', logoEgg:false, koEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
+  diamonds:0, golds:0, clicks:0, maxCombo:1, candy:0, vcDeals:0, rbN:1, ach:{}, perks:{}, stars:{}, research:{}, pets:{}, equip:[], hatches:0, asc:0, beaten:false, rebTotal:0, trueEnd:false, lastSeen:0, cheater:false, ap:0, aup:{}, ascEver:0, lup:{}, lpts:{apo:0, sing:0, omni:0}, pack:'classic', logoEgg:false, koEgg:false, tp:0, tup:{}, autoBuy2:true, skipAnim:false, tr:0, apo:0, sing:0, omni:0, chal:null, chalDone:{}, day:'', dcoins:0, month:'', mcoins:0, boss:0, spins:0, casNet:0, autoBuy:true, rainbow:false, muted:[], guild:'', eggs:{}, owner:'', bought:0, fPipes:0, pdots:0, resBought:0, qcombo:1, quests:{day:'', list:[], bonus:false, reroll:false},
   sound:true, vol:.6, sci:false, appearance:'dark', playtime:0, started:0, daily:{last:'', streak:0}, display:'',
   cos:{owned:{}, hat:'', acc:'', aura:'', title:'', color:'', back:'', card:''}, week:'', wcoins:0, friends:[], bigClick:0});
 let S = DEF();
@@ -1120,7 +1140,9 @@ if (saved) {
   if (!('hc' in saved)) S.hc = S.bp;                                    // tokens for players who rebirthed before the shop existed
   if (S.perks && S.perks.maxbuy) { S.hc += 5; delete S.perks.maxbuy; }
   if (saved.tp === undefined) S.tp = S.tr || 0;
-  S.ascEver = Math.max(S.ascEver || 0, S.asc || 0);   // 🌠 points for Transcends done before the shop existed
+  S.ascEver = Math.max(S.ascEver || 0, S.asc || 0);
+  if (!saved.lpts) S.lpts = {apo:S.apo || 0, sing:S.sing || 0, omni:S.omni || 0};   // points for layers done before the shops existed
+  S.lup = S.lup || {};   // 🌠 points for Transcends done before the shop existed
   if (S.perks && S.perks.keep) { S.hc += keepRefund(S.perks.keep); delete S.perks.keep; }
   if (S.aup && (S.aup.rich || S.aup.keep)) { S.ap = (S.ap || 0) + (S.aup.rich ? 1 : 0) + (S.aup.keep ? 2 : 0); delete S.aup.rich; delete S.aup.keep; }  // MAX buy is free now: refund Bulk Buyer
   if (!('theme' in saved)) S.theme = saved.xmas === false ? 'none' : 'xmas';
@@ -1302,7 +1324,7 @@ const PET_GROUPS = [
   ['shop', '🛒 Shop & eggs', ['hedge', 'chick']],
   ['luck', '🎲 Luck & events', ['wolf', 'frog']],
 ];
-const PET_MAX = 25, PET_SLOTS = 4;
+const PET_MAX = 25; let PET_SLOTS = 4;   // 6 with the Pet Pen (Singularity Shop)
 
 // daily quests. cur() = the counter the quest tracks; progress = cur() - the value when the quest was handed out.
 // t = targets for easy/medium/hard (a function when it should scale with your income); r = token rewards per difficulty.
@@ -1350,6 +1372,10 @@ const AUP = [
   {id:'lab',    ic:'🔬', nm:'Lab Notes',     ds:'Keep your research when you rebirth', cost:2},
   {id:'head',   ic:'🏁', nm:'Fast Start',    ds:'Start every climb with 10 rebirths already done', cost:2},
   {id:'carry',  ic:'🧳', nm:'Carry-On',      ds:'Keep 25% of your Rebirth Shop perk levels when you Ascend', cost:2},
+  {id:'hatch',  ic:'🥚', nm:'Hatchery',      ds:'Coin eggs cost 25% less', cost:2},
+  {id:'bosstime', ic:'⏱️', nm:'Boss Stopwatch', ds:'Boss fights last 10 seconds longer', cost:2},
+  {id:'diarush', ic:'💎', nm:'Diamond Rush',  ds:'Diamond Juns show up twice as often', cost:2},
+  {id:'vcpro',  ic:'💼', nm:'VC Charm',      ds:'VC offers are worth twice as much', cost:1},
   {id:'auto',   ic:'🤖', nm:'Auto Buyer',    ds:'Buys the cheapest upgrade every 2 seconds, only if it costs 10% of your coins or less (switch it off here)', cost:10},
 ];
 const asu = id => !!S.aup[id];
@@ -1373,7 +1399,22 @@ const parseCost = c => ({k:c.split(':')[0], n:+c.split(':')[1]});
 // Transcendence Shop: bought with 🌠 (1 per Transcend)
 const TUP = [
   {id:'auto5', ic:'🤖', nm:'Auto Buyer+', ds:'5× Auto Buyer: buys 5 upgrades every 2 seconds, each only if it costs 10% of your coins or less (switch it off here)', cost:2},
+  {id:'tclick', ic:'👊', nm:'Transcendent Finger', ds:'Click power ×10', cost:1},
+  {id:'tidle',  ic:'💤', nm:'Cosmic Passive', ds:'Passive income ×10', cost:1},
+  {id:'tboss',  ic:'⚔️', nm:'Boss Slayer', ds:'Boss damage ×5', cost:2},
+  {id:'tluck',  ic:'🍀', nm:'Star Luck', ds:'Rare, Epic, Legendary and higher pets are twice as likely', cost:2},
+  {id:'tkeep',  ic:'🧳', nm:'Transcend Memory', ds:'Start every climb with 50 rebirths already done', cost:3},
 ];
+// shops for the higher layers: 1 point per Apotheosis / Singularity / Omniverse
+const LUP = {
+  apo:[{id:'agod', ic:'✨', nm:'Godly Aura', ds:'Everything ×100', cost:1}, {id:'agold', ic:'🌟', nm:'Golden Era', ds:'Golden Juns pay ×10', cost:1},
+       {id:'astart', ic:'🏁', nm:'Divine Start', ds:'Start after every Transcend or higher with 3 Ascensions', cost:2}],
+  sing:[{id:'sall', ic:'🕳️', nm:'Event Horizon Field', ds:'Everything ×10,000', cost:1}, {id:'sasc', ic:'🔺', nm:'Warp Ascension', ds:'Each Ascension gives ×4 instead of ×3 (rebirth costs scale with it)', cost:2},
+        {id:'spets', ic:'🐾', nm:'Pet Pen', ds:'+2 pet slots (6 equipped)', cost:2}],
+  omni:[{id:'oall', ic:'🌌', nm:'Omnipotence', ds:'Everything ×100,000,000', cost:1}, {id:'oluck', ic:'🎲', nm:'Multiversal Luck', ds:'The 1-in-a-billion pet becomes 1 in a million', cost:1},
+        {id:'oauto', ic:'🤖', nm:'Auto Buyer ∞', ds:'Auto Buyers buy 25 at a time', cost:2}],
+};
+const lsu = id => !!S.lup?.[id];
 const tsu = id => !!S.tup[id];
 const aupRefund = a => (a?.rich ? 1 : 0) + (a?.keep ? 2 : 0);   // Trust Fund and Rainy Day Fund were removed
 
@@ -1496,7 +1537,13 @@ const rbBoost = (r = S.rebirths) => 1 + .2 * r ** .85;
 const MILES = [25, 50, 100, 200, 400];
 const umult = u => 2 ** MILES.filter(m => own(u) >= m).length * (RM.up[u.id] || 1) * RM[u.t];
 const achCount = () => ACH.filter(a => S.ach[a.id]).length;
-const prestige = () => evtMult() * liveMult('coins') * rbBoost() * 3 ** S.asc * layerMult() * chalMult() * (1 + .08*petLv('prism')) * (1 + (.02 + .005*lv('shine')) * achCount()) * (1 + .05*lv('power')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn')) * (1 + .2*petLv('mammoth')) * (1 + .1*petLv('kingjun')) * (1 + .35*petLv('tiger')) * (1 + .8*petLv('dodo')) * (1 + petLv('orca')) * (petLv('blackhole') ? 201 : 1);
+const petAll = () => (1 + .08*petLv('prism')) * (1 + .1*petLv('dragon')) * (1 + .15*petLv('unicorn')) * (1 + .2*petLv('mammoth')) * (1 + .1*petLv('kingjun')) * (1 + .35*petLv('tiger')) * (1 + .8*petLv('dodo')) * (1 + petLv('orca')) * (petLv('blackhole') ? 201 : 1);
+const ascBase = () => lsu('sasc') ? 4 : 3;
+const PRESTIGE_PARTS = () => [
+  ['🔁 Rebirth boost', rbBoost()], ['✨ Ascensions', ascBase() ** S.asc], ['🌌 Prestige layers', layerMult()], ['⚔️ Challenges won', chalMult()],
+  ['🏆 Achievements', 1 + (.02 + .005*lv('shine')) * achCount()], ['⚡ Buzz Boost perk', 1 + .05*lv('power')], ['🐾 Pets', petAll()],
+  ['🎉 Events & frenzies', evtMult() * liveMult('coins')], ['🛒 Prestige shops', (lsu('agod') ? 100 : 1) * (lsu('sall') ? 1e4 : 1) * (lsu('oall') ? 1e8 : 1)]];
+const prestige = () => PRESTIGE_PARTS().reduce((m, p) => m * p[1], 1);
 // auto clickers get pricier faster (×1.3 each) since their value scales with your click power
 const growth = u => u.g;
 // MAX buys as many as you can afford (unlocked by the Bulk Buyer perk); otherwise ×1/×10/×25/×50
@@ -1509,11 +1556,16 @@ function maxN(u){
 }
 const cost = (u, n = buyN(u)) => { const g = growth(u); return fin(Math.ceil((inChal('broke') ? 10 : 1) * u.cost * g ** own(u) * (g ** n - 1) / (g - 1) * (1 - .03*lv('cheap')) * (1 - .01*petLv('hedge')))); };
 // the base click is always exactly 1; boosts multiply what your Click Power upgrades add on top of it
-const perClick = () => fin(1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .1*lv('click')) * bossMult() * (1 + .05*petLv('cat')) * (1 + .08*petLv('eagle')) * (1 + .03*petLv('bee')) * (1 + .12*petLv('shark')) * (1 + .6*petLv('swan')) + perSec()*RM.c2);
+const CLICK_PARTS = () => [['👊 Iron Finger perk', 1 + .1*lv('click')], ['⚔️ Bosses beaten', bossMult()],
+  ['🐾 Pets', (1 + .05*petLv('cat')) * (1 + .08*petLv('eagle')) * (1 + .03*petLv('bee')) * (1 + .12*petLv('shark')) * (1 + .6*petLv('swan'))],
+  ['🔬 Research', RM.c], ['🌠 Transcendent Finger', tsu('tclick') ? 10 : 1]];
+const perClick = () => fin(1 + UPS.filter(u => u.t==='c').reduce((s,u) => s + u.v*own(u)*umult(u)/RM.c, 0) * prestige() * CLICK_PARTS().reduce((m, p) => m * p[1], 1) + perSec()*RM.c2);
 let AUTO = .1;   // 0.2 with the Robot Hands perk, see applyPerks
 const income = () => fin(perSec() + autoCps()*AUTO*perClick());   // steady coins/sec: passive + auto clickers
 const autoCps = () => fin(UPS.filter(u => u.t==='k').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * (1 + .05*petLv('ham')) * (1 + .08*petLv('octo')));
-const perSec = () => fin(UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u), 0) * prestige() * (1 + .05*petLv('pug')) * (1 + .04*petLv('eagle')) * (1 + .03*petLv('bee')) * (1 + .12*petLv('lion')) * (1 + .6*petLv('swan')));
+const PASSIVE_PARTS = () => [['🐾 Pets', (1 + .05*petLv('pug')) * (1 + .04*petLv('eagle')) * (1 + .03*petLv('bee')) * (1 + .12*petLv('lion')) * (1 + .6*petLv('swan'))],
+  ['🔬 Research', RM.a], ['🌠 Cosmic Passive', tsu('tidle') ? 10 : 1]];
+const perSec = () => fin(UPS.filter(u => u.t==='a').reduce((s,u) => s + u.v*own(u)*umult(u)/RM.a, 0) * prestige() * PASSIVE_PARTS().reduce((m, p) => m * p[1], 1));
 const fmt = n => n >= 1e300 ? '∞' : n < 1e3 ? String(Math.round(n*10)/10) : S.sci ? n.toExponential(2).replace('+', '')   // one decimal under 1K, rounded (13.26 → 13.3); K/M/B above
   : n >= 1e36 ? n.toExponential(2).replace('+', '')   // beyond decillions: 1.23e40
   : (()=>{const u=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc']; let i=-1; while(n>=1e3&&i<u.length-1){n/=1e3;i++} return n.toFixed(n<10?2:n<100?1:0)+u[i]})();
@@ -1638,7 +1690,7 @@ const setText = (el, t) => { if (el.textContent !== t) el.textContent = t; };
 function refresh(){
   const fz = frenzy() > 1 ? ` · 💎 FRENZY ${Math.ceil((frenzyUntil - performance.now())/1000)}s` : '';
   $('rates').textContent = `${fmt(perClick()*frenzy())} per click · ${fmt(perSec())} per second${autoCps() ? ` · 🖱️ ${cps(autoCps())} auto clicks/sec` : ''}${fz}${S.chal ? ` · ⚔️ ${CHALS.find(c => c.id === S.chal.id).nm}` : ''}`;
-  document.title = `${fmt(S.coins)} coins · Click Jun`;
+  document.title = `${fmt(S.coins)} coins · Click Jun`; PET_SLOTS = 4 + (lsu('spets') ? 2 : 0);
   setText($('muteBtn'), S.sound ? '🔊' : '🔇');
   if (UPS.filter(u => own(u)).length !== shopSig) renderShop();   // a first purchase (any path, or a reset) changes which upgrades are revealed
   const pc = perClick();
@@ -1659,9 +1711,10 @@ function refresh(){
   const capped = S.rebirths >= ascNeed();
   $('ascBtn').hidden = !capped;
   $('ascLine').hidden = !S.asc && !capped;
-  $('ascLine').textContent = `✨ Ascensions: ${S.asc} · ×${fmt(3 ** S.asc)} everything · next Ascension needs ${ascNeed()} rebirths`;
+  $('ascLine').textContent = `✨ Ascensions: ${S.asc} · ×${fmt(ascBase() ** S.asc)} everything · next Ascension needs ${ascNeed()} rebirths`;
   $('ashopBtn').hidden = !S.asc && !S.ap; setText($('apBal'), String(S.ap));
   $('tshopBtn').hidden = !S.tr && !S.tp; setText($('tpBal'), String(S.tp));
+  for (const k of ['apo', 'sing', 'omni']) { const b = $('ls_' + k); b.hidden = !S[k] && !S.lpts[k]; setText(b.querySelector('span'), String(S.lpts[k] || 0)); }
   $('rbBtn').disabled = g < 1 || capped || !!S.chal;
   $('rbBtn').textContent = S.chal ? '⚔️ Finish or abandon your challenge to rebirth' : capped ? '👑 You beat Click Jun! Ascend to climb again' : g < 1 ? `🔁 Rebirth (need ${fmt(rbReq(S.rebirths))} coins this run)` : `🔁 Rebirth${n > 1 ? ` ×${n}` : ''} · +${gainPct}% boost · ${tokenGain(gn)} 💈`;
   setText($('hcBal'), String(S.hc));
@@ -1737,7 +1790,7 @@ function spawnGold(){
   $('golden').style.display = 'block'; goldUntil = performance.now() + 7000 * (1 + .15*lv('linger'));
 }
 function goldPay(e){
-  const n = Math.max(income()*60, perClick()*100) * (1 + .2*lv('gold')) * RM.gold * (1 + .1*petLv('fly')); earn(n); S.golds++; sfx('gold'); pop('+'+fmt(n)+' ✨', e);
+  const n = Math.max(income()*60, perClick()*100) * (1 + .2*lv('gold')) * RM.gold * (1 + .1*petLv('fly')) * (lsu('agold') ? 10 : 1); earn(n); S.golds++; sfx('gold'); pop('+'+fmt(n)+' ✨', e);
   toast(`GOLDEN JUN! +${fmt(n)} coins`);
 }
 $('golden').addEventListener('pointerdown', e => {
@@ -1749,7 +1802,7 @@ setTimeout(spawnGold, goldDelay());
 // diamond Jun: rare (every 3–6 min), tiny, fast, 4s on screen. Worth 10 min of income + click frenzy
 const dia = mover($('diamond'), 600);
 let diaUntil = 0;
-const diaDelay = () => (180000 + Math.random()*180000) / (1 + .25*lv('diamond')) / (1 + .2*petLv('baby')) / liveMult('diamond');
+const diaDelay = () => (180000 + Math.random()*180000) / (1 + .25*lv('diamond')) / (1 + .2*petLv('baby')) / liveMult('diamond') / (asu('diarush') ? 2 : 1);
 function spawnDiamond(){
   Object.assign(dia, {x:0, y:Math.random()*(stage.clientHeight-80), vx:600, vy:(Math.random()-.5)*600});
   $('diamond').style.display = 'block'; diaUntil = performance.now() + 4000 * (1 + .15*lv('linger'));
@@ -1784,7 +1837,7 @@ const MAXR = 300;
 // +20% per rebirth, sharply steeper past 200. Costs scale with your permanent multipliers (Ascensions, prestige layers,
 // challenges), so every climb to 300 takes about as long as your first one: never easier, never impossible
 const CLIMB_EXP = 1.5;   // simulated: Ascension 4, 10 and Transcend climbs all take ~27-34h AFK vs ~42h for a brand-new player
-const climbMult = () => 3 ** S.asc * layerMult() * chalMult();
+const climbMult = () => ascBase() ** S.asc * layerMult() * chalMult();
 const rbBase = (r = S.rebirths) => 1e6 * 1.2 ** r * (r > 200 ? 10 ** ((r - 200) ** 2 / 1000) : 1) * climbMult() ** CLIMB_EXP;
 const rbReq = r => rbBase(r);                           // coins this run needed to rebirth at all, only ever goes up
 const rbGain = () => S.total < rbBase() ? 0 : Math.floor(Math.cbrt(S.total / rbBase()) * rbMult());
@@ -1822,7 +1875,7 @@ function ascend(){
   if (S.rebirths < ascNeed() || S.chal) return;
   if (!confirm(`✨ Ascend? You reset coins, upgrades, research, rebirths, tokens and perks.\n\nYou keep lifetime coins (your leaderboard spot), pets, achievements and stars, your ${S.rebirths} rebirths still count on the Rebirths leaderboard, and you gain:\n• ×3 to everything (stacks every Ascension)\n• +50% rebirth tokens\n• 1 ✨ for the Ascension Shop`)) return;
   const carried = asu('carry') ? Object.fromEntries(Object.entries(S.perks).map(([k, v]) => [k, Math.floor(v/4)]).filter(([, v]) => v > 0)) : {};
-  Object.assign(S, {coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1, ascEver:Math.max(S.ascEver || 0, S.asc + 1)});
+  Object.assign(S, {coins:0, total:0, own:{}, research:{}, rebirths:Math.max(asu('head') ? 10 : 0, tsu('tkeep') ? 50 : 0), hc:0, perks:carried, beaten:false, asc:S.asc + 1, ap:S.ap + 1, ascEver:Math.max(S.ascEver || 0, S.asc + 1)});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
   playAscendScene();
   if (S.asc === 1) setTimeout(() => toast('🕊️ Angel Wings unlocked! Wear them in your 👕 Wardrobe'), 9000);
@@ -1849,8 +1902,8 @@ function doLayer(i){
   const lower = ['Ascensions', ...LAYERS.slice(0, i).map(x => x.pl)].join(', ');
   if (!confirm(`${L.ic} ${L.nm}? This resets coins, upgrades, research, rebirths, tokens, perks and your ${lower}.\n\nYou keep lifetime coins, pets, achievements, cosmetics, bosses, challenges and the Ascension Shop, and gain ×${fmt(L.x)} to everything (stacks every time). Rebirth costs scale with it, so climbs stay the same length.`)) return;
   const zero = Object.fromEntries(LAYERS.slice(0, i).map(x => [x.k, 0]));
-  if (L.k === 'tr') S.tp += 1;
-  Object.assign(S, zero, {[L.k]:S[L.k] + 1, coins:0, total:0, own:{}, research:{}, rebirths:asu('head') ? 10 : 0, hc:0, perks:{}, beaten:false, asc:0});
+  if (L.k === 'tr') S.tp += 1; else S.lpts[L.k] = (S.lpts[L.k] || 0) + 1;
+  Object.assign(S, zero, {[L.k]:S[L.k] + 1, coins:0, total:0, own:{}, research:{}, rebirths:Math.max(asu('head') ? 10 : 0, tsu('tkeep') ? 50 : 0), hc:0, perks:{}, beaten:false, asc:lsu('astart') ? 3 : 0});
   shown = 0; recalcResearch(); applyPerks(); save(); refresh(); renderLayers(); window.pushNow?.();
   playLayerScene(i);
 }
@@ -2299,7 +2352,9 @@ function applyState(d, keepCheat = true){
     pets:Object.fromEntries(PETS.filter(q => d.pets && d.pets[q.id]).map(q => [q.id, Math.min(PET_MAX, Math.max(1, int(d.pets[q.id])))])),
     equip:Array.isArray(d.equip) ? [...new Set(d.equip.filter(id => d.pets && d.pets[id] && PETS.some(q => q.id === id)))].slice(0, PET_SLOTS) : [],
     hatches:int(d.hatches), asc:int(d.asc), beaten:d.beaten === true, trueEnd:d.trueEnd === true,
-    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, prefsAt:num(d.prefsAt), ascEver:Math.max(int(d.ascEver), int(d.asc)), sci:d.sci === true, skipAnim:d.skipAnim === true, pack:['classic', '8bit', 'cute', 'meme'].includes(d.pack) ? d.pack : 'classic', logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
+    sound:d.sound !== false, vol:Number.isFinite(d.vol) ? Math.min(1, Math.max(0, d.vol)) : .6, prefsAt:num(d.prefsAt), ascEver:Math.max(int(d.ascEver), int(d.asc)),
+    lup:Object.fromEntries(Object.values(LUP).flat().filter(a => d.lup && d.lup[a.id] === true).map(a => [a.id, true])),
+    lpts:d.lpts ? {apo:int(d.lpts.apo), sing:int(d.lpts.sing), omni:int(d.lpts.omni)} : {apo:int(d.apo), sing:int(d.sing), omni:int(d.omni)}, sci:d.sci === true, skipAnim:d.skipAnim === true, pack:['classic', '8bit', 'cute', 'meme'].includes(d.pack) ? d.pack : 'classic', logoEgg:d.logoEgg === true, koEgg:d.koEgg === true,
     appearance:['auto', 'dark', 'light'].includes(d.appearance) ? d.appearance : 'dark', playtime:num(d.playtime), started:num(d.started) || Date.now(),
     daily:{last:typeof d.daily?.last === 'string' ? d.daily.last.slice(0, 12) : '', streak:Math.min(7, int(d.daily?.streak))},
     display:cleanName(d.display), cos:cleanCos(d.cos), week:typeof d.week === 'string' ? d.week.slice(0, 10) : '', wcoins:num(d.wcoins), bigClick:num(d.bigClick),
@@ -2727,7 +2782,7 @@ function renderBoss(){
 let fight = null;
 function bossStart(){
   const i = S.boss; if (i >= BOSSES.length) return;
-  fight = {i, hp:bossHp(i), max:bossHp(i), end:performance.now() + 30000 + 500*petLv('sloth'), done:false};
+  fight = {i, hp:bossHp(i), max:bossHp(i), end:performance.now() + 30000 + 500*petLv('sloth') + (asu('bosstime') ? 10000 : 0), done:false};
   $('bName').textContent = `${BOSSES[i][1]}`; $('bMob').textContent = BOSSES[i][0]; $('bEnd').hidden = true;
   $('boss').style.display = 'flex'; bossDraw();
   clearInterval(fight.t); fight.t = setInterval(() => { if (!fight || fight.done) return; bossDraw(); if (performance.now() > fight.end) bossOver(false); }, 100);
@@ -2740,7 +2795,7 @@ function bossDraw(){
 }
 $('bMob').addEventListener('pointerdown', e => {
   const f = fight; if (!f || f.done) return;
-  const dmg = perClick() * (1 + .05*petLv('crab')) * (1 + .1*petLv('kingjun')); f.hp -= dmg; sfx('click');
+  const dmg = perClick() * (1 + .05*petLv('crab')) * (1 + .1*petLv('kingjun')) * (tsu('tboss') ? 5 : 1); f.hp -= dmg; sfx('click');
   const M = $('bMob'); M.classList.add('hit'); setTimeout(() => M.classList.remove('hit'), 60);
   const r = $('boss').getBoundingClientRect(), d = document.createElement('div'); d.className = 'bdmg'; d.textContent = '-' + fmt(dmg);
   d.style.left = (e.clientX - r.left - 20 + (Math.random() - .5)*30) + 'px'; d.style.top = (e.clientY - r.top - 30) + 'px';
@@ -3020,6 +3075,11 @@ document.addEventListener('visibilitychange', () => {
 
 // update log: newest first. To post an update, add an entry at the top of this list.
 const UPDATES = [
+  {v:'5.3', date:'Oct 8, 2026', title:'Prestige Shops & Bonuses', notes:[
+    '🛒 New shops: 🔆 Apotheosis, 🕳️ Singularity and 🌌 Omniverse (1 point per layer, back-dated)',
+    '🌠 Transcendence Shop: Transcendent Finger, Cosmic Passive, Boss Slayer, Star Luck, Transcend Memory',
+    '✨ Ascension Shop: Hatchery, Boss Stopwatch, Diamond Rush, VC Charm',
+    '✖️ Bonuses panel (in 📊 Stats): see every multiplier on your clicks, passive income and everything else']},
   {v:'5.2', date:'Oct 7, 2026', title:'Guild House', notes:[
     '🏰 Guild House: walk around a shared base with your guildmates in real time, and chat bubbles pop over people\'s heads',
     '🏛️ Town Hall: level it from Hut to Palace and build trees, torches, a fountain, flags, statues, a party tent, floors and a giant Jun statue. Anyone in the guild can chip in with coins, rebirths or Ascensions',
@@ -3218,7 +3278,7 @@ function vcShow(msg){
 function vcEnd(msg){ $('vc').close(); toast(msg); vcSchedule(); }
 $('vcPing').onclick = () => {
   $('vcPing').hidden = true;
-  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(income()*300, perClick()*500, Math.min(rbReq(S.rebirths)*.02, S.total*.05), 1000) * frenzy() * (.8 + Math.random()*.7) * (1 + .2*lv('vc')), odds:.7});   // scales with progress: up to 2% of your next rebirth, but never more than 5% of what you've earned this run
+  Object.assign(VC, {name:VCS[Math.random()*VCS.length|0], amt:Math.max(income()*300, perClick()*500, Math.min(rbReq(S.rebirths)*.02, S.total*.05), 1000) * frenzy() * (.8 + Math.random()*.7) * (1 + .2*lv('vc')) * (asu('vcpro') ? 2 : 1), odds:.7});   // scales with progress: up to 2% of your next rebirth, but never more than 5% of what you've earned this run
   $('vcName').textContent = '💼 ' + VC.name;
   vcShow('We love what you\'re doing with the forehead. Here\'s our offer:');
   $('vc').showModal();
@@ -3292,7 +3352,7 @@ $('resAll').onclick = () => {
 const coinEgg = t => ['basic', 'golden', 'jungle'].includes(t);
 const eggCost = (t = 'basic') => coinEgg(t) ? Math.ceil((t === 'basic' ? 25000 * 1.8 ** (S.eggs.basic || 0)
   : t === 'golden' ? eggCost('basic') * 25 * 1.3 ** (S.eggs.golden || 0)
-  : eggCost('golden') * 20 * 1.3 ** (S.eggs.jungle || 0)) * (1 - .02*petLv('chick')))
+  : eggCost('golden') * 20 * 1.3 ** (S.eggs.jungle || 0)) * (1 - .02*petLv('chick')) * (asu('hatch') ? .75 : 1))
   : {cosmic:25, lucky:60, royal:1, void:3}[t];
 const eggCur = t => ['cosmic', 'lucky'].includes(t) ? '💈' : ['royal', 'void'].includes(t) ? '✨' : '🪙';
 const eggHave = t => eggCur(t) === '💈' ? S.hc : eggCur(t) === '✨' ? S.ap : S.coins;
@@ -3364,10 +3424,10 @@ function hatchEgg(free, tier = 'basic', want = 1){
 function rollEgg(egg){
   S.eggs[egg.id] = (S.eggs[egg.id] || 0) + 1; S.hatches++;
   // pick a rarity by the egg's odds (Lucky Eggs doubles the non-Common odds), then a pet of that rarity
-  const odds = Object.fromEntries(Object.entries(egg.odds).map(([k, v]) => [k, v * (asu('luck') && k !== 'Common' ? 2 : 1) * (k !== 'Common' ? liveMult('luck') : 1)]));
+  const odds = Object.fromEntries(Object.entries(egg.odds).map(([k, v]) => [k, v * (asu('luck') && k !== 'Common' ? 2 : 1) * (k !== 'Common' ? liveMult('luck') * (tsu('tluck') ? 2 : 1) : 1)]));
   let pick = Math.random() * Object.values(odds).reduce((a, b) => a + b, 0), rar = 'Common';
   for (const [k, v] of Object.entries(odds)) if ((pick -= v) <= 0) { rar = k; break; }
-  if (Math.random() < 1e-9) rar = 'Secret';   // 🕳️ Event Horizon: 0.0000001% from any egg
+  if (Math.random() < (lsu('oluck') ? 1e-6 : 1e-9)) rar = 'Secret';   // 🕳️ Event Horizon: 0.0000001% from any egg
   const pool = PETS.filter(x => x.r === rar), q = pool[Math.random()*pool.length|0];
   const L = S.pets[q.id] || 0;
   let note;
@@ -3517,6 +3577,24 @@ $('dispSave').onclick = () => {
 
 // --- stats ---
 $('cpsTabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; for (const x of $('cpsTabs').children) x.classList.toggle('on', x === b); drawCps(b.dataset.s); };
+function renderBonus(){
+  const L = $('bonusList'); L.innerHTML = '';
+  const sec = (title, total, parts, note) => {
+    const box = document.createElement('div'); box.className = 'bsec';
+    box.innerHTML = `<div class="bhead"><span></span><b></b></div>`; box.querySelector('span').textContent = title; box.querySelector('b').textContent = total;
+    for (const [k, v] of parts) { const r = document.createElement('div'); r.className = 'brow' + (v === 1 ? ' off' : ''); r.innerHTML = '<span></span><b></b>'; r.firstChild.textContent = k; r.lastChild.textContent = typeof v === 'number' ? '×' + fmt(v) : v; box.appendChild(r); }
+    if (note) box.appendChild(Object.assign(document.createElement('div'), {className:'dimtxt', textContent:note}));
+    L.appendChild(box);
+  };
+  const prod = a => a.reduce((m, p) => m * p[1], 1);
+  sec('🌟 Everything multiplier', '×' + fmt(prestige()), PRESTIGE_PARTS(), 'Applies to clicks, auto clicks and passive income.');
+  sec('👆 Click power', fmt(perClick()) + ' per click', [...CLICK_PARTS(), ['🌟 Everything', prestige()], ...(RM.c2 ? [['🧴 Clicks also earn', `${Math.round(RM.c2*100)}% of per-second`]] : [])]);
+  sec('💤 Passive income', fmt(perSec()) + ' per second', [...PASSIVE_PARTS(), ['🌟 Everything', prestige()]]);
+  sec('🖱️ Auto clickers', `${cps(autoCps())} clicks/sec`, [['Each auto click is worth', `${Math.round(AUTO*100)}% of a click`], ['🔬 Research', RM.k], ['🐾 Pets', (1 + .05*petLv('ham')) * (1 + .08*petLv('octo'))]]);
+  sec('🎲 Other bonuses', '', [['✨ Golden Jun payout', (1 + .2*lv('gold')) * RM.gold * (1 + .1*petLv('fly')) * (lsu('agold') ? 10 : 1)], ['🔥 Combo cap', `${(3 + .5*lv('combo') + .2*petLv('fox')).toFixed(1)}×`],
+    ['⚔️ Boss damage', (1 + .05*petLv('crab')) * (1 + .1*petLv('kingjun')) * (tsu('tboss') ? 5 : 1)], ['🐾 Pet slots', String(PET_SLOTS)], ['💈 Token bonus', (1 + .1*lv('tokens')) * (1 + .1*petLv('whale')) * (1 + .5*S.asc) * (asu('tokens') ? 2 : 1) * (1 + .05*petLv('panda'))]]);
+}
+$('bonusBtn').onclick = () => { $('stats').close(); renderBonus(); $('bonus').showModal(); };
 $('statBtn').onclick = () => {
   const rows = [['Lifetime coins', fmt(S.lifetime)], ['Coins this week', fmt(S.wcoins)], ['Coins this run', fmt(S.total)], ['Time played', dur(S.playtime)],
     ['Jun clicks', fmt(S.clicks)], ['Biggest single click', fmt(S.bigClick)], ['Best combo', S.maxCombo.toFixed(1) + '×'],
@@ -3699,6 +3777,23 @@ function renderAshop(){
   }
 }
 $('ashopBtn').onclick = () => { renderAshop(); $('ashop').showModal(); };
+const LSHOP = {apo:['🔆', 'Apotheosis', 'Apotheosis'], sing:['🕳️', 'Singularity', 'Singularity'], omni:['🌌', 'Omniverse', 'Omniverse']};
+let lshopK = 'apo';
+function renderLshop(){
+  const [ic, nm] = LSHOP[lshopK], pts = S.lpts[lshopK] || 0;
+  $('lsTitle').innerHTML = `${ic} ${nm} <span>Shop</span>`; $('lsBig').textContent = `${fmt(pts)} ${ic}`; $('lsSub').textContent = `Permanent upgrades. You earn 1 ${ic} every time you reach ${nm}.`;
+  $('lsList').innerHTML = '';
+  for (const a of LUP[lshopK]) {
+    const has = lsu(a.id), b = document.createElement('button');
+    b.className = 'up perk' + (has ? ' owned' : '');
+    b.innerHTML = `<div class="ic">${a.ic}</div><div style="flex:1;min-width:0"><div class="nm"></div><div class="ds"></div><div class="ct"></div></div>`;
+    b.querySelector('.nm').textContent = a.nm; b.querySelector('.ds').textContent = a.ds; b.querySelector('.ct').textContent = has ? 'Owned ✓' : `${ic} ${a.cost}`;
+    b.disabled = has || pts < a.cost;
+    b.onclick = () => { if (has || pts < a.cost) return; S.lpts[lshopK] -= a.cost; S.lup[a.id] = true; sfx('fanfare'); confetti(60); toast(`${a.ic} ${a.nm} unlocked forever!`); recalcResearch(); save(); renderLshop(); refresh(); };
+    $('lsList').appendChild(b);
+  }
+}
+['apo', 'sing', 'omni'].forEach(k => $('ls_' + k).onclick = () => { lshopK = k; renderLshop(); $('lshop').showModal(); });
 function renderTshop(){
   $('tpBig').textContent = fmt(S.tp); $('tList').innerHTML = '';
   for (const a of TUP) {
@@ -3721,7 +3816,7 @@ $('tshopBtn').onclick = () => { renderTshop(); $('tshop').showModal(); };
 let abTick = 0;
 function autoBuyer(){
   if (++abTick % 2) return;
-  const n = tsu('auto5') && S.autoBuy2 ? 5 : asu('auto') && S.autoBuy ? 1 : 0;   // Auto Buyer+ (Transcendence Shop) = 5 at a time
+  const n = (tsu('auto5') && S.autoBuy2 ? 5 : asu('auto') && S.autoBuy ? 1 : 0) * (lsu('oauto') ? 5 : 1);   // Auto Buyer+ = 5, Auto Buyer ∞ = ×5 more
   let bought = 0;
   while (bought < n) {
     let best = null, bc = Infinity;
