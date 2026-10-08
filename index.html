@@ -92,7 +92,7 @@ body.stealth{display:block;height:auto;min-height:100vh;overflow:auto;background
 #stQ{padding:8px 4px}.stLogo{display:inline-flex;align-items:center;gap:10px;background:#fff;padding:8px 12px;font:600 26px 'Nunito',sans-serif;color:#222}
 .stLogo b{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#2a73d9;color:#fff;font-size:22px}.stLogo em{font-style:normal;color:#2a73d9}
 #stQ p{font-size:clamp(15px,2.1vw,22px);line-height:1.45;color:#555;margin:22px 0 18px}
-#stQ ol{font-size:clamp(15px,2vw,21px);color:#555;padding-left:30px;line-height:1.7}
+#stQ ol{font-size:clamp(15px,2vw,21px);color:#555;padding-left:30px;line-height:1.6;columns:2;column-gap:24px}
 #stL{display:none;position:absolute;inset:0}
 #stealth.shop #stQ{display:none}#stealth.shop #stL{display:block}
 body.stealth aside{position:absolute;inset:0;overflow-y:auto;border:0;background:#fbfbfd!important;padding:4px 6px 20px;color:#333}
@@ -106,6 +106,7 @@ body.stealth #coins{font-size:26px!important;color:#333!important;text-shadow:no
 body.stealth #rates,body.stealth #live{font-size:11px!important;color:#777!important;background:none!important}
 .stAns{text-align:center;color:#555;font-size:17px;margin:26px 0 18px}
 .stBtns{display:flex;justify-content:space-around;padding:0 40px 40px}
+.stBtns button.on{background:#1d63c6;color:#fff}
 .stBtns button{width:66px;height:66px;border-radius:50%;border:2px solid #1d63c6;background:#fff;color:#1d63c6;font:700 22px 'Nunito',sans-serif;cursor:pointer}
 @media(max-width:760px){.stCols{flex-direction:column;height:auto}.stLeft{flex:none;height:42vh}.stRight{flex:none;height:46vh}.stBtns{padding:0 8px 30px}.stBtns button{width:52px;height:52px;font-size:18px}.stH{font-size:22px}}#liveBar.mini{bottom:auto;top:12px;left:12px;transform:none;max-width:none;padding:4px 10px;font-size:12px}
 #liveBar.final{font-size:18px;padding:10px 20px;color:#fff;background:linear-gradient(90deg,#ff8a3d,#ff5c7a);border-color:transparent;animation:livepulse .5s ease-in-out infinite}
@@ -571,8 +572,8 @@ body.light .ab:hover{background:#e6e8f2}
       <div class="stLeft">
         <div id="stQ">
           <div class="stLogo"><b>☁</b><span>Cloud <em>Poll</em></span></div>
-          <p>For the enzyme responsible for NH<sub>4</sub><sup>+</sup> uptake in <i>N. maritimus</i> SCM1, what is the approximate half-saturation constant (K<sub>m</sub>)?</p>
-          <ol type="A"><li>1.6 µM</li><li>0.8 µM</li><li>0.4 µM</li><li>0.15 µM</li></ol>
+          <p>Which section of the review should we cover next? Select the answer that best matches your study plan.</p>
+          <ol type="A" id="stKey"><li>Shop</li><li>Rebirth</li><li>Pets</li><li>Goals</li><li>Social</li><li>Games</li></ol>
         </div>
         <div id="stL"></div>
       </div>
@@ -581,7 +582,7 @@ body.light .ab:hover{background:#e6e8f2}
     <div class="stRule"><i></i><span id="stNum" title="">11</span><i></i></div>
   </div></div>
   <div class="stAns">Answer</div>
-  <div class="stBtns"><button>A</button><button>B</button><button>C</button><button>D</button><button>E</button></div>
+  <div class="stBtns" id="stBtns"><button data-tab="shop">A</button><button data-tab="rebirth">B</button><button data-tab="pets">C</button><button data-tab="goals">D</button><button data-tab="social">E</button><button data-tab="games">F</button></div>
 </div>
 <main id="stage">
   <button id="muteBtn" title="Mute / unmute (M)"></button>
@@ -2997,8 +2998,15 @@ function applyXmas(){
 }
 // easter egg: tap the theme button 10 times within 4 seconds to unlock the secret rainbow theme
 let themeTaps = [];
-$('stNum').onclick = () => $('stealth').classList.toggle('shop');
-addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('stealth')) { $('stealth').classList.remove('shop'); document.querySelectorAll('dialog[open]').forEach(d => d.close()); } });
+const stSync = () => document.querySelectorAll('#stBtns button').forEach(b => b.classList.toggle('on', $('stealth').classList.contains('shop') && b.dataset.tab === tab));
+$('stNum').onclick = () => { $('stealth').classList.toggle('shop'); stSync(); };
+$('stBtns').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const W = $('stealth'), again = W.classList.contains('shop') && tab === b.dataset.tab;
+  if (again) W.classList.remove('shop'); else { showTab(b.dataset.tab); W.classList.add('shop'); document.querySelector('aside').scrollTop = 0; }
+  stSync();
+};
+addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('stealth')) { $('stealth').classList.remove('shop'); stSync(); document.querySelectorAll('dialog[open]').forEach(d => d.close()); } });
 $('xmasBtn').onclick = () => {
   const now = Date.now(); themeTaps = [...themeTaps.filter(t => now - t < 4000), now];
   if (!S.rainbow && themeTaps.length >= 10) {
